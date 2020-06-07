@@ -15,29 +15,41 @@
       stroke="gray"
     ></line>
 
-    <circle
-      class="Starmap_Star_Govt"
+    <g
+      class="Starmap_Star"
       v-for="star in Object.values(galaxy.stars)"
       :key="star.id + '2'"
       :id="star.id"
-      :cx="star.point.x"
-      :cy="star.point.y"
-      :r="10"
-      :fill="getStarColor(star)"
-      fill-opacity="0.7"
-    ></circle>
+      data-id="star.id"
+      v-on:mouseenter="setActiveStar(star)"
+    >
+      <circle
+        class="Starmap_Star_Govt"
+        :cx="star.point.x"
+        :cy="star.point.y"
+        :r="10"
+        :fill="getStarColor(star)"
+        fill-opacity="0.7"
+      ></circle>
 
-    <circle
-      class="Starmap_Star"
-      v-for="star in Object.values(galaxy.stars)"
-      :key="star.id"
-      :id="star.id"
-      :cx="star.point.x"
-      :cy="star.point.y"
-      :r="5"
-      fill="black"
-      stroke="white"
-    ></circle>
+      <circle
+        class="Starmap_Star_Inner"
+        :cx="star.point.x"
+        :cy="star.point.y"
+        :r="5"
+        fill="black"
+        stroke="white"
+      ></circle>
+    </g>
+
+    <text
+      class="Starmap_Star_Label"
+      v-if="activeStar"
+      :x="activeStar.point.x - 40"
+      :y="activeStar.point.y - 20"
+    >
+      {{ getStarName(activeStar) }}
+    </text>
   </svg>
 </template>
 
@@ -47,9 +59,14 @@ import { namespace } from "vuex-class";
 
 import { Galaxy } from "@/game/types/Galaxy";
 import { Star } from "@/game/types/Star";
-import { Govt } from "@/game/gen/govts";
 import { GameState } from "../store";
+import { GovtMap } from "@/game/gen/govts";
+import { StarMetadataMap } from "../game/gen/StarMetadataSystem";
 
+/**
+ * Simple function that lets you log one object in the middle of an expression.
+ * Can be disabled by setting enable=false.
+ */
 function log<T>(label: string, obj: T, enable = true): T {
   if (!enable) return obj;
   console.log(label, obj);
@@ -61,8 +78,10 @@ const x = namespace("game");
 @Component
 export default class Starmap extends Vue {
   @x.State seed!: string;
-  @x.Getter govtMap!: Record<string, Govt>;
+  @x.Getter govtMap!: GovtMap;
+  @x.Getter metadataMap!: StarMetadataMap;
   @x.Getter galaxy!: Galaxy;
+  activeStar: Star | null = null;
 
   get state(): GameState {
     return this.$store.state as GameState;
@@ -77,20 +96,44 @@ export default class Starmap extends Vue {
     return this.govtMap[s.id].color;
   }
 
+  getStarName(s: Star): string {
+    if (!this.metadataMap[s.id]) return "unknown";
+    return this.metadataMap[s.id].name;
+  }
+
   @x.Mutation("newRandomSeed") click!: () => void;
+
+  setActiveStar(star: Star) {
+    console.log("activate", star);
+    this.activeStar = star;
+  }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .Starmap {
   position: relative;
   background-color: black;
   border: 1px solid blue;
 }
 
+.Starmap_Star_Label {
+  fill: white;
+  font-weight: bold;
+}
+
 .Starmap_Star:hover {
-  stroke: yellow;
-  fill: #333;
-  cursor: pointer;
+  text {
+    visibility: visible;
+  }
+
+  circle {
+    cursor: pointer;
+  }
+
+  circle.Starmap_Star_Inner {
+    stroke: yellow;
+    fill: #333;
+  }
 }
 </style>

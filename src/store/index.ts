@@ -5,6 +5,10 @@ import VuexPersistence from "vuex-persist";
 import { generateStars } from "@/game/gen/stargen";
 import { GovtMap, GovtSystem } from "@/game/gen/govts";
 import { Galaxy } from "@/game/types/Galaxy";
+import {
+  StarMetadataMap,
+  StarMetadataSystem,
+} from "@/game/gen/StarMetadataSystem";
 
 Vue.use(Vuex);
 
@@ -37,6 +41,9 @@ const game: Module<GameState, RootState> = {
     },
     govtMap: function (state): GovtMap {
       return GovtSystem.makeGovts(state.seed, getGalaxy(state.seed));
+    },
+    metadataMap: function (state): StarMetadataMap {
+      return StarMetadataSystem.makeMetadata(state.seed, getGalaxy(state.seed));
     },
   },
   actions: {},
