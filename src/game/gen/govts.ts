@@ -1,6 +1,5 @@
-import { Galaxy } from "./Galaxy";
-import { Star } from "./types";
-import { RNG } from "./RNG";
+import { Galaxy } from "@/game/types/Galaxy";
+import { RNG } from "@/game/framework/RNG";
 
 export interface Govt {
   name: string;
@@ -87,9 +86,9 @@ export const GovtSystem = {
     while (unused.size && iters < allStars.length * 10) {
       iters += 1;
       const govt = govts[govtIx];
-      if (govt.open.length) {
+      const sid = govt.open.pop();
+      if (sid) {
         rng.shuffle(govt.open);
-        const sid = govt.open.pop()!;
 
         if (!govtMap[sid]) {
           unused.delete(sid);

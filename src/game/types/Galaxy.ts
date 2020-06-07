@@ -1,7 +1,7 @@
-import { getDoLineSegmentsIntersect } from "./getDoLineSegmentsIntersect";
-import { Vector2, Star } from "./types";
-import { distance } from "./util";
-import { MIN_STAR_SPACE } from "./stargen";
+import { getDoLineSegmentsIntersect, Vector2 } from "@/game/framework/Vector2";
+import { distance } from "@/game/util";
+import { MIN_STAR_SPACE } from "@/game/gen/stargen";
+import { Star } from "./Star";
 
 export class Galaxy {
   stars: Record<string, Star> = {};

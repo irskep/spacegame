@@ -45,10 +45,9 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
-import { generateStars } from "@/game/stargen";
-import { Galaxy } from "@/game/Galaxy";
-import { Star } from "@/game/types";
-import { Govt } from "@/game/govts";
+import { Galaxy } from "@/game/types/Galaxy";
+import { Star } from "@/game/types/Star";
+import { Govt } from "@/game/gen/govts";
 import { GameState } from "../store";
 
 function log<T>(label: string, obj: T, enable = true): T {

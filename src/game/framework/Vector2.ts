@@ -1,4 +1,7 @@
-import { Vector2 } from "./types";
+export interface Vector2 {
+  x: number;
+  y: number;
+}
 
 // line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/
 // Determine the intersection point of two line segments

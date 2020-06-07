@@ -1,9 +1,10 @@
 import Vue from "vue";
 import Vuex, { Module } from "vuex";
 import VuexPersistence from "vuex-persist";
-import { generateStars } from "@/game/stargen";
-import { GovtMap, GovtSystem, Govt } from "@/game/govts";
-import { Galaxy } from "@/game/Galaxy";
+
+import { generateStars } from "@/game/gen/stargen";
+import { GovtMap, GovtSystem } from "@/game/gen/govts";
+import { Galaxy } from "@/game/types/Galaxy";
 
 Vue.use(Vuex);
 
@@ -34,7 +35,7 @@ const game: Module<GameState, RootState> = {
     galaxy: function (state): Galaxy {
       return getGalaxy(state.seed);
     },
-    govtMap: function (state): Record<string, Govt> {
+    govtMap: function (state): GovtMap {
       return GovtSystem.makeGovts(state.seed, getGalaxy(state.seed));
     },
   },
