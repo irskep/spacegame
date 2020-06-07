@@ -6,6 +6,14 @@ export class RNG {
     this.getRandom = seedrandom(seed);
   }
 
+  replaceMathRandom<T>(fn: () => T): T {
+    const r = Math.random;
+    Math.random = this.getRandom;
+    const val = fn();
+    Math.random = r;
+    return val;
+  }
+
   int(minInclusive: number, maxExclusive: number): number {
     return minInclusive + Math.floor(this.getRandom() * maxExclusive);
   }

@@ -104,7 +104,6 @@ export default class Starmap extends Vue {
   @x.Mutation("newRandomSeed") click!: () => void;
 
   setActiveStar(star: Star) {
-    console.log("activate", star);
     this.activeStar = star;
   }
 }

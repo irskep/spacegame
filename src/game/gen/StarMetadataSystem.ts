@@ -18,14 +18,15 @@ function replaceMathRandom<T>(rng: () => number, fn: () => T): T {
 
 export const StarMetadataSystem = {
   makeMetadata: function (seed: string, g: Galaxy): StarMetadataMap {
-    return replaceMathRandom(new RNG(seed).getRandom, () => {
-      const metadata: StarMetadataMap = {};
-      for (const s of g.heyNow()) {
+    const metadata: StarMetadataMap = {};
+    for (const s of g.heyNow()) {
+      const rng = new RNG(s.id);
+      rng.replaceMathRandom(() => {
         metadata[s.id] = {
           name: starnames.flatten("#starname#"),
         };
-      }
-      return metadata;
-    });
+      });
+    }
+    return metadata;
   },
 };

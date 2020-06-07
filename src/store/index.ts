@@ -3,7 +3,7 @@ import Vuex, { Module } from "vuex";
 import VuexPersistence from "vuex-persist";
 
 import { generateStars } from "@/game/gen/stargen";
-import { GovtMap, GovtSystem } from "@/game/gen/govts";
+import { GovtMap, GovtSystem } from "@/game/gen/StarGovtSystem";
 import { Galaxy } from "@/game/types/Galaxy";
 import {
   StarMetadataMap,
