@@ -1,12 +1,10 @@
-import { Vertex } from "voronoijs";
-export type Vector2 = Vertex;
+export interface Vector2 {
+  x: number;
+  y: number;
+}
 
-// export interface Star extends Vertex {}
 export interface Star {
   id: string;
-  point: {
-    x: number;
-    y: number;
-  };
+  point: Vector2;
   slots: number[];
 }

@@ -1,13 +1,13 @@
-import { Vertex } from "voronoijs";
+import { Vector2 } from "./types";
 
 // line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/
 // Determine the intersection point of two line segments
 // Return FALSE if the lines don't intersect
 export function getDoLineSegmentsIntersect(
-  a1: Vertex,
-  a2: Vertex,
-  b1: Vertex,
-  b2: Vertex
+  a1: Vector2,
+  a2: Vector2,
+  b1: Vector2,
+  b2: Vector2
 ): boolean {
   // Check if none of the lines are of length 0
   if ((a1.x === a2.x && a1.y === a2.y) || (b1.x === b2.x && b1.y === b2.y)) {

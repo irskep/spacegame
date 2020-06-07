@@ -16,6 +16,17 @@
     ></line>
 
     <circle
+      class="Starmap_Star_Govt"
+      v-for="star in Object.values(galaxy.stars)"
+      :key="star.id + '2'"
+      :id="star.id"
+      :cx="star.point.x"
+      :cy="star.point.y"
+      :r="10"
+      :fill="getStarColor(star)"
+    ></circle>
+
+    <circle
       class="Starmap_Star"
       v-for="star in Object.values(galaxy.stars)"
       :key="star.id"
@@ -30,12 +41,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import { createDecorator } from "vue-class-component";
-import { State, namespace } from "vuex-class";
+import { Component, Vue } from "vue-property-decorator";
+import { namespace } from "vuex-class";
 
-import { RootState } from "../store";
-import { generateStars, Galaxy, Star } from "../game/stargen";
+import { generateStars } from "@/game/stargen";
+import { Galaxy } from "@/game/Galaxy";
+import { Star } from "@/game/types";
+import { Govt } from "@/game/govts";
+import { GameState } from "../store";
 
 function log<T>(label: string, obj: T, enable = true): T {
   if (!enable) return obj;
@@ -48,13 +61,19 @@ const x = namespace("game");
 @Component
 export default class Starmap extends Vue {
   @x.State seed!: string;
+  @x.Getter govtMap!: Record<string, Govt>;
+  @x.Getter galaxy!: Galaxy;
 
-  get galaxy(): Galaxy {
-    return log("Galaxy", generateStars(this.seed));
+  get state(): GameState {
+    return this.$store.state as GameState;
   }
 
   get allNeighbors(): [Star, Star][] {
     return log("allNeighbors", this.galaxy.getAllNeighbors(), false);
+  }
+
+  getStarColor(s: Star): string {
+    return this.govtMap[s.id].color;
   }
 
   @x.Mutation("newRandomSeed") click!: () => void;

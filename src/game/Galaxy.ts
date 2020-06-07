@@ -5,24 +5,40 @@ import { MIN_STAR_SPACE } from "./stargen";
 
 export class Galaxy {
   stars: Record<string, Star> = {};
-  neighbors: Record<string, [string, string]> = {};
+  arrayNeighbors: Record<string, string[]> = {};
+  flatNeighbors: Record<string, [string, string]> = {};
   size: Vector2;
   homeStarID!: string;
+
   constructor(size: Vector2) {
     this.size = size;
   }
+
+  heyNow() {
+    // you're getting all stars
+    return Object.values(this.stars);
+  }
+
   addStar(s: Star) {
     if (!this.homeStarID) {
       this.homeStarID = s.id;
     }
     this.stars[s.id] = s;
   }
+
   getAllNeighbors(): [Star, Star][] {
-    return Object.values(this.neighbors).map((v) => [
+    return Object.values(this.flatNeighbors).map((v) => [
       this.stars[v[0]],
       this.stars[v[1]],
     ]);
   }
+
+  getNeighbors(s: Star): Star[] {
+    return (this.arrayNeighbors[s.id] || []).map((id) => this.stars[id]);
+  }
+
+  /* generation */
+
   getIsNewPointAllowed(p: Vector2): boolean {
     // out of bounds?
     if (
@@ -41,6 +57,7 @@ export class Galaxy {
     }
     return true;
   }
+
   getIsConnectionAllowed(s1: Star, s2: Star): boolean {
     for (const [s3, s4] of this.getAllNeighbors()) {
       if (s1 === s3 || s1 === s4 || s2 === s3 || s2 === s4) continue;
@@ -50,7 +67,9 @@ export class Galaxy {
     }
     return true;
   }
+
   /* connections */
+
   private _canonicalize(a: string, b: string): string {
     if (a.localeCompare(b) < 0) {
       return `${a}-${b}`;
@@ -58,13 +77,23 @@ export class Galaxy {
       return `${b}-${a}`;
     }
   }
+
   getIsConnected(a: string, b: string) {
-    return this.neighbors[this._canonicalize(a, b)];
+    return this.flatNeighbors[this._canonicalize(a, b)];
   }
+
   connect(a: string, b: string) {
-    this.neighbors[this._canonicalize(a, b)] = [a, b];
+    if (this.getIsConnected(a, b)) return;
+    if (!this.arrayNeighbors[a]) this.arrayNeighbors[a] = [];
+    if (!this.arrayNeighbors[b]) this.arrayNeighbors[b] = [];
+    this.arrayNeighbors[a].push(b);
+    this.arrayNeighbors[b].push(a);
+    this.flatNeighbors[this._canonicalize(a, b)] = [a, b];
   }
+
   unconnect(a: string, b: string) {
-    delete this.neighbors[this._canonicalize(a, b)];
+    this.arrayNeighbors[a] = this.arrayNeighbors[a].filter((x) => x != b);
+    this.arrayNeighbors[b] = this.arrayNeighbors[b].filter((x) => x != a);
+    delete this.flatNeighbors[this._canonicalize(a, b)];
   }
 }

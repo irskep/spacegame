@@ -1,6 +1,3 @@
-import { Voronoi, BoundingBox, Site, Diagram } from "voronoijs";
-import seedrandom from "seedrandom";
-import shortUUID from "short-uuid";
 import { RNG } from "./RNG";
 import { Vector2, Star } from "./types";
 import { distance, uuid } from "./util";
@@ -9,8 +6,12 @@ import { Galaxy } from "./Galaxy";
 export const MIN_STAR_SPACE = 40;
 const MAX_STAR_SPACE = 80;
 
-export function generateStars(seed: string, n = 100): Galaxy {
-  const g = new Galaxy({ x: 800, y: 600 });
+export function generateStars(
+  seed: string,
+  n = 100,
+  size = { x: 800, y: 600 }
+): Galaxy {
+  const g = new Galaxy(size);
 
   const rng = new RNG(seed);
 
@@ -73,27 +74,4 @@ export function generateStars(seed: string, n = 100): Galaxy {
   }
 
   return g;
-}
-
-export function generateStarsVoronoi(seed: string, n = 100): Star[] {
-  const voronoi = new Voronoi();
-  const bbox: BoundingBox = { xl: 0, xr: 800, yt: 0, yb: 600 };
-  const sites = new Array<Site>();
-
-  const rng = seedrandom(seed);
-
-  for (let i = 0; i < n; i++) {
-    sites.push({
-      id: i,
-      x: bbox.xl + rng() * bbox.xr,
-      y: bbox.yt + rng() * bbox.yb,
-    });
-  }
-
-  const diagram: Diagram = voronoi.compute(sites, bbox);
-  return diagram.vertices.map((v) => ({
-    id: shortUUID().new(),
-    point: { x: v.x, y: v.y },
-    slots: [],
-  }));
 }
