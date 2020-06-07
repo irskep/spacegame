@@ -37,6 +37,10 @@ export class Galaxy {
     return (this.arrayNeighbors[s.id] || []).map((id) => this.stars[id]);
   }
 
+  getNeighborIDs(sid: string): string[] {
+    return this.arrayNeighbors[sid] || [];
+  }
+
   /* generation */
 
   getIsNewPointAllowed(p: Vector2): boolean {

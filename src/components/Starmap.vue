@@ -24,6 +24,7 @@
       :cy="star.point.y"
       :r="10"
       :fill="getStarColor(star)"
+      fill-opacity="0.7"
     ></circle>
 
     <circle
@@ -73,6 +74,7 @@ export default class Starmap extends Vue {
   }
 
   getStarColor(s: Star): string {
+    if (!this.govtMap[s.id]) return "#616161";
     return this.govtMap[s.id].color;
   }
 
