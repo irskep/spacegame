@@ -1,10 +1,5 @@
 <template>
-  <svg
-    class="Starmap"
-    :width="galaxy.size.x"
-    :height="galaxy.size.y"
-    v-on:click="click"
-  >
+  <svg class="Starmap" :width="galaxy.size.x" :height="galaxy.size.y">
     <line
       v-for="pair in allNeighbors"
       :key="`${pair[0].id}-${pair[1].id}`"
@@ -12,16 +7,21 @@
       :y1="pair[0].point.y"
       :x2="pair[1].point.x"
       :y2="pair[1].point.y"
+      class="Edge"
+      :class="{ 'm-active': getIsHoveredEdge(pair) }"
       stroke="gray"
     ></line>
 
     <g
       class="Starmap_Star"
+      :class="{ 'm-travelable': getMayTravel(star) }"
       v-for="star in Object.values(galaxy.stars)"
       :key="star.id + '2'"
       :id="star.id"
       data-id="star.id"
-      v-on:mouseenter="setActiveStar(star)"
+      v-on:click="travel(star)"
+      v-on:mouseenter="setHoveredStar(star)"
+      v-on:mouseleave="setHoveredStar(null)"
     >
       <circle
         class="Starmap_Star_Govt"
@@ -40,15 +40,25 @@
         fill="black"
         stroke="white"
       ></circle>
+
+      <circle
+        v-if="star.id === playerLocationStarID"
+        :cx="star.point.x"
+        :cy="star.point.y"
+        :r="15"
+        stroke="lightgreen"
+        fill="transparent"
+        class="pulse"
+      ></circle>
     </g>
 
     <text
       class="Starmap_Star_Label"
-      v-if="activeStar"
-      :x="activeStar.point.x - 40"
-      :y="activeStar.point.y - 20"
+      v-if="hoveredStar"
+      :x="Math.max(2, hoveredStar.point.x - 40)"
+      :y="Math.max(2, hoveredStar.point.y - 20)"
     >
-      {{ getStarName(activeStar) }}
+      {{ getStarName(hoveredStar) }}
     </text>
   </svg>
 </template>
@@ -59,9 +69,9 @@ import { namespace } from "vuex-class";
 
 import { Galaxy } from "@/game/types/Galaxy";
 import { Star } from "@/game/types/Star";
-import { GameState } from "../store";
-import { GovtMap } from "@/game/gen/govts";
-import { StarMetadataMap } from "../game/gen/StarMetadataSystem";
+import { GameState } from "@/store";
+import { GovtMap } from "@/game/gen/StarGovtSystem";
+import { StarMetadataMap } from "@/game/gen/StarMetadataSystem";
 
 /**
  * Simple function that lets you log one object in the middle of an expression.
@@ -78,10 +88,11 @@ const x = namespace("game");
 @Component
 export default class Starmap extends Vue {
   @x.State seed!: string;
+  @x.State playerLocationStarID!: string;
   @x.Getter govtMap!: GovtMap;
   @x.Getter metadataMap!: StarMetadataMap;
   @x.Getter galaxy!: Galaxy;
-  activeStar: Star | null = null;
+  hoveredStar: Star | null = null;
 
   get state(): GameState {
     return this.$store.state as GameState;
@@ -101,10 +112,27 @@ export default class Starmap extends Vue {
     return this.metadataMap[s.id].name;
   }
 
-  @x.Mutation("newRandomSeed") click!: () => void;
+  getMayTravel(star: Star) {
+    return this.galaxy.getIsConnected(star.id, this.playerLocationStarID);
+  }
 
-  setActiveStar(star: Star) {
-    this.activeStar = star;
+  getIsHoveredEdge(pair: [Star, Star]) {
+    const isOnA =
+      pair[0].id === this.playerLocationStarID ||
+      pair[1].id === this.playerLocationStarID;
+    const isOnB =
+      pair[0].id === this.hoveredStar?.id ||
+      pair[1].id === this.hoveredStar?.id;
+    return isOnA && isOnB;
+  }
+
+  setHoveredStar(star: Star | null) {
+    this.hoveredStar = star;
+  }
+
+  travel(star: Star) {
+    if (!this.galaxy.getIsConnected(star.id, this.playerLocationStarID)) return;
+    this.$store.commit("game/travel", star.id);
   }
 }
 </script>
@@ -114,6 +142,11 @@ export default class Starmap extends Vue {
   position: relative;
   background-color: black;
   border: 1px solid blue;
+
+  .Edge.m-active {
+    stroke: white;
+    stroke-width: 2px;
+  }
 }
 
 .Starmap_Star_Label {
@@ -126,13 +159,32 @@ export default class Starmap extends Vue {
     visibility: visible;
   }
 
-  circle {
+  &.m-travelable circle {
     cursor: pointer;
   }
 
   circle.Starmap_Star_Inner {
     stroke: yellow;
     fill: #333;
+  }
+}
+
+.pulse {
+  animation-duration: 3s;
+  animation-name: pulse;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    r: 12px;
+  }
+  50% {
+    r: 20px;
+  }
+  100% {
+    r: 12px;
   }
 }
 </style>

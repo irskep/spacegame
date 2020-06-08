@@ -3,12 +3,14 @@ import Vuex, { Module } from "vuex";
 import VuexPersistence from "vuex-persist";
 
 import { generateStars } from "@/game/gen/stargen";
-import { GovtMap, GovtSystem } from "@/game/gen/StarGovtSystem";
+import { GovtMap, GovtSystem, Govt } from "@/game/gen/StarGovtSystem";
 import { Galaxy } from "@/game/types/Galaxy";
 import {
   StarMetadataMap,
   StarMetadataSystem,
+  StarMetadata,
 } from "@/game/gen/StarMetadataSystem";
+import { Star } from "@/game/types/Star";
 
 Vue.use(Vuex);
 
@@ -29,11 +31,13 @@ function getGalaxy(s: string): Galaxy {
   return g;
 }
 
+const initialSeed = `${Math.random()}`;
+
 const game: Module<GameState, RootState> = {
   namespaced: true,
   state: {
-    seed: `${Math.random()}`,
-    playerLocationStarID: null,
+    seed: initialSeed,
+    playerLocationStarID: getGalaxy(initialSeed).homeStarID,
   },
   getters: {
     galaxy: function (state): Galaxy {
@@ -45,9 +49,26 @@ const game: Module<GameState, RootState> = {
     metadataMap: function (state): StarMetadataMap {
       return StarMetadataSystem.makeMetadata(state.seed, getGalaxy(state.seed));
     },
+    playerStar: function (state): Star | null {
+      if (!state.playerLocationStarID) return null;
+      return getGalaxy(state.seed).stars[state.playerLocationStarID];
+    },
+    playerStarGovt: function (state): Govt | null {
+      if (!state.playerLocationStarID) return null;
+      return GovtSystem.makeGovts(state.seed, getGalaxy(state.seed))[
+        state.playerLocationStarID
+      ];
+    },
+    playerStarMetadata: function (state): StarMetadata | null {
+      if (!state.playerLocationStarID) return null;
+      return StarMetadataSystem.makeMetadataForStar(state.playerLocationStarID);
+    },
   },
   actions: {},
   mutations: {
+    travel(state, newStarID: string) {
+      state.playerLocationStarID = newStarID;
+    },
     newRandomSeed(state) {
       state.seed = `${Math.random()}`;
       const g = getGalaxy(state.seed);

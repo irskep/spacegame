@@ -20,13 +20,16 @@ export const StarMetadataSystem = {
   makeMetadata: function (seed: string, g: Galaxy): StarMetadataMap {
     const metadata: StarMetadataMap = {};
     for (const s of g.heyNow()) {
-      const rng = new RNG(s.id);
-      rng.replaceMathRandom(() => {
-        metadata[s.id] = {
-          name: starnames.flatten("#starname#"),
-        };
-      });
+      metadata[s.id] = StarMetadataSystem.makeMetadataForStar(s.id);
     }
     return metadata;
+  },
+  makeMetadataForStar: function (sid: string): StarMetadata {
+    const rng = new RNG(sid);
+    return rng.replaceMathRandom(() => {
+      return {
+        name: starnames.flatten("#starname#"),
+      };
+    });
   },
 };

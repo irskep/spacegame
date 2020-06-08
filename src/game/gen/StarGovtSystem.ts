@@ -1,6 +1,8 @@
 import { Galaxy } from "@/game/types/Galaxy";
 import { RNG } from "@/game/framework/RNG";
 
+import govtnames from "@/game/gen/govtnames";
+
 export interface Govt {
   name: string;
   color: string;
@@ -43,14 +45,28 @@ export const GovtSystem = {
     const allStars = rng.shuffled(g.heyNow());
     const colors = rng.shuffled(COLORS).slice(0, numGovts);
 
+    const usedGovtNames = new Set<string>();
     const govts: ExploringGovt[] = colors.map((c) => {
+      let name = rng.replaceMathRandom(() => {
+        return govtnames.flatten("#govtname#");
+      });
+      while (usedGovtNames.has(name)) {
+        name = rng.replaceMathRandom(() => {
+          return govtnames.flatten("#govtname#");
+        });
+      }
+      usedGovtNames.add(name);
       return {
-        govt: { name: c, color: c },
+        govt: { name, color: c },
         count: 0,
         open: [],
         closed: [],
       };
     });
+
+    // for (let i = 0; i < 100; i++) {
+    //   console.log(govtnames.flatten("#govtname#"));
+    // }
 
     const unused = new Set<string>(allStars.map((s) => s.id));
     const govtMap: GovtMap = {};

@@ -16,8 +16,13 @@ export function generateStars(
 
   const rng = new RNG(seed);
 
+  let nextStarId = 1;
+  const makeStarID = () => {
+    return `${nextStarId++}`;
+  };
+
   const centerStar: Star = {
-    id: uuid(),
+    id: makeStarID(),
     point: { x: 400, y: 300 },
     slots: rng.getSlots(6),
   };
@@ -48,7 +53,7 @@ export function generateStars(
     if (!g.getIsNewPointAllowed(p2)) continue;
 
     const newStar: Star = {
-      id: uuid(),
+      id: makeStarID(),
       point: p2,
       slots: rng.getSlots(rng.int(3, 6)),
     };

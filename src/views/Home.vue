@@ -1,17 +1,16 @@
 <template>
   <div class="home">
-    <Starmap seed="1234" />
+    <Game />
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import Starmap from "@/components/Starmap.vue";
+import Game from "@/components/Game.vue";
 
 export default {
   name: "Home",
   components: {
-    Starmap,
+    Game,
   },
 };
 </script>
