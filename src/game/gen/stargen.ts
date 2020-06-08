@@ -42,8 +42,8 @@ export function generateStars(
     const dist = rng.float(MIN_STAR_SPACE, MIN_STAR_SPACE * 1.2);
     const p1: Vector2 = s.point;
     const p2: Vector2 = {
-      x: p1.x + Math.cos(slot) * dist,
-      y: p1.y + Math.sin(slot) * dist,
+      x: Math.floor(p1.x + Math.cos(slot) * dist),
+      y: Math.floor(p1.y + Math.sin(slot) * dist),
     };
 
     if (isNaN(p2.x) || isNaN(p2.y)) {

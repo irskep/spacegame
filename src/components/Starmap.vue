@@ -141,7 +141,6 @@ export default class Starmap extends Vue {
 .Starmap {
   position: relative;
   background-color: black;
-  border: 1px solid blue;
 
   .Edge.m-active {
     stroke: white;
