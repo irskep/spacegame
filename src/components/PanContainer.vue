@@ -31,13 +31,6 @@ export default {
     };
   },
   props: ["center", "className"],
-  mounted: function () {
-    const containerSize = {
-      x: this.$refs.container.clientWidth,
-      y: this.$refs.container.clientHeight,
-    };
-    return;
-  },
   computed: {
     transform: function () {
       const x = -this.$props.center.x + this.offset.x;

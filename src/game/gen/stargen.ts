@@ -2,7 +2,7 @@ import { RNG } from "@/game/framework/RNG";
 import { Vector2 } from "@/game/framework/Vector2";
 import { Star } from "@/game/types/Star";
 import { Galaxy } from "@/game/types/Galaxy";
-import { distance, uuid } from "@/game/util";
+import { distance } from "@/game/util";
 
 export const MIN_STAR_SPACE = 40;
 const MAX_STAR_SPACE = 80;

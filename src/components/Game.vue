@@ -10,12 +10,11 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import DebugToolbar from "@/components/DebugToolbar.vue";
 import Starmap from "@/components/Starmap.vue";
 import ActiveStar from "@/components/ActiveStar.vue";
 import PanContainer from "@/components/PanContainer.vue";
-import { Star } from "@/game/types/Star";
 
 export default {
   name: "Game",
@@ -27,7 +26,7 @@ export default {
   },
   computed: {
     panContainerCenter: function () {
-      const star = this.$store.getters["game/playerStar"] as Star | null;
+      const star = this.$store.getters["game/playerStar"];
       if (star) {
         return star.point;
       } else {

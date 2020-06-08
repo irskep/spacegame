@@ -8,14 +8,6 @@ export interface StarMetadata {
   name: string;
 }
 
-function replaceMathRandom<T>(rng: () => number, fn: () => T): T {
-  const r = Math.random;
-  Math.random = rng;
-  const val = fn();
-  Math.random = r;
-  return val;
-}
-
 export const StarMetadataSystem = {
   makeMetadata: function (seed: string, g: Galaxy): StarMetadataMap {
     const metadata: StarMetadataMap = {};
