@@ -46,10 +46,6 @@ export function generateStars(
       y: Math.floor(p1.y + Math.sin(slot) * dist),
     };
 
-    if (isNaN(p2.x) || isNaN(p2.y)) {
-      debugger;
-    }
-
     if (!g.getIsNewPointAllowed(p2)) continue;
 
     const newStar: Star = {
