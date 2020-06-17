@@ -2,15 +2,19 @@ import Vue from "vue";
 import Vuex, { Module } from "vuex";
 import VuexPersistence from "vuex-persist";
 
-import { generateStars } from "@/game/gen/stargen";
-import { GovtMap, GovtSystem, Govt } from "@/game/gen/StarGovtSystem";
-import { Galaxy } from "@/game/types/Galaxy";
+import { generateStars } from "@/game/exploration/gen/stargen";
+import {
+  GovtMap,
+  GovtSystem,
+  Govt,
+} from "@/game/exploration/gen/StarGovtSystem";
+import { Galaxy } from "@/game/exploration/types/Galaxy";
 import {
   StarMetadataMap,
   StarMetadataSystem,
   StarMetadata,
-} from "@/game/gen/StarMetadataSystem";
-import { Star } from "@/game/types/Star";
+} from "@/game/exploration/gen/StarMetadataSystem";
+import { Star } from "@/game/exploration/types/Star";
 
 Vue.use(Vuex);
 

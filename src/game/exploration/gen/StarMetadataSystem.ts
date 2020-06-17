@@ -1,6 +1,6 @@
-import starnames from "./starnames";
-import { Galaxy } from "../types/Galaxy";
-import { RNG } from "../framework/RNG";
+import starnames from "@/game/exploration/gen/starnames";
+import { Galaxy } from "@/game/exploration/types/Galaxy";
+import { RNG } from "@/game/framework/RNG";
 
 export type StarMetadataMap = Record<string, StarMetadata>;
 

@@ -1,6 +1,6 @@
 import { getDoLineSegmentsIntersect, Vector2 } from "@/game/framework/Vector2";
-import { distance } from "@/game/util";
-import { MIN_STAR_SPACE } from "@/game/gen/stargen";
+import { distance } from "@/game/framework/util";
+import { MIN_STAR_SPACE } from "@/game/exploration/gen/stargen";
 import { Star } from "./Star";
 
 export class Galaxy {

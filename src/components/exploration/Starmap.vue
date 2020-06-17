@@ -67,11 +67,12 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
-import { Galaxy } from "@/game/types/Galaxy";
-import { Star } from "@/game/types/Star";
 import { GameState } from "@/store";
-import { GovtMap } from "@/game/gen/StarGovtSystem";
-import { StarMetadataMap } from "@/game/gen/StarMetadataSystem";
+
+import { Galaxy } from "@/game/exploration/types/Galaxy";
+import { Star } from "@/game/exploration/types/Star";
+import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
+import { StarMetadataMap } from "@/game/exploration/gen/StarMetadataSystem";
 
 /**
  * Simple function that lets you log one object in the middle of an expression.

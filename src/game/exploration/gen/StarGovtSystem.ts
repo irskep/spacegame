@@ -1,7 +1,7 @@
-import { Galaxy } from "@/game/types/Galaxy";
+import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { RNG } from "@/game/framework/RNG";
 
-import govtnames from "@/game/gen/govtnames";
+import govtnames from "@/game/exploration/gen/govtnames";
 
 export interface Govt {
   name: string;
