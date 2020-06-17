@@ -9,12 +9,12 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
+import { GameState } from "@/store";
+import { Govt } from "@/game/gen/StarGovtSystem";
+import { GovtMap } from "@/game/gen/StarGovtSystem";
+import { StarMetadataMap, StarMetadata } from "@/game/gen/StarMetadataSystem";
 import { Galaxy } from "@/game/types/Galaxy";
 import { Star } from "@/game/types/Star";
-import { GameState } from "../store";
-import { GovtMap } from "@/game/gen/StarGovtSystem";
-import { StarMetadataMap, StarMetadata } from "../game/gen/StarMetadataSystem";
-import { Govt } from "../game/gen/StarGovtSystem";
 
 const x = namespace("game");
 

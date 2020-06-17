@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Game from "@/components/Game.vue";
+import Game from "@/components/exploration/Game.vue";
 
 export default {
   name: "Home",

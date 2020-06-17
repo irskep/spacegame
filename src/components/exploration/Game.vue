@@ -11,10 +11,10 @@
 </template>
 
 <script>
-import DebugToolbar from "@/components/DebugToolbar.vue";
-import Starmap from "@/components/Starmap.vue";
-import ActiveStar from "@/components/ActiveStar.vue";
-import PanContainer from "@/components/PanContainer.vue";
+import DebugToolbar from "@/components/exploration/DebugToolbar.vue";
+import Starmap from "@/components/exploration/Starmap.vue";
+import ActiveStar from "@/components/exploration/ActiveStar.vue";
+import PanContainer from "@/components/exploration/PanContainer.vue";
 
 export default {
   name: "Game",
