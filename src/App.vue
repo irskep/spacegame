@@ -5,6 +5,15 @@
 </template>
 
 <style lang="scss">
+html {
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
 /* Sakura.css v1.3.0
  * ================
  * Minimal css theme.
