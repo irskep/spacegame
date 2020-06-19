@@ -23,6 +23,7 @@ export default {
 <style lang="scss">
 .Card {
   border: 1px solid black;
+  border-radius: 0.5vw;
   background-color: white;
 
   display: flex;
@@ -37,6 +38,8 @@ export default {
   &.m-medium {
     width: 15vw;
     height: 22.5vw;
+    max-width: 100px;
+    max-height: 150px;
   }
 
   &.m-large {

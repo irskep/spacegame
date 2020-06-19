@@ -138,10 +138,8 @@ blockquote {
 }
 
 img {
+  width: auto;
   height: auto;
-  max-width: 100%;
-  margin-top: 0px;
-  margin-bottom: 2.5rem;
 }
 
 /* Pre and Code */
