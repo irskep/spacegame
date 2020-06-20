@@ -35,7 +35,28 @@ export default {
 }
 
 .ShipImage {
-  width: 50%;
+  max-width: 50%;
+  max-height: 70%;
+  transform: rotate(180deg);
+
+  animation-duration: 3s;
+  animation-name: float;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0.5vw) rotate(180deg);
+  }
+
+  50% {
+    transform: translate(0, -0.5vw) rotate(180deg);
+  }
+
+  100% {
+    transform: translate(0, 0.5vw) rotate(180deg);
+  }
 }
 
 .Title {

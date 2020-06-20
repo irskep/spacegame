@@ -4,11 +4,10 @@
       <Viewscreen />
     </div>
 
-    <div class="CrewLabel">Crew:</div>
-
     <CardGroup
       extraClass="m-bottom-left"
-      imgSrc="/portraits/Mothership Chars 01.jpg"
+      :crew="crew[0]"
+      :imgSrc="`/portraits/${crew[0].portraitID}`"
     >
       <Card size="medium" />
       <Card size="medium" />
@@ -17,7 +16,8 @@
 
     <CardGroup
       extraClass="m-bottom-center"
-      imgSrc="/portraits/Mothership Chars 04.jpg"
+      :crew="crew[2]"
+      :imgSrc="`/portraits/${crew[2].portraitID}`"
     >
       <Card size="medium" />
       <Card size="medium" />
@@ -26,7 +26,8 @@
 
     <CardGroup
       extraClass="m-bottom-right"
-      imgSrc="/portraits/Mothership Chars 02.jpg"
+      :crew="crew[1]"
+      :imgSrc="`/portraits/${crew[1].portraitID}`"
     >
       <Card size="medium" />
       <Card size="medium" />
@@ -41,9 +42,16 @@ import CardGroup from "@/components/cardgame/CardGroup.vue";
 // import DeckRow from "@/components/cardgame/DeckRow.vue";
 import Viewscreen from "@/components/cardgame/Viewscreen.vue";
 
+import { CREW_MEMBERS } from "@/game/cardgame/CrewMember";
+
 export default {
   name: "CardGame",
   components: { Card, CardGroup, Viewscreen },
+  computed: {
+    crew: function () {
+      return CREW_MEMBERS;
+    },
+  },
 };
 </script>
 
@@ -72,16 +80,5 @@ export default {
     width: 70vw;
     height: 100%;
   }
-}
-
-.CrewLabel {
-  font-size: 3rem;
-  position: absolute;
-  top: 50%;
-  width: 200px;
-  left: 0;
-  right: 0;
-  margin: auto;
-  text-align: center;
 }
 </style>

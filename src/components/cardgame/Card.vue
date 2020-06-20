@@ -25,6 +25,7 @@ export default {
   border: 1px solid black;
   border-radius: 0.5vw;
   background-color: white;
+  cursor: pointer;
 
   display: flex;
   align-items: center;

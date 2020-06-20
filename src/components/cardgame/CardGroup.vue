@@ -2,6 +2,7 @@
   <div class="CardGroup" :class="[extraClass]">
     <div class="CardGroup_Row">
       <img class="Portrait" :src="imgSrc" />
+      <div class="Name">{{ crew.name }}: {{ crew.subtitle }}</div>
     </div>
     <div class="CardGroup_Cards">
       <slot></slot>
@@ -13,6 +14,7 @@
 export default {
   name: "CardGroup",
   props: {
+    crew: {},
     extraClass: {
       type: String,
       default: "",
@@ -90,6 +92,10 @@ export default {
       z-index: 1;
     }
   }
+}
+
+.CardGroup_Row {
+  margin-bottom: 1vw;
 }
 
 .Portrait {
