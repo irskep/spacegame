@@ -95,6 +95,7 @@ export default {
 }
 
 .CardGroup_Row {
+  text-align: center;
   margin-bottom: 1vw;
 }
 

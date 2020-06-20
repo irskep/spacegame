@@ -67,7 +67,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
-import { GameState } from "@/store";
+import { GalaxyState } from "@/store/types";
 
 import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { Star } from "@/game/exploration/types/Star";
@@ -84,7 +84,7 @@ function log<T>(label: string, obj: T, enable = true): T {
   return obj;
 }
 
-const x = namespace("game");
+const x = namespace("galaxy");
 
 @Component
 export default class Starmap extends Vue {
@@ -95,8 +95,8 @@ export default class Starmap extends Vue {
   @x.Getter galaxy!: Galaxy;
   hoveredStar: Star | null = null;
 
-  get state(): GameState {
-    return this.$store.state as GameState;
+  get state(): GalaxyState {
+    return this.$store.state.galaxy as GalaxyState;
   }
 
   get allNeighbors(): [Star, Star][] {
@@ -133,7 +133,7 @@ export default class Starmap extends Vue {
 
   travel(star: Star) {
     if (!this.galaxy.getIsConnected(star.id, this.playerLocationStarID)) return;
-    this.$store.commit("game/travel", star.id);
+    this.$store.commit("galaxy/travel", star.id);
   }
 }
 </script>

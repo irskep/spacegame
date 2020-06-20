@@ -10,7 +10,7 @@ export default {
   name: "DebugToolbar",
   methods: {
     newSeed: function () {
-      this.$store.commit("game/newRandomSeed");
+      this.$store.commit("galaxy/newRandomSeed");
     },
     resetState: function () {
       delete localStorage.vuex;

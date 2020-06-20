@@ -26,7 +26,7 @@ export default {
   },
   computed: {
     panContainerCenter: function () {
-      const star = this.$store.getters["game/playerStar"];
+      const star = this.$store.getters["galaxy/playerStar"];
       if (star) {
         return star.point;
       } else {

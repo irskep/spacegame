@@ -9,7 +9,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
-import { GameState } from "@/store";
+import { GalaxyState } from "@/store/types";
 import { Govt } from "@/game/exploration/gen/StarGovtSystem";
 import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
 import {
@@ -19,7 +19,7 @@ import {
 import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { Star } from "@/game/exploration/types/Star";
 
-const x = namespace("game");
+const x = namespace("galaxy");
 
 @Component
 export default class ActiveStar extends Vue {
@@ -30,8 +30,8 @@ export default class ActiveStar extends Vue {
   @x.Getter("playerStarGovt") starGovt!: Govt;
   @x.Getter("playerStarMetadata") starMetadata!: StarMetadata;
 
-  get state(): GameState {
-    return this.$store.state as GameState;
+  get state(): GalaxyState {
+    return this.$store.state as GalaxyState;
   }
 }
 </script>
