@@ -5,7 +5,7 @@ export interface CardEffect {
   description: string;
 }
 
-export const CARD_EFFECTS: CardEffect[] = [
+export const CARD_EFFECT_LIST: CardEffect[] = [
   {
     id: "fire-lasers",
     name: "Fire laser weapon",
@@ -20,3 +20,7 @@ export const CARD_EFFECTS: CardEffect[] = [
     // If shields at max, do nothing
   },
 ];
+
+export const CARD_EFFECTS = new Map<string, CardEffect>(
+  CARD_EFFECT_LIST.map((d) => [d.id, d])
+);

@@ -4,7 +4,7 @@ export interface CardDef {
   effects: string[];
 }
 
-export const CARDS: CardDef[] = [
+export const CARD_DEF_LIST: CardDef[] = [
   {
     id: "pewpew",
     name: "Pew Pew",
@@ -16,3 +16,7 @@ export const CARDS: CardDef[] = [
     effects: ["raise-shields-1"],
   },
 ];
+
+export const CARD_DEFS = new Map<string, CardDef>(
+  CARD_DEF_LIST.map((d) => [d.id, d])
+);

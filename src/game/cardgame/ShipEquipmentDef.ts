@@ -6,7 +6,7 @@ export interface ShipEquipmentDef {
   satisfies: string[];
 }
 
-export const SHIP_EQUIPMENTS: ShipEquipmentDef[] = [
+export const SHIP_EQUIPMENT_LIST: ShipEquipmentDef[] = [
   {
     id: "lasers-1",
     name: "Basic Laser",
@@ -20,3 +20,7 @@ export const SHIP_EQUIPMENTS: ShipEquipmentDef[] = [
     satisfies: ["has.shields"],
   },
 ];
+
+export const SHIP_EQUIPMENT = new Map<string, ShipEquipmentDef>(
+  SHIP_EQUIPMENT_LIST.map((d) => [d.id, d])
+);

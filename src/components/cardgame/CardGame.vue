@@ -47,9 +47,17 @@ import { CREW_MEMBERS } from "@/game/cardgame/CrewMember";
 export default {
   name: "CardGame",
   components: { Card, CardGroup, Viewscreen },
+  beforeMount: function () {
+    this.$store.commit("cardgame/enter", {
+      shipID: "normie",
+      crewMembers: ["Alex", "Taylor", "Skylar"],
+    });
+  },
   computed: {
     crew: function () {
-      return CREW_MEMBERS;
+      return this.$store.state.cardgame.crew?.map((c) =>
+        CREW_MEMBERS.get(c.crewID)
+      );
     },
   },
 };
