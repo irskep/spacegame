@@ -7,6 +7,7 @@
     v-on:mouseup="mouseup"
     v-on:mouseleave="mouseup"
     v-on:mousemove="mousemove"
+    v-on:wheel="scroll"
   >
     <div
       class="PanContainer_Inner"
@@ -52,6 +53,13 @@ export default {
       this.offset = {
         x: this.offsetStart.x + e.clientX - this.mouseStart.x,
         y: this.offsetStart.y + e.clientY - this.mouseStart.y,
+      };
+    },
+    scroll: function (e) {
+      e.preventDefault();
+      this.offset = {
+        x: this.offset.x - e.deltaX,
+        y: this.offset.y - e.deltaY,
       };
     },
   },

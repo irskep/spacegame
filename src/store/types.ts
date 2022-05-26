@@ -19,10 +19,14 @@ export interface Ship {
   kind: string;
 }
 
+export type ExplorerState = "traveling" | "scanning";
+
 export type Explorer = TravelerComponent & {
   id: string;
   crew: Crewmate[];
   ship: Ship;
+  state: ExplorerState;
+  scanProgress: number;
 };
 
 export interface GalaxyState {

@@ -1,7 +1,7 @@
 import tracery from "tracery-grammar";
 
 const grammar = tracery.createGrammar({
-  peoplename: ["#firstname# #lastname"],
+  peoplename: ["#firstname# #lastname#"],
 
   firstname: [
     "James",

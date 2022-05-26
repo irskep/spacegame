@@ -6,11 +6,7 @@ import { StarMetadataSystem } from "@/game/exploration/gen/StarMetadataSystem";
 import { GalaxyState, RootState } from "./types";
 import { generateExplorer } from "@/game/exploration/gen/explorers";
 import { RNG } from "@/game/framework/RNG";
-import { distance } from "@/game/framework/util";
-
-const CONSTANTS = {
-  travelTime: 10000,
-};
+import { tickScan, tickTravel } from "./ticks";
 
 const galaxyCache: Record<string, Galaxy> = {};
 
@@ -71,26 +67,29 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
       const galaxy = getGalaxy(state.seed);
 
       for (const e of Object.values(state.explorers)) {
-        if (e.destinationStarID) {
-          const srcStar = galaxy.stars[e.starID];
-          const destStar = galaxy.stars[e.destinationStarID];
-          const starDist = distance(srcStar.point, destStar.point);
-
-          const speedFactor = 50 / starDist;
-
-          e.travelProgress += (dt * speedFactor) / CONSTANTS.travelTime;
-          if (e.travelProgress >= 1) {
-            e.travelProgress = 0;
-            e.starID = e.destinationStarID;
-            e.destinationStarID = null;
-          }
+        const oldState = e.state;
+        switch (e.state) {
+          case "traveling":
+            tickTravel(dt, galaxy, e);
+            break;
+          case "scanning":
+            tickScan(dt, galaxy, e);
+            break;
         }
 
-        if (!e.destinationStarID) {
-          e.destinationStarID = new RNG(`${Math.random()}`).choice(
-            galaxy.getNeighborIDs(e.starID)
-          );
-          e.travelProgress = 0;
+        const newState = e.state;
+        if (newState != oldState) {
+          switch (newState) {
+            case "traveling":
+              e.destinationStarID = new RNG(`${Math.random()}`).choice(
+                galaxy.getNeighborIDs(e.starID)
+              );
+              e.travelProgress = 0;
+              break;
+            case "scanning":
+              e.destinationStarID = null;
+              e.scanProgress = 0;
+          }
         }
       }
     },

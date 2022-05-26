@@ -19,14 +19,14 @@ export default class PanelGroup extends Vue {
 .PanelGroup {
   display: flex;
   flex-direction: column;
-  padding-top: 0.5rem;
+  padding-top: 1rem;
   pointer-events: none;
   justify-content: flex-start;
   align-items: flex-start;
 }
 
 .PanelGroup > * {
-  margin-left: 0.5rem;
+  margin-bottom: 1rem;
   pointer-events: auto;
 }
 </style>

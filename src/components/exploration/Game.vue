@@ -64,10 +64,10 @@ export default {
 
 <style lang="css">
 .UI h6 {
-  margin: 0;
+  margin: 0 0 0.5rem 0;
 }
 
-.UI p:last-child {
+.UI p {
   margin-bottom: 0;
 }
 

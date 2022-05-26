@@ -1,8 +1,21 @@
 <template>
-  <div class="ExplorerDetails" v-if="explorerID">
+  <div class="ExplorerDetails" v-if="explorer">
     <h6>{{ explorer.name }}</h6>
-    <p v-if="!isTraveling">{{ star.name }}</p>
-    <p v-if="isTraveling">Between {{ star.name }} and {{ destStar.name }}</p>
+    <p v-if="explorer.state === 'scanning'">Scanning {{ star.name }}</p>
+    <ProgressBar
+      v-if="explorer.state === 'scanning'"
+      :progress="explorer.scanProgress"
+    />
+    <p v-if="explorer.state === 'traveling' && destStar">
+      Jumping between {{ star.name }} and {{ destStar.name }}
+    </p>
+    <ProgressBar
+      v-if="explorer.state === 'traveling'"
+      :progress="explorer.travelProgress"
+    />
+    <p v-for="crew in explorer.crew" :key="crew.id">
+      {{ crew.role }}: {{ crew.name }}
+    </p>
   </div>
 </template>
 
@@ -10,6 +23,7 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
+import ProgressBar from "@/components/ui/ProgressBar.vue";
 import { Explorer, GalaxyState } from "@/store/types";
 import { Govt } from "@/game/exploration/gen/StarGovtSystem";
 import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
@@ -21,7 +35,7 @@ import {
 
 const x = namespace("galaxy");
 
-@Component
+@Component({ components: { ProgressBar } })
 export default class ExplorerDetails extends Vue {
   @Prop() explorerID!: string;
   @x.State explorers!: Record<string, Explorer>;
@@ -35,10 +49,6 @@ export default class ExplorerDetails extends Vue {
 
   get explorer(): Explorer {
     return this.explorers[this.explorerID];
-  }
-
-  get isTraveling(): boolean {
-    return !!this.explorer.destinationStarID;
   }
 
   get star(): StarMetadata | null {
