@@ -9,6 +9,9 @@
         <Panel v-if="selectedStarID">
           <StarDetails :starID="selectedStarID" />
         </Panel>
+        <Panel v-if="selectedExplorerID">
+          <ExplorerDetails :explorerID="selectedExplorerID" />
+        </Panel>
       </PanelGroup>
     </div>
   </div>
@@ -17,6 +20,7 @@
 <script>
 import DebugToolbar from "@/components/exploration/DebugToolbar.vue";
 import Starmap from "@/components/exploration/Starmap.vue";
+import ExplorerDetails from "@/components/exploration/ExplorerDetails.vue";
 import StarDetails from "@/components/exploration/StarDetails.vue";
 import PanContainer from "@/components/exploration/PanContainer.vue";
 import Panel from "@/components/ui/Panel.vue";
@@ -25,6 +29,7 @@ import PanelGroup from "@/components/ui/PanelGroup.vue";
 export default {
   name: "Game",
   components: {
+    ExplorerDetails,
     StarDetails,
     DebugToolbar,
     Starmap,
@@ -41,6 +46,9 @@ export default {
     },
     selectedStarID: function () {
       return this.$store.state.ui.selectedStarID;
+    },
+    selectedExplorerID: function () {
+      return this.$store.state.ui.selectedExplorerID;
     },
     panContainerCenter: function () {
       const star = this.$store.getters["galaxy/playerStar"];

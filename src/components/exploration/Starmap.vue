@@ -45,13 +45,15 @@
     <g
       v-for="explorer of Object.values(explorers)"
       v-bind:key="explorer.id"
+      v-on:click="setSelectedExplorer(explorer.id)"
+      class="Starmap_ExplorerIndicator"
       :id="explorer.id"
     >
       <circle
-        class="ExplorerIndicator pulse"
+        :class="{ pulse: getIsExplorerSelected(explorer) }"
         :cx="getExplorerPoint(explorer).x"
         :cy="getExplorerPoint(explorer).y"
-        :r="15"
+        :r="7"
         stroke="lightgreen"
         fill="transparent"
       ></circle>
@@ -103,6 +105,7 @@ export default class Starmap extends Vue {
   @x.Getter galaxy!: Galaxy;
 
   @ui.State hoveredStarID!: string | null;
+  @ui.State selectedExplorerID!: string | null;
 
   get state(): GalaxyState {
     return this.$store.state.galaxy as GalaxyState;
@@ -160,6 +163,10 @@ export default class Starmap extends Vue {
     }
   }
 
+  getIsExplorerSelected(e: Explorer): boolean {
+    return this.selectedExplorerID == e.id;
+  }
+
   // UI events
 
   setHoveredStar(starID: string | null) {
@@ -168,8 +175,10 @@ export default class Starmap extends Vue {
 
   setSelectedStar(starID: string | null) {
     this.$store.commit("ui/selectStar", starID);
-    // if (!this.galaxy.getIsConnected(star.id, this.playerLocationStarID)) return;
-    // this.$store.commit("galaxy/travel", star.id);
+  }
+
+  setSelectedExplorer(explorerID: string | null) {
+    this.$store.commit("ui/selectExplorer", explorerID);
   }
 }
 </script>
@@ -201,6 +210,10 @@ export default class Starmap extends Vue {
 .Starmap_Star:hover circle.Starmap_Star_Inner {
   stroke: yellow;
   fill: #333;
+}
+
+.Starmap_ExplorerIndicator {
+  cursor: pointer;
 }
 
 .pulse {
