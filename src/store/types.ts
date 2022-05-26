@@ -35,6 +35,7 @@ export interface GalaxyState {
 export interface UIState {
   hoveredStarID: string | null;
   selectedStarID: string | null;
+  selectedExplorerID: string | null;
 }
 
 export interface RootState {

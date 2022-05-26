@@ -6,6 +6,7 @@ export const UIModule: Module<UIState, RootState> = {
   state: {
     hoveredStarID: null,
     selectedStarID: null,
+    selectedExplorerID: null,
   },
   getters: {},
   actions: {},
@@ -15,7 +16,9 @@ export const UIModule: Module<UIState, RootState> = {
     },
     selectStar(state, starID: string | null) {
       state.selectedStarID = starID;
-      console.log(state);
+    },
+    selectExplorer(state, explorerID: string | null) {
+      state.selectedExplorerID = explorerID;
     },
   },
 };

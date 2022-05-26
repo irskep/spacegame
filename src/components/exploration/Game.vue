@@ -32,6 +32,9 @@ export default {
     Panel,
     PanelGroup,
   },
+  mounted: function () {
+    this.$store.dispatch("galaxy/beginTick");
+  },
   computed: {
     hoveredStarID: function () {
       return this.$store.state.ui.hoveredStarID;

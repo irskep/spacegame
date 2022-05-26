@@ -40,15 +40,20 @@
         fill="black"
         stroke="white"
       ></circle>
+    </g>
 
+    <g
+      v-for="explorer of Object.values(explorers)"
+      v-bind:key="explorer.id"
+      :id="explorer.id"
+    >
       <circle
-        v-if="getHasExplorer(star.id)"
-        :cx="star.point.x"
-        :cy="star.point.y"
+        class="ExplorerIndicator pulse"
+        :cx="getExplorerPoint(explorer).x"
+        :cy="getExplorerPoint(explorer).y"
         :r="15"
         stroke="lightgreen"
         fill="transparent"
-        class="pulse"
       ></circle>
     </g>
 
@@ -73,6 +78,8 @@ import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { Star } from "@/game/exploration/types/Star";
 import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
 import { StarMetadataMap } from "@/game/exploration/gen/StarMetadataSystem";
+import { Vector2 } from "@/game/framework/Vector2";
+import { lerp } from "@/game/framework/util";
 
 /**
  * Simple function that lets you log one object in the middle of an expression.
@@ -142,6 +149,18 @@ export default class Starmap extends Vue {
     // pair[1].id === this.hoveredStar?.id;
     // return isOnA && isOnB;
   }
+
+  getExplorerPoint(e: Explorer): Vector2 {
+    const star = this.galaxy.stars[e.starID];
+    if (e.destinationStarID) {
+      const destStar = this.galaxy.stars[e.destinationStarID];
+      return lerp(star.point, destStar.point, e.travelProgress);
+    } else {
+      return star.point;
+    }
+  }
+
+  // UI events
 
   setHoveredStar(starID: string | null) {
     this.$store.commit("ui/hoverStar", starID);

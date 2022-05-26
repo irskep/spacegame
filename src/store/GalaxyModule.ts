@@ -5,9 +5,11 @@ import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { StarMetadataSystem } from "@/game/exploration/gen/StarMetadataSystem";
 import { GalaxyState, RootState } from "./types";
 import { generateExplorer } from "@/game/exploration/gen/explorers";
+import { RNG } from "@/game/framework/RNG";
+import { distance } from "@/game/framework/util";
 
 const CONSTANTS = {
-  travelTime: 1000,
+  travelTime: 10000,
 };
 
 const galaxyCache: Record<string, Galaxy> = {};
@@ -46,20 +48,49 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
       return getGalaxy(state.seed);
     },
   },
-  actions: {},
+  actions: {
+    beginTick() {
+      let lastTick = Date.now();
+      const exec = () => {
+        const now = Date.now();
+        const dt = now - lastTick;
+
+        this.commit("galaxy/tick", dt);
+
+        lastTick = now;
+        requestAnimationFrame(exec);
+      };
+      requestAnimationFrame(exec);
+    },
+  },
   mutations: {
     travel(state, opts: { explorerID: string; newStarID: string }) {
       state.explorers[opts.explorerID].destinationStarID = opts.newStarID;
     },
     tick(state, dt: number) {
+      const galaxy = getGalaxy(state.seed);
+
       for (const e of Object.values(state.explorers)) {
         if (e.destinationStarID) {
-          e.travelProgress = e.travelProgress + dt / CONSTANTS.travelTime;
+          const srcStar = galaxy.stars[e.starID];
+          const destStar = galaxy.stars[e.destinationStarID];
+          const starDist = distance(srcStar.point, destStar.point);
+
+          const speedFactor = 50 / starDist;
+
+          e.travelProgress += (dt * speedFactor) / CONSTANTS.travelTime;
           if (e.travelProgress >= 1) {
             e.travelProgress = 0;
             e.starID = e.destinationStarID;
             e.destinationStarID = null;
           }
+        }
+
+        if (!e.destinationStarID) {
+          e.destinationStarID = new RNG(`${Math.random()}`).choice(
+            galaxy.getNeighborIDs(e.starID)
+          );
+          e.travelProgress = 0;
         }
       }
     },
