@@ -27,7 +27,6 @@ import StarDetails from "@/components/exploration/StarDetails.vue";
 import PanContainer from "@/components/exploration/PanContainer.vue";
 import Panel from "@/components/ui/Panel.vue";
 import PanelGroup from "@/components/ui/PanelGroup.vue";
-import { cancelAnimation } from "@/store/GalaxyModule";
 
 export default {
   name: "Game",

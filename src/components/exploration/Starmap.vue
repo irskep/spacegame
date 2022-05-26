@@ -14,7 +14,6 @@
 
     <g
       class="Starmap_Star"
-      :class="{ 'm-travelable': getMayTravel(star.id) }"
       v-for="star in Object.values(galaxy.stars)"
       :key="star.id + '2'"
       :id="star.id"
@@ -156,11 +155,6 @@ export default class Starmap extends Vue {
     return this.starInfo[s].name;
   }
 
-  getMayTravel(starID: string) {
-    return true;
-    // return this.galaxy.getIsConnected(star.id, this.playerLocationStarID);
-  }
-
   getHasExplorer(starID: string): boolean {
     for (const e of Object.values(this.explorers)) {
       if (e.starID == starID) return true;
@@ -232,10 +226,6 @@ export default class Starmap extends Vue {
 
 .Starmap_Star:hover text {
   visibility: visible;
-}
-
-.Starmap_Star:hover.m-travelable circle {
-  cursor: pointer;
 }
 
 .Starmap_Star:hover circle.Starmap_Star_Inner {

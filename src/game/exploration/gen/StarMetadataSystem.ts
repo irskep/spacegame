@@ -6,6 +6,8 @@ export type StarMetadataMap = Record<string, StarMetadata>;
 
 export interface StarMetadata {
   name: string;
+  known: boolean;
+  explored: boolean;
 }
 
 export const StarMetadataSystem = {
@@ -21,6 +23,8 @@ export const StarMetadataSystem = {
     return rng.replaceMathRandom(() => {
       return {
         name: starnames.flatten("#starname#"),
+        known: false,
+        explored: false,
       };
     });
   },
