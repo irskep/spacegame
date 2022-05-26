@@ -1,6 +1,6 @@
 <template>
   <div class="ActiveStar" v-if="star">
-    <h1>{{ starMetadata.name }}</h1>
+    <h6>{{ starMetadata.name }}</h6>
     <p>{{ starGovt.name }}</p>
   </div>
 </template>
