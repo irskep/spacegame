@@ -18,7 +18,7 @@ export function generateStars(
 
   let nextStarId = 1;
   const makeStarID = () => {
-    return `${nextStarId++}`;
+    return `star-${nextStarId++}`;
   };
 
   const centerStar: Star = {

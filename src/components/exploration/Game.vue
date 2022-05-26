@@ -6,8 +6,8 @@
         <Starmap />
       </PanContainer>
       <PanelGroup className="m-hud-top">
-        <Panel>
-          <ActiveStar />
+        <Panel v-if="selectedStarID">
+          <StarDetails :starID="selectedStarID" />
         </Panel>
       </PanelGroup>
     </div>
@@ -17,7 +17,7 @@
 <script>
 import DebugToolbar from "@/components/exploration/DebugToolbar.vue";
 import Starmap from "@/components/exploration/Starmap.vue";
-import ActiveStar from "@/components/exploration/ActiveStar.vue";
+import StarDetails from "@/components/exploration/StarDetails.vue";
 import PanContainer from "@/components/exploration/PanContainer.vue";
 import Panel from "@/components/ui/Panel.vue";
 import PanelGroup from "@/components/ui/PanelGroup.vue";
@@ -25,7 +25,7 @@ import PanelGroup from "@/components/ui/PanelGroup.vue";
 export default {
   name: "Game",
   components: {
-    ActiveStar,
+    StarDetails,
     DebugToolbar,
     Starmap,
     PanContainer,
@@ -33,6 +33,12 @@ export default {
     PanelGroup,
   },
   computed: {
+    hoveredStarID: function () {
+      return this.$store.state.ui.hoveredStarID;
+    },
+    selectedStarID: function () {
+      return this.$store.state.ui.selectedStarID;
+    },
     panContainerCenter: function () {
       const star = this.$store.getters["galaxy/playerStar"];
       if (star) {

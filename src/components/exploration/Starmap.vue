@@ -14,13 +14,13 @@
 
     <g
       class="Starmap_Star"
-      :class="{ 'm-travelable': getMayTravel(star) }"
+      :class="{ 'm-travelable': getMayTravel(star.id) }"
       v-for="star in Object.values(galaxy.stars)"
       :key="star.id + '2'"
       :id="star.id"
       data-id="star.id"
-      v-on:click="travel(star)"
-      v-on:mouseenter="setHoveredStar(star)"
+      v-on:click="setSelectedStar(star.id)"
+      v-on:mouseenter="setHoveredStar(star.id)"
       v-on:mouseleave="setHoveredStar(null)"
     >
       <circle
@@ -42,7 +42,7 @@
       ></circle>
 
       <circle
-        v-if="star.id === playerLocationStarID"
+        v-if="getHasExplorer(star.id)"
         :cx="star.point.x"
         :cy="star.point.y"
         :r="15"
@@ -58,7 +58,7 @@
       :x="Math.max(2, hoveredStar.point.x - 40)"
       :y="Math.max(2, hoveredStar.point.y - 20)"
     >
-      {{ getStarName(hoveredStar) }}
+      {{ getStarName(hoveredStarID) }}
     </text>
   </svg>
 </template>
@@ -67,7 +67,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
-import { GalaxyState } from "@/store/types";
+import { Explorer, GalaxyState } from "@/store/types";
 
 import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { Star } from "@/game/exploration/types/Star";
@@ -85,15 +85,17 @@ function log<T>(label: string, obj: T, enable = true): T {
 }
 
 const x = namespace("galaxy");
+const ui = namespace("ui");
 
 @Component
 export default class Starmap extends Vue {
   @x.State seed!: string;
-  @x.State playerLocationStarID!: string;
-  @x.Getter govtMap!: GovtMap;
-  @x.Getter metadataMap!: StarMetadataMap;
+  @x.State govtInfo!: GovtMap;
+  @x.State starInfo!: StarMetadataMap;
+  @x.State explorers!: Record<string, Explorer>;
   @x.Getter galaxy!: Galaxy;
-  hoveredStar: Star | null = null;
+
+  @ui.State hoveredStarID!: string | null;
 
   get state(): GalaxyState {
     return this.$store.state.galaxy as GalaxyState;
@@ -103,37 +105,52 @@ export default class Starmap extends Vue {
     return log("allNeighbors", this.galaxy.getAllNeighbors(), false);
   }
 
+  get hoveredStar(): Star | null {
+    if (!this.hoveredStarID) return null;
+    return this.galaxy.stars[this.hoveredStarID];
+  }
+
   getStarColor(s: Star): string {
-    if (!this.govtMap[s.id]) return "#616161";
-    return this.govtMap[s.id].color;
+    if (!this.govtInfo[s.id]) return "#616161";
+    return this.govtInfo[s.id].color;
   }
 
-  getStarName(s: Star): string {
-    if (!this.metadataMap[s.id]) return "unknown";
-    return this.metadataMap[s.id].name;
+  getStarName(s: string): string {
+    if (!this.starInfo[s]) return "unknown";
+    return this.starInfo[s].name;
   }
 
-  getMayTravel(star: Star) {
-    return this.galaxy.getIsConnected(star.id, this.playerLocationStarID);
+  getMayTravel(starID: string) {
+    return true;
+    // return this.galaxy.getIsConnected(star.id, this.playerLocationStarID);
+  }
+
+  getHasExplorer(starID: string): boolean {
+    for (const e of Object.values(this.explorers)) {
+      if (e.starID == starID) return true;
+    }
+    return false;
   }
 
   getIsHoveredEdge(pair: [Star, Star]) {
-    const isOnA =
-      pair[0].id === this.playerLocationStarID ||
-      pair[1].id === this.playerLocationStarID;
-    const isOnB =
-      pair[0].id === this.hoveredStar?.id ||
-      pair[1].id === this.hoveredStar?.id;
-    return isOnA && isOnB;
+    return false;
+    // const isOnA =
+    // pair[0].id === this.playerLocationStarID ||
+    // pair[1].id === this.playerLocationStarID;
+    // const isOnB =
+    // pair[0].id === this.hoveredStar?.id ||
+    // pair[1].id === this.hoveredStar?.id;
+    // return isOnA && isOnB;
   }
 
-  setHoveredStar(star: Star | null) {
-    this.hoveredStar = star;
+  setHoveredStar(starID: string | null) {
+    this.$store.commit("ui/hoverStar", starID);
   }
 
-  travel(star: Star) {
-    if (!this.galaxy.getIsConnected(star.id, this.playerLocationStarID)) return;
-    this.$store.commit("galaxy/travel", star.id);
+  setSelectedStar(starID: string | null) {
+    this.$store.commit("ui/selectStar", starID);
+    // if (!this.galaxy.getIsConnected(star.id, this.playerLocationStarID)) return;
+    // this.$store.commit("galaxy/travel", star.id);
   }
 }
 </script>
