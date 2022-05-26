@@ -13,7 +13,6 @@ export default {
   methods: {
     newSeed: function () {
       this.$store.commit("galaxy/newRandomSeed");
-      window.location.reload(false);
     },
     resetState: function () {
       this.$store.dispatch("galaxy/stopTick");

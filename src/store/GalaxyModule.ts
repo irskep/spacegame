@@ -3,7 +3,7 @@ import { generateStars } from "@/game/exploration/gen/stargen";
 import { GovtSystem } from "@/game/exploration/gen/StarGovtSystem";
 import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { StarMetadataSystem } from "@/game/exploration/gen/StarMetadataSystem";
-import { GalaxyState, RootState } from "./types";
+import { Explorer, GalaxyState, RootState } from "./types";
 import { generateExplorer } from "@/game/exploration/gen/explorers";
 import { RNG } from "@/game/framework/RNG";
 import { tickScan, tickTravel } from "./ticks";
@@ -22,12 +22,14 @@ function newRandomSeed(state: GalaxyState): GalaxyState {
   const g = getGalaxy(state.seed);
   state.starInfo = StarMetadataSystem.makeMetadata(state.seed, g);
   state.govtInfo = GovtSystem.makeGovts(state.seed, getGalaxy(state.seed));
-  state.explorers = {};
+  const newExplorers: Record<string, Explorer> = {};
   for (let i = 0; i < 5; i++) {
     const e = generateExplorer(g.homeStarID);
-    state.explorers[e.id] = e;
+    newExplorers[e.id] = e;
   }
-  console.log(Object.values(state.explorers).length);
+  state.explorers = newExplorers;
+  console.log("Regen");
+  console.log(Object.keys(state.explorers).sort());
   return state;
 }
 

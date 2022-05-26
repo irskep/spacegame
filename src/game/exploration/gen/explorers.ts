@@ -10,6 +10,7 @@ const makeID = (prefix: string) => {
 };
 
 export function generateExplorer(starID: string): Explorer {
+  // if (nextId >= 20) debugger;
   return {
     id: makeID("explorer"),
     name: shipnames.flatten("#shipname#"),
