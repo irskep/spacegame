@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<style lang="scss">
+<style lang="css">
 html {
   box-sizing: border-box;
 }
@@ -29,11 +29,8 @@ html {
 body {
   font-size: 1.8rem;
   line-height: 1.618;
-  // max-width: 38em;
-  // margin: auto;
   color: #4a4a4a;
   background-color: #f9f9f9;
-  // padding: 13px;
   padding: 0;
   margin: 0;
 }

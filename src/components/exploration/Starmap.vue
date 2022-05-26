@@ -138,15 +138,15 @@ export default class Starmap extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 .Starmap {
   position: relative;
   background-color: black;
+}
 
-  .Edge.m-active {
-    stroke: white;
-    stroke-width: 2px;
-  }
+.Starmap .Edge.m-active {
+  stroke: white;
+  stroke-width: 2px;
 }
 
 .Starmap_Star_Label {
@@ -154,19 +154,17 @@ export default class Starmap extends Vue {
   font-weight: bold;
 }
 
-.Starmap_Star:hover {
-  text {
-    visibility: visible;
-  }
+.Starmap_Star:hover text {
+  visibility: visible;
+}
 
-  &.m-travelable circle {
-    cursor: pointer;
-  }
+.Starmap_Star:hover.m-travelable circle {
+  cursor: pointer;
+}
 
-  circle.Starmap_Star_Inner {
-    stroke: yellow;
-    fill: #333;
-  }
+.Starmap_Star:hover circle.Starmap_Star_Inner {
+  stroke: yellow;
+  fill: #333;
 }
 
 .pulse {

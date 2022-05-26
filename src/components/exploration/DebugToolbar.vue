@@ -20,7 +20,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="css">
 .DebugToolbar {
   background-color: black;
   padding: 0 5px 5px 5px;

@@ -65,7 +65,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="css">
 .PanContainer {
   position: relative;
   overflow: hidden;

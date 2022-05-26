@@ -37,7 +37,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="css">
 .Game_Inner {
   display: flex;
   flex-wrap: wrap;

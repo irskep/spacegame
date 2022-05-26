@@ -36,4 +36,4 @@ export default class ActiveStar extends Vue {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="css" scoped></style>
