@@ -58,6 +58,14 @@
         fill="black"
       ></circle>
 
+      <circle
+        :cx="getExplorerPoint(explorer).x"
+        :cy="getExplorerPoint(explorer).y - 17"
+        :r="7"
+        stroke="white"
+        fill="black"
+      ></circle>
+
       <line
         :x1="getExplorerPoint(explorer).x"
         :y1="getExplorerPoint(explorer).y - 10"
@@ -75,6 +83,15 @@
       :y="Math.max(2, hoveredStar.point.y - 20)"
     >
       {{ getStarName(hoveredStarID) }}
+    </text>
+
+    <text
+      class="Starmap_Explorer_Label"
+      v-if="selectedExplorerID"
+      :x="Math.max(2, getExplorerPoint(explorers[selectedExplorerID]).x - 40)"
+      :y="Math.max(2, getExplorerPoint(explorers[selectedExplorerID]).y - 30)"
+    >
+      {{ explorers[selectedExplorerID].name }}
     </text>
   </svg>
 </template>
@@ -208,6 +225,11 @@ export default class Starmap extends Vue {
   font-weight: bold;
 }
 
+.Starmap_Explorer_Label {
+  fill: white;
+  /* font-weight: bold; */
+}
+
 .Starmap_Star:hover text {
   visibility: visible;
 }
@@ -226,7 +248,7 @@ export default class Starmap extends Vue {
 }
 
 .pulse {
-  animation-duration: 3s;
+  animation-duration: 2s;
   animation-name: pulse;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
@@ -234,13 +256,13 @@ export default class Starmap extends Vue {
 
 @keyframes pulse {
   0% {
-    r: 12px;
+    r: 9px;
   }
   50% {
-    r: 20px;
+    r: 15px;
   }
   100% {
-    r: 12px;
+    r: 9px;
   }
 }
 </style>

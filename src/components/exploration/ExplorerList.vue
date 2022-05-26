@@ -7,7 +7,10 @@
       v-on:click="selectExplorer(explorer.id)"
     >
       <strong>{{ explorer.name }}:</strong> {{ explorer.state }}
-      <InlineProgressBar :progress="getExplorerProgress(explorer)" />
+      <InlineProgressBar
+        :progress="getExplorerProgress(explorer)"
+        :color="getExplorerColor(explorer)"
+      />
     </p>
   </div>
 </template>
@@ -40,6 +43,13 @@ export default class ExplorerDetails extends Vue {
     if (e.scanProgress > 0) return e.scanProgress;
     if (e.travelProgress > 0) return e.travelProgress;
     return 0;
+  }
+
+  getExplorerColor(e: Explorer): string {
+    return {
+      traveling: "lightblue",
+      scanning: "lightgreen",
+    }[e.state];
   }
 
   selectExplorer(eid: string) {

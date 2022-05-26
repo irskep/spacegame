@@ -1,6 +1,9 @@
 <template>
   <div class="InlineProgressBar">
-    <div class="InlineProgressBar_Inner" :style="{ width: width }"></div>
+    <div
+      class="InlineProgressBar_Inner"
+      :style="{ width: width, backgroundColor: color || 'lightgreen' }"
+    ></div>
   </div>
 </template>
 
@@ -10,6 +13,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 @Component
 export default class InlineProgressBar extends Vue {
   @Prop() progress!: number;
+  @Prop() color!: string;
 
   get width(): string {
     return `${(this.progress || 0) * 100}%`;

@@ -4,13 +4,15 @@
     <p v-if="explorer.state === 'scanning'">Scanning {{ star.name }}</p>
     <ProgressBar
       v-if="explorer.state === 'scanning'"
+      color="lightgreen"
       :progress="explorer.scanProgress"
     />
     <p v-if="explorer.state === 'traveling' && destStar">
-      Jumping between {{ star.name }} and {{ destStar.name }}
+      {{ star.name }} &rarr; {{ destStar.name }}
     </p>
     <ProgressBar
       v-if="explorer.state === 'traveling'"
+      color="lightblue"
       :progress="explorer.travelProgress"
     />
     <p v-for="crew in explorer.crew" :key="crew.id">

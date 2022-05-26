@@ -27,6 +27,7 @@ function newRandomSeed(state: GalaxyState): GalaxyState {
     const e = generateExplorer(g.homeStarID);
     state.explorers[e.id] = e;
   }
+  console.log(Object.values(state.explorers).length);
   return state;
 }
 
@@ -68,9 +69,6 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
     },
   },
   mutations: {
-    travel(state, opts: { explorerID: string; newStarID: string }) {
-      state.explorers[opts.explorerID].destinationStarID = opts.newStarID;
-    },
     tick(state, dt: number) {
       const galaxy = getGalaxy(state.seed);
 
