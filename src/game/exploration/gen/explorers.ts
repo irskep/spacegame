@@ -9,11 +9,17 @@ const makeID = (prefix: string) => {
   return `${prefix}-${nextId++}`;
 };
 
-export function generateExplorer(starID: string): Explorer {
-  // if (nextId >= 20) debugger;
+export function generateExplorer(
+  starID: string,
+  usedNames: string[]
+): Explorer {
+  let shipName = shipnames.flatten("#shipname#");
+  while (usedNames.indexOf(shipName) >= 0) {
+    shipName = shipnames.flatten("#shipname#");
+  }
   return {
     id: makeID("explorer"),
-    name: shipnames.flatten("#shipname#"),
+    name: shipName,
     starID,
     destinationStarID: null,
     travelProgress: 0,

@@ -53,7 +53,6 @@ export default class ExplorerDetails extends Vue {
   }
 
   selectExplorer(eid: string) {
-    console.log(Object.keys(this.explorers).sort());
     this.$store.commit("ui/selectExplorer", eid);
   }
 }

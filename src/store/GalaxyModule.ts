@@ -12,7 +12,7 @@ const galaxyCache: Record<string, Galaxy> = {};
 
 function getGalaxy(s: string): Galaxy {
   if (galaxyCache[s]) return galaxyCache[s];
-  const g = generateStars(s);
+  const g = generateStars(s, 300, { x: 2048, y: 2048 });
   galaxyCache[s] = g;
   return g;
 }
@@ -24,7 +24,10 @@ function newRandomSeed(state: GalaxyState): GalaxyState {
   state.govtInfo = GovtSystem.makeGovts(state.seed, getGalaxy(state.seed));
   const newExplorers: Record<string, Explorer> = {};
   for (let i = 0; i < 5; i++) {
-    const e = generateExplorer(g.homeStarID);
+    const e = generateExplorer(
+      g.homeStarID,
+      Object.values(newExplorers).map((e) => e.name)
+    );
     newExplorers[e.id] = e;
   }
   state.explorers = newExplorers;

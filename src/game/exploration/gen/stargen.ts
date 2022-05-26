@@ -32,6 +32,16 @@ export function generateStars(
   let numPlaced = 0;
   let iters = 0;
   while (numPlaced < n && iters < n * 10) {
+    if (openStars.length <= 0) {
+      console.warn(
+        "Ran out of stars at",
+        numPlaced,
+        "stars and",
+        iters,
+        "iters"
+      );
+      break;
+    }
     iters += 1;
     const s = rng.choice(openStars);
     const slot = rng.chooseAndRemove(s.slots);
