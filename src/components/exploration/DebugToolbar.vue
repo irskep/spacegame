@@ -2,6 +2,8 @@
   <div class="DebugToolbar">
     <button v-on:click="newSeed">New seed</button>
     <button v-on:click="resetState">Reset state</button>
+    <button v-on:click="pause">Pause</button>
+    <button v-on:click="resume">Resume</button>
   </div>
 </template>
 
@@ -11,10 +13,18 @@ export default {
   methods: {
     newSeed: function () {
       this.$store.commit("galaxy/newRandomSeed");
+      window.location.reload(false);
     },
     resetState: function () {
+      this.$store.dispatch("galaxy/stopTick");
       delete localStorage.vuex;
       window.location.reload(false);
+    },
+    pause: function () {
+      this.$store.dispatch("galaxy/stopTick");
+    },
+    resume: function () {
+      this.$store.dispatch("galaxy/beginTick");
     },
   },
 };

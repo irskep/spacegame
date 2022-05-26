@@ -11,6 +11,7 @@ export default class Panel extends Vue {}
 
 <style lang="css">
 .Panel {
+  max-width: 350px;
   background-color: black;
   border: 1px solid #666;
   padding: 0.5rem;

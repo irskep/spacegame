@@ -1,6 +1,8 @@
 import { Explorer } from "@/store/types";
 import shipnames from "@/game/exploration/gen/shipnames";
 import peoplenames from "@/game/exploration/gen/peoplenames";
+import { RNG } from "@/game/framework/RNG";
+import { SPACESHIP_IMAGES } from "@/game/defs/shipGfx";
 
 let nextId = 1;
 const makeID = (prefix: string) => {
@@ -19,6 +21,7 @@ export function generateExplorer(starID: string): Explorer {
     ship: {
       id: makeID("ship"),
       kind: "Clipper",
+      image: new RNG(`${Math.random()}`).choice(SPACESHIP_IMAGES),
     },
     crew: [
       {

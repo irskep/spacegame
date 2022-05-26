@@ -6,6 +6,7 @@
         <Starmap />
       </PanContainer>
       <PanelGroup className="m-hud-top">
+        <Panel><ExplorerList /></Panel>
         <Panel v-if="selectedStarID">
           <StarDetails :starID="selectedStarID" />
         </Panel>
@@ -21,15 +22,18 @@
 import DebugToolbar from "@/components/exploration/DebugToolbar.vue";
 import Starmap from "@/components/exploration/Starmap.vue";
 import ExplorerDetails from "@/components/exploration/ExplorerDetails.vue";
+import ExplorerList from "@/components/exploration/ExplorerList.vue";
 import StarDetails from "@/components/exploration/StarDetails.vue";
 import PanContainer from "@/components/exploration/PanContainer.vue";
 import Panel from "@/components/ui/Panel.vue";
 import PanelGroup from "@/components/ui/PanelGroup.vue";
+import { cancelAnimation } from "@/store/GalaxyModule";
 
 export default {
   name: "Game",
   components: {
     ExplorerDetails,
+    ExplorerList,
     StarDetails,
     DebugToolbar,
     Starmap,
@@ -69,6 +73,7 @@ export default {
 
 .UI p {
   margin-bottom: 0;
+  font-size: 12px;
 }
 
 .Game {

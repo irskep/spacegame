@@ -52,11 +52,20 @@
       <circle
         :class="{ pulse: getIsExplorerSelected(explorer) }"
         :cx="getExplorerPoint(explorer).x"
-        :cy="getExplorerPoint(explorer).y"
+        :cy="getExplorerPoint(explorer).y - 17"
         :r="7"
-        stroke="lightgreen"
-        fill="transparent"
+        stroke="white"
+        fill="black"
       ></circle>
+
+      <line
+        :x1="getExplorerPoint(explorer).x"
+        :y1="getExplorerPoint(explorer).y - 10"
+        :x2="getExplorerPoint(explorer).x"
+        :y2="getExplorerPoint(explorer).y"
+        class="Edge"
+        stroke="white"
+      ></line>
     </g>
 
     <text

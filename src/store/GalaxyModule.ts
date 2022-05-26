@@ -33,6 +33,7 @@ function newRandomSeed(state: GalaxyState): GalaxyState {
 export const GalaxyModule: Module<GalaxyState, RootState> = {
   namespaced: true,
   state: newRandomSeed({
+    animationHandle: 0,
     seed: "0",
     starInfo: {},
     govtInfo: {},
@@ -45,7 +46,9 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
     },
   },
   actions: {
-    beginTick() {
+    beginTick(ctx) {
+      ctx.dispatch("stopTick");
+      if (ctx.state.animationHandle !== 0) return;
       let lastTick = Date.now();
       const exec = () => {
         const now = Date.now();
@@ -54,9 +57,14 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
         this.commit("galaxy/tick", dt);
 
         lastTick = now;
-        requestAnimationFrame(exec);
+        ctx.state.animationHandle = requestAnimationFrame(exec);
       };
-      requestAnimationFrame(exec);
+      ctx.state.animationHandle = requestAnimationFrame(exec);
+    },
+    stopTick(ctx) {
+      if (ctx.state.animationHandle === 0) return;
+      cancelAnimationFrame(ctx.state.animationHandle);
+      ctx.state.animationHandle = 0;
     },
   },
   mutations: {

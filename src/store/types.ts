@@ -17,6 +17,7 @@ export interface Crewmate {
 export interface Ship {
   id: string;
   kind: string;
+  image: string;
 }
 
 export type ExplorerState = "traveling" | "scanning";
@@ -30,6 +31,7 @@ export type Explorer = TravelerComponent & {
 };
 
 export interface GalaxyState {
+  animationHandle: number;
   seed: string;
   starInfo: StarMetadataMap;
   govtInfo: GovtMap;
