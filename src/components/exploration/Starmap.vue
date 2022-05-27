@@ -131,11 +131,6 @@ export default class Starmap extends Vue {
   @ui.State hoveredStarID!: string | null;
   @ui.State selectedExplorerID!: string | null;
 
-  mounted() {
-    console.log(this.$store.state);
-    console.log(this.$store.getters["galaxy/galaxy"]);
-  }
-
   get state(): GalaxyState {
     return this.$store.state.galaxy as GalaxyState;
   }
