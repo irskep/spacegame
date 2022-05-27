@@ -8,13 +8,12 @@
       :x2="pair[1].point.x"
       :y2="pair[1].point.y"
       class="Edge"
-      :class="{ 'm-active': getIsHoveredEdge(pair) }"
       stroke="gray"
     ></line>
 
     <g
       class="Starmap_Star"
-      v-for="star in Object.values(galaxy.stars)"
+      v-for="star in allStars"
       :key="star.id + '2'"
       :id="star.id"
       data-id="star.id"
@@ -24,6 +23,7 @@
     >
       <circle
         class="Starmap_Star_Govt"
+        :class="{ 'm-unexplored': !getIsExplored(star.id) }"
         :cx="star.point.x"
         :cy="star.point.y"
         :r="10"
@@ -48,23 +48,6 @@
       class="Starmap_ExplorerIndicator"
       :id="explorer.id"
     >
-      <circle
-        :class="{ pulse: getIsExplorerSelected(explorer) }"
-        :cx="getExplorerPoint(explorer).x"
-        :cy="getExplorerPoint(explorer).y - 17"
-        :r="7"
-        stroke="white"
-        fill="black"
-      ></circle>
-
-      <circle
-        :cx="getExplorerPoint(explorer).x"
-        :cy="getExplorerPoint(explorer).y - 17"
-        :r="7"
-        stroke="white"
-        fill="black"
-      ></circle>
-
       <line
         :x1="getExplorerPoint(explorer).x"
         :y1="getExplorerPoint(explorer).y - 10"
@@ -73,6 +56,32 @@
         class="Edge"
         stroke="white"
       ></line>
+
+      <circle
+        :class="{ pulse: getIsExplorerSelected(explorer) }"
+        :cx="getExplorerPoint(explorer).x"
+        :cy="getExplorerPoint(explorer).y - 23"
+        :r="12"
+        stroke="white"
+        fill="black"
+      ></circle>
+
+      <circle
+        :cx="getExplorerPoint(explorer).x"
+        :cy="getExplorerPoint(explorer).y - 23"
+        :r="12"
+        stroke="white"
+        fill="black"
+      ></circle>
+
+      <image
+        :href="`/spaceships/${explorer.ship.image}`"
+        :x="getExplorerPoint(explorer).x"
+        :y="getExplorerPoint(explorer).y - 10"
+        transform="translate(-8, -22)"
+        transform-origin="center"
+        height="16"
+      ></image>
     </g>
 
     <text
@@ -108,16 +117,6 @@ import { StarMetadataMap } from "@/game/exploration/gen/StarMetadataSystem";
 import { Vector2 } from "@/game/framework/Vector2";
 import { lerp } from "@/game/framework/util";
 
-/**
- * Simple function that lets you log one object in the middle of an expression.
- * Can be disabled by setting enable=false.
- */
-function log<T>(label: string, obj: T, enable = true): T {
-  if (!enable) return obj;
-  console.log(label, obj);
-  return obj;
-}
-
 const x = namespace("galaxy");
 const ui = namespace("ui");
 
@@ -137,7 +136,17 @@ export default class Starmap extends Vue {
   }
 
   get allNeighbors(): [Star, Star][] {
-    return log("allNeighbors", this.galaxy.getAllNeighbors(), false);
+    return this.galaxy
+      .getAllNeighbors()
+      .filter(
+        ([a, b]) => this.starInfo[a.id].known && this.starInfo[b.id].known
+      );
+  }
+
+  get allStars(): Star[] {
+    return Object.values(this.galaxy.stars).filter(
+      (s) => this.starInfo[s.id].known
+    );
   }
 
   get hoveredStar(): Star | null {
@@ -145,8 +154,16 @@ export default class Starmap extends Vue {
     return this.galaxy.stars[this.hoveredStarID];
   }
 
+  getIsKnown(sid: string): boolean {
+    return this.starInfo[sid].known;
+  }
+
+  getIsExplored(sid: string): boolean {
+    return this.starInfo[sid].explored;
+  }
+
   getStarColor(s: Star): string {
-    if (!this.govtInfo[s.id]) return "#616161";
+    if (!this.govtInfo[s.id] || !this.getIsExplored(s.id)) return "#616161";
     return this.govtInfo[s.id].color;
   }
 
@@ -160,17 +177,6 @@ export default class Starmap extends Vue {
       if (e.starID == starID) return true;
     }
     return false;
-  }
-
-  getIsHoveredEdge(pair: [Star, Star]) {
-    return false;
-    // const isOnA =
-    // pair[0].id === this.playerLocationStarID ||
-    // pair[1].id === this.playerLocationStarID;
-    // const isOnB =
-    // pair[0].id === this.hoveredStar?.id ||
-    // pair[1].id === this.hoveredStar?.id;
-    // return isOnA && isOnB;
   }
 
   getExplorerPoint(e: Explorer): Vector2 {

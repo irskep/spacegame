@@ -1,6 +1,10 @@
 <template>
   <div class="ExplorerDetails" v-if="explorer">
     <h6>{{ explorer.name }}</h6>
+    <img
+      class="Spaceship m-large"
+      :src="`/spaceships/${explorer.ship.image}`"
+    />
     <p v-if="explorer.state === 'scanning'">Scanning {{ star.name }}</p>
     <ProgressBar
       v-if="explorer.state === 'scanning'"
@@ -68,4 +72,9 @@ export default class ExplorerDetails extends Vue {
 }
 </script>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+img.Spaceship.m-large {
+  height: 64px;
+  width: auto;
+}
+</style>
