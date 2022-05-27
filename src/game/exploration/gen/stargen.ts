@@ -3,6 +3,7 @@ import { Vector2 } from "@/game/framework/Vector2";
 import { Star } from "@/game/exploration/types/Star";
 import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { distance } from "@/game/framework/util";
+import shortUUID from "short-uuid";
 
 export const MIN_STAR_SPACE = 40;
 const MAX_STAR_SPACE = 80;
@@ -16,9 +17,8 @@ export function generateStars(
 
   const rng = new RNG(seed);
 
-  let nextStarId = 1;
   const makeStarID = () => {
-    return `star-${nextStarId++}`;
+    return shortUUID.generate();
   };
 
   const centerStar: Star = {

@@ -1,4 +1,6 @@
 import { Module } from "vuex";
+import { StarSystem } from "stellardream";
+
 import { generateStars } from "@/game/exploration/gen/stargen";
 import { GovtSystem } from "@/game/exploration/gen/StarGovtSystem";
 import { Galaxy } from "@/game/exploration/types/Galaxy";
@@ -15,6 +17,58 @@ function getGalaxy(s: string): Galaxy {
   const g = generateStars(s, 300, { x: 2048, y: 2048 });
   galaxyCache[s] = g;
   return g;
+}
+
+const starSystemCache: Record<string, StarSystem> = {};
+function generateStarSystem(s: string): StarSystem {
+  function score(starSystem: StarSystem): number {
+    let result = 0;
+    if (starSystem.stars[0].starType === "M") {
+      result -= 1; // dwarfs are boring
+    }
+    if (starSystem.planets.length > 3) {
+      result += 1; // lots of planets are cool
+    }
+    let hasInterestingPlanet = false;
+    for (const planet of starSystem.planets) {
+      const isCold = planet.distance > starSystem.habitableZoneMax;
+      const isHot = planet.distance < starSystem.habitableZoneMin;
+      const isTidallyLocked = !isCold && starSystem.stars[0].starType == "M";
+      if (!isCold && !isHot && !isTidallyLocked) {
+        hasInterestingPlanet = true;
+        break;
+      }
+    }
+    if (hasInterestingPlanet) {
+      result += 2;
+    }
+    return result;
+  }
+
+  // Generate 100 stars and pick the coolest one
+  const rng = new RNG(s);
+  let result = new StarSystem(rng.getRandom() * (Number.MAX_SAFE_INTEGER / 4));
+  let resultScore = score(result);
+  for (let i = 1; i < 100; i++) {
+    const candidate = new StarSystem(
+      rng.getRandom() * (Number.MAX_SAFE_INTEGER / 4) + i
+    );
+    const candidateScore = score(candidate);
+    if (candidateScore > resultScore) {
+      result = candidate;
+      resultScore = candidateScore;
+    }
+  }
+  debugger;
+  return result;
+}
+
+// Stars are globally unique, so no need to make it a getter
+export function getStarSystem(s: string): StarSystem {
+  if (!starSystemCache[s]) {
+    starSystemCache[s] = generateStarSystem(s);
+  }
+  return starSystemCache[s];
 }
 
 function newRandomSeed(state: GalaxyState): GalaxyState {
@@ -52,6 +106,10 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
   getters: {
     galaxy: function (state): Galaxy {
       console.log("Galaxy for", state.seed);
+      const g = getGalaxy(state.seed);
+      if (!g) {
+        debugger;
+      }
       return getGalaxy(state.seed);
     },
   },
@@ -80,6 +138,11 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
     },
   },
   mutations: {
+    ensureSeeded(state) {
+      if (state.seed === "0") {
+        newRandomSeed(state);
+      }
+    },
     tick(state, dt: number) {
       const galaxy = getGalaxy(state.seed);
 

@@ -41,6 +41,7 @@ export default {
     PanelGroup,
   },
   mounted: function () {
+    this.$store.commit("galaxy/ensureSeeded");
     this.$store.dispatch("galaxy/beginTick");
   },
   computed: {

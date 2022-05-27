@@ -131,13 +131,20 @@ export default class Starmap extends Vue {
   @ui.State hoveredStarID!: string | null;
   @ui.State selectedExplorerID!: string | null;
 
+  mounted() {
+    console.log(this.$store.state);
+    console.log(this.$store.getters["galaxy/galaxy"]);
+  }
+
   get state(): GalaxyState {
     return this.$store.state.galaxy as GalaxyState;
   }
 
   get allNeighbors(): [Star, Star][] {
+    console.log("hi");
     return this.galaxy
       .getAllNeighbors()
+      .filter(([a, b]) => this.starInfo[a.id] && this.starInfo[b.id])
       .filter(
         ([a, b]) => this.starInfo[a.id].known && this.starInfo[b.id].known
       );
@@ -145,7 +152,7 @@ export default class Starmap extends Vue {
 
   get allStars(): Star[] {
     return Object.values(this.galaxy.stars).filter(
-      (s) => this.starInfo[s.id].known
+      (s) => this.starInfo[s.id] && this.starInfo[s.id].known
     );
   }
 
@@ -155,11 +162,11 @@ export default class Starmap extends Vue {
   }
 
   getIsKnown(sid: string): boolean {
-    return this.starInfo[sid].known;
+    return this.starInfo[sid] && this.starInfo[sid].known;
   }
 
   getIsExplored(sid: string): boolean {
-    return this.starInfo[sid].explored;
+    return this.starInfo[sid] && this.starInfo[sid].explored;
   }
 
   getStarColor(s: Star): string {

@@ -17,8 +17,14 @@ import {
   StarMetadata,
   StarMetadataMap,
 } from "@/game/exploration/gen/StarMetadataSystem";
+import { getStarSystem } from "@/store/GalaxyModule";
+import { StarSystem } from "stellardream";
 
 const x = namespace("galaxy");
+
+interface PlanetInfo {
+  name: string;
+}
 
 @Component
 export default class StarDetails extends Vue {
@@ -40,7 +46,60 @@ export default class StarDetails extends Vue {
     if (!this.starID) return null;
     return this.govtInfo[this.starID];
   }
+
+  get starSystem(): StarSystem {
+    return getStarSystem(this.starID);
+  }
+
+  get planets(): PlanetInfo[] {
+    const ordinals: string[] = [
+      "First",
+      "Second",
+      "Third",
+      "Fourth",
+      "Fifth",
+      "Sixth",
+      "Seventh",
+      "Eighth",
+      "Ninth",
+      "Tenth",
+      "Eleventh",
+      "Twelfth",
+      "Thirteenth",
+      "Fourteenth",
+      "Fifteenth",
+      "Sixteenth",
+      "Seventeenth",
+      "Eighteenth",
+      "Nineteenth",
+      "Twentieth",
+    ];
+
+    const planets = getStarSystem(this.starID).planets;
+    return planets.map((planet, i) => {
+      const isCold = planet.distance > this.starSystem.habitableZoneMax;
+      const isHot = planet.distance < this.starSystem.habitableZoneMin;
+      const isTidallyLocked =
+        !isCold && this.starSystem.stars[0].starType == "M";
+      return {
+        name: ordinals[i],
+        hab: !isHot && !isCold,
+        isTidallyLocked,
+        planetType: planet.planetType,
+      };
+    });
+  }
 }
 </script>
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+.Planet.m-Neptunian {
+  color: teal;
+}
+.Planet.m-Terran {
+  color: lightblue;
+}
+.Planet.m-Jovian {
+  color: tan;
+}
+</style>

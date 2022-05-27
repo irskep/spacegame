@@ -1,29 +1,18 @@
-# fermi-praxis
+- Probes, science vessels, miners, colony ships
+- Things you can build
+  - Ship construction platforms (only autobuild after upgrade)
+- Goal: Find and repair the multiverse warp gate (prestige)
 
-## Project setup
-```
-yarn install
-```
+- Minerals
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+  - Found on planets:
+    - Beryllium spheres
+  - Found in space
+    - S-type asteroids have silicon, nickel-iron
+    - M-type asteroids have nickel-iron
 
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Run your unit tests
-```
-yarn test:unit
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- Planet states
+  - Known
+  - Mapped
+    - Has available research
+    - Has available materials
