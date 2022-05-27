@@ -123,10 +123,10 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
         const now = Date.now();
         const dt = now - lastTick;
 
+        ctx.state.animationHandle = requestAnimationFrame(exec);
         this.commit("galaxy/tick", dt);
 
         lastTick = now;
-        ctx.state.animationHandle = requestAnimationFrame(exec);
       };
       ctx.state.animationHandle = requestAnimationFrame(exec);
     },
@@ -169,6 +169,7 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
             case "scanning":
               e.destinationStarID = null;
               e.scanProgress = 0;
+              break;
           }
         }
       }

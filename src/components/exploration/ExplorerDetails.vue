@@ -44,6 +44,7 @@ const x = namespace("galaxy");
 @Component({ components: { ProgressBar } })
 export default class ExplorerDetails extends Vue {
   @Prop() explorerID!: string;
+  @x.State animationHandle!: number;
   @x.State explorers!: Record<string, Explorer>;
   @x.State govtInfo!: GovtMap;
   @x.State starInfo!: StarMetadataMap;
@@ -54,6 +55,9 @@ export default class ExplorerDetails extends Vue {
   }
 
   get explorer(): Explorer {
+    // hack: watch animationHandle
+    this.animationHandle;
+
     return this.explorers[this.explorerID];
   }
 

@@ -122,6 +122,7 @@ const ui = namespace("ui");
 
 @Component
 export default class Starmap extends Vue {
+  @x.State animationHandle!: number;
   @x.State seed!: string;
   @x.State govtInfo!: GovtMap;
   @x.State starInfo!: StarMetadataMap;
@@ -136,7 +137,9 @@ export default class Starmap extends Vue {
   }
 
   get allNeighbors(): [Star, Star][] {
-    console.log("hi");
+    // hack: watch animationHandle
+    this.animationHandle;
+
     return this.galaxy
       .getAllNeighbors()
       .filter(([a, b]) => this.starInfo[a.id] && this.starInfo[b.id])

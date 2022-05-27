@@ -30,6 +30,7 @@ const x = namespace("galaxy");
 @Component({ components: { InlineProgressBar } })
 export default class ExplorerDetails extends Vue {
   @Prop() explorerID!: string;
+  @x.State animationHandle!: number;
   @x.State explorers!: Record<string, Explorer>;
   @x.State govtInfo!: GovtMap;
   @x.State starInfo!: StarMetadataMap;
@@ -40,6 +41,9 @@ export default class ExplorerDetails extends Vue {
   }
 
   getExplorerProgress(e: Explorer): number {
+    // hack: watch animationHandle
+    this.animationHandle;
+
     if (e.scanProgress > 0) return e.scanProgress;
     if (e.travelProgress > 0) return e.travelProgress;
     return 0;
