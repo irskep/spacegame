@@ -44,7 +44,6 @@
     "gh-pages": "^3.0.0",
     "node-sass": "^4.12.0",
     "prettier": "2",
-    "sass-loader": "^8.0.2",
     "typescript": "~3.9.3",
     "vue-template-compiler": "^2.6.11"
   }
