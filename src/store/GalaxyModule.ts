@@ -59,7 +59,6 @@ function generateStarSystem(s: string): StarSystem {
       resultScore = candidateScore;
     }
   }
-  debugger;
   return result;
 }
 
@@ -106,10 +105,6 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
   getters: {
     galaxy: function (state): Galaxy {
       console.log("Galaxy for", state.seed);
-      const g = getGalaxy(state.seed);
-      if (!g) {
-        debugger;
-      }
       return getGalaxy(state.seed);
     },
   },

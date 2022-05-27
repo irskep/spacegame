@@ -2,6 +2,9 @@
   <div class="StarDetails" v-if="starID">
     <h6>{{ info.name }}</h6>
     <p>{{ govt.name }}</p>
+    <p v-for="planet in planets" :key="planet.name" :class="planet.cssClass">
+      {{ planet.name }}: {{ planet.planetType }}
+    </p>
   </div>
 </template>
 
@@ -24,6 +27,8 @@ const x = namespace("galaxy");
 
 interface PlanetInfo {
   name: string;
+  planetType: string;
+  cssClass: Record<string, boolean>;
 }
 
 @Component
@@ -81,11 +86,17 @@ export default class StarDetails extends Vue {
       const isHot = planet.distance < this.starSystem.habitableZoneMin;
       const isTidallyLocked =
         !isCold && this.starSystem.stars[0].starType == "M";
+      const hab = !isHot && !isCold && !isTidallyLocked;
       return {
         name: ordinals[i],
-        hab: !isHot && !isCold,
-        isTidallyLocked,
         planetType: planet.planetType,
+        hab,
+        isTidallyLocked,
+        cssClass: {
+          Planet: true,
+          [`m-${planet.planetType}`]: true,
+          "m-habitable": hab,
+        },
       };
     });
   }
@@ -101,5 +112,8 @@ export default class StarDetails extends Vue {
 }
 .Planet.m-Jovian {
   color: tan;
+}
+.Planet.m-Terran.m-habitable {
+  color: lightgreen;
 }
 </style>
