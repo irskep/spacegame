@@ -29,6 +29,10 @@ export function tickTravel(
     );
     e.travelProgress = 0;
   }
+  if (!galaxy.stars[e.starID]) {
+    console.error("bad data:", e.starID);
+    return;
+  }
   const srcStar = galaxy.stars[e.starID];
   const destStar = galaxy.stars[e.destinationStarID];
   const starDist = distance(srcStar.point, destStar.point);

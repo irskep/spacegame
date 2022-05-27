@@ -17,8 +17,9 @@ export function generateStars(
 
   const rng = new RNG(seed);
 
+  let starN = 1;
   const makeStarID = () => {
-    return shortUUID.generate();
+    return `star-${seed}-${starN++}`;
   };
 
   const centerStar: Star = {

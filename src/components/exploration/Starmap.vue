@@ -186,6 +186,7 @@ export default class Starmap extends Vue {
 
   getExplorerPoint(e: Explorer): Vector2 {
     const star = this.galaxy.stars[e.starID];
+    if (!star) return { x: 0, y: 0 };
     if (e.destinationStarID) {
       const destStar = this.galaxy.stars[e.destinationStarID];
       return lerp(star.point, destStar.point, e.travelProgress);

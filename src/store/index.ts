@@ -13,5 +13,5 @@ export default new Vuex.Store<RootState>({
     galaxy: GalaxyModule,
     ui: UIModule,
   },
-  // plugins: [new VuexPersistence().plugin],
+  plugins: [new VuexPersistence().plugin],
 });
