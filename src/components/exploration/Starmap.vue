@@ -113,7 +113,7 @@ import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
 import { StarMetadataMap } from "@/game/exploration/gen/StarMetadataSystem";
 import { scaleToHeight, Vector2 } from "@/game/framework/Vector2";
 import { lerp } from "@/game/framework/util";
-import { getStarSystem } from "@/store/GalaxyModule";
+import { getStarSystem } from "@/store/getterHelpers/starSystems";
 import { getStarSystemFacts } from "@/game/exploration/types/spacefacts";
 
 const x = namespace("galaxy");

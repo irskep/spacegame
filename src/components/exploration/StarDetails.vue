@@ -19,8 +19,8 @@ import {
   StarMetadata,
   StarMetadataMap,
 } from "@/game/exploration/gen/StarMetadataSystem";
-import { getStarSystem } from "@/store/GalaxyModule";
 import { StarSystem } from "stellardream";
+import { getStarSystem } from "@/store/getterHelpers/starSystems";
 
 const x = namespace("galaxy");
 

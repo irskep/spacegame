@@ -39,6 +39,7 @@ export interface PlanetInfo {
 export interface GalaxyState {
   animationHandle: number;
   messages: string[];
+  lowPowerMode: boolean;
 
   seed: string;
 

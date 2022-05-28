@@ -2,7 +2,7 @@ import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { RNG } from "@/game/framework/RNG";
 import { distance } from "@/game/framework/util";
 import { addMessage } from "./messages";
-import { Explorer, ExplorerState, GalaxyState } from "./types";
+import { Explorer, ExplorerState, GalaxyState } from "../types";
 
 const CONSTANTS = {
   travelTime: 5,

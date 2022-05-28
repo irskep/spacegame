@@ -1,103 +1,17 @@
 import { Module } from "vuex";
-import { StarSystem } from "stellardream";
 
-import { generateStars } from "@/game/exploration/gen/stargen";
-import { GovtSystem } from "@/game/exploration/gen/StarGovtSystem";
 import { Galaxy } from "@/game/exploration/types/Galaxy";
-import { StarMetadataSystem } from "@/game/exploration/gen/StarMetadataSystem";
 import { GalaxyState, RootState } from "./types";
-import { generateExplorer } from "@/game/exploration/gen/explorers";
-import { RNG } from "@/game/framework/RNG";
-import { NEXTS, STARTS, TICKS } from "./ticks";
-
-const galaxyCache: Record<string, Galaxy> = {};
-
-function getGalaxy(s: string): Galaxy {
-  if (galaxyCache[s]) return galaxyCache[s];
-  const g = generateStars(s, 300, { x: 2048, y: 2048 });
-  galaxyCache[s] = g;
-  return g;
-}
-
-const starSystemCache: Record<string, StarSystem> = {};
-function generateStarSystem(s: string): StarSystem {
-  function score(starSystem: StarSystem): number {
-    let result = 0;
-    if (starSystem.stars[0].starType === "M") {
-      result -= 1; // dwarfs are boring
-    }
-    if (starSystem.planets.length > 3) {
-      result += 1; // lots of planets are cool
-    }
-    let hasInterestingPlanet = false;
-    for (const planet of starSystem.planets) {
-      const isCold = planet.distance > starSystem.habitableZoneMax;
-      const isHot = planet.distance < starSystem.habitableZoneMin;
-      const isTidallyLocked = !isCold && starSystem.stars[0].starType == "M";
-      if (!isCold && !isHot && !isTidallyLocked) {
-        hasInterestingPlanet = true;
-        break;
-      }
-    }
-    if (hasInterestingPlanet) {
-      result += 2;
-    }
-    return result;
-  }
-
-  // Generate 100 stars and pick the coolest one
-  const rng = new RNG(s);
-  let result = new StarSystem(rng.getRandom() * (Number.MAX_SAFE_INTEGER / 4));
-  let resultScore = score(result);
-  for (let i = 1; i < 100; i++) {
-    const candidate = new StarSystem(
-      rng.getRandom() * (Number.MAX_SAFE_INTEGER / 4) + i
-    );
-    const candidateScore = score(candidate);
-    if (candidateScore > resultScore) {
-      result = candidate;
-      resultScore = candidateScore;
-    }
-  }
-  return result;
-}
-
-// Stars are globally unique, so no need to make it a getter
-export function getStarSystem(s: string): StarSystem {
-  if (!starSystemCache[s]) {
-    starSystemCache[s] = generateStarSystem(s);
-  }
-  return starSystemCache[s];
-}
-
-function newRandomSeed(state: GalaxyState): GalaxyState {
-  state.seed = `${Math.random()}`;
-  const g = getGalaxy(state.seed);
-  state.starInfo = StarMetadataSystem.makeMetadata(state.seed, g);
-  state.govtInfo = GovtSystem.makeGovts(state.seed, getGalaxy(state.seed));
-  state.explorers = {};
-  for (let i = 0; i < 5; i++) {
-    const e = generateExplorer(
-      g.homeStarID,
-      Object.values(state.explorers).map((e) => e.name)
-    );
-    state.explorers[e.id] = e;
-  }
-
-  state.starInfo[g.homeStarID].known = true;
-  state.starInfo[g.homeStarID].explored = true;
-  for (const neighborID of g.getNeighborIDs(g.homeStarID)) {
-    state.starInfo[neighborID].known = true;
-  }
-
-  return state;
-}
+import { NEXTS, STARTS, TICKS } from "./mutationHelpers/ticks";
+import { getGalaxy } from "./getterHelpers/getGalaxy";
+import { newRandomSeed } from "./mutationHelpers/newRandomSeed";
 
 export const GalaxyModule: Module<GalaxyState, RootState> = {
   namespaced: true,
   state: {
     animationHandle: 0,
     messages: [],
+    lowPowerMode: false,
     seed: "0",
     starInfo: {},
     govtInfo: {},
