@@ -12,6 +12,15 @@ const grammar = tracery.createGrammar({
     "Stephen",
     "Susan",
     "Talia",
+
+    "Thane",
+    "Samara",
+    "Miranda",
+    "Jack",
+    "Jacob",
+    "Morden",
+    "Joker",
+    "Garrus",
   ],
 
   lastname: [
@@ -23,6 +32,12 @@ const grammar = tracery.createGrammar({
     "Sinclair",
     "Clark",
     "Reynolds",
+
+    "Shepard",
+    "Krios",
+    "Taylor",
+    "Solus",
+    "Vakerian",
   ],
 });
 

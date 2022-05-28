@@ -5,8 +5,8 @@ import { addMessage } from "./messages";
 import { Explorer, ExplorerState, GalaxyState } from "./types";
 
 const CONSTANTS = {
-  travelTime: 5000,
-  scanTime: 2000,
+  travelTime: 5,
+  scanTime: 2,
 };
 
 type StarExplorationState = "None" | "Some" | "All";

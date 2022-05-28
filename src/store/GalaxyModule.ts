@@ -115,12 +115,16 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
       ctx.dispatch("stopTick");
       console.log("RESUME");
       if (ctx.state.animationHandle !== 0) return;
-      let lastTime = performance.now();
+      let lastTime: number | null = null;
       const exec = (t: number) => {
         ctx.state.animationHandle = requestAnimationFrame(exec);
+        if (!lastTime) {
+          lastTime = t;
+          return;
+        }
         const dt = t - lastTime;
         this.commit("galaxy/tick", dt / 1000);
-        lastTime = dt;
+        lastTime = t;
       };
       ctx.state.animationHandle = requestAnimationFrame(exec);
     },
