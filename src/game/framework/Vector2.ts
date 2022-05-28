@@ -3,6 +3,11 @@ export interface Vector2 {
   y: number;
 }
 
+export function scaleToHeight(a: Vector2, height: number): Vector2 {
+  const factor = height / a.y;
+  return { x: a.x * factor, y: height };
+}
+
 // line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/
 // Determine the intersection point of two line segments
 // Return FALSE if the lines don't intersect

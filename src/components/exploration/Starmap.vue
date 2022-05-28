@@ -46,41 +46,38 @@
       v-bind:key="explorer.id"
       v-on:click="setSelectedExplorer(explorer.id)"
       class="Starmap_ExplorerIndicator"
+      :transform="`translate(${getExplorerPoint(explorer).x}, ${
+        getExplorerPoint(explorer).y
+      })`"
       :id="explorer.id"
     >
       <line
-        :x1="getExplorerPoint(explorer).x"
-        :y1="getExplorerPoint(explorer).y - 10"
-        :x2="getExplorerPoint(explorer).x"
-        :y2="getExplorerPoint(explorer).y"
+        :x1="0"
+        :y1="-10"
+        :x2="0"
+        :y2="0"
         class="Edge"
         stroke="white"
       ></line>
 
       <circle
         :class="{ pulse: getIsExplorerSelected(explorer) }"
-        :cx="getExplorerPoint(explorer).x"
-        :cy="getExplorerPoint(explorer).y - 23"
+        :cx="0"
+        :cy="-23"
         :r="12"
         stroke="white"
         fill="black"
       ></circle>
 
-      <circle
-        :cx="getExplorerPoint(explorer).x"
-        :cy="getExplorerPoint(explorer).y - 23"
-        :r="12"
-        stroke="white"
-        fill="black"
-      ></circle>
+      <circle :cx="0" :cy="-23" :r="12" stroke="white" fill="black"></circle>
 
       <image
-        :href="`/spaceships/${explorer.ship.image}`"
-        :x="getExplorerPoint(explorer).x"
-        :y="getExplorerPoint(explorer).y - 10"
-        transform="translate(-8, -22)"
+        :href="getSpaceshipURL(explorer)"
+        :x="-getImageSize(getSpaceshipURL(explorer)).x / 2"
+        :y="-23 - getImageSize(getSpaceshipURL(explorer)).y / 2"
         transform-origin="center"
-        height="16"
+        :width="getImageSize(getSpaceshipURL(explorer)).x"
+        :height="getImageSize(getSpaceshipURL(explorer)).y"
       ></image>
     </g>
 
@@ -114,7 +111,7 @@ import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { Star } from "@/game/exploration/types/Star";
 import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
 import { StarMetadataMap } from "@/game/exploration/gen/StarMetadataSystem";
-import { Vector2 } from "@/game/framework/Vector2";
+import { scaleToHeight, Vector2 } from "@/game/framework/Vector2";
 import { lerp } from "@/game/framework/util";
 import { getStarSystem } from "@/store/GalaxyModule";
 import { getStarSystemFacts } from "@/game/exploration/types/spacefacts";
@@ -133,6 +130,9 @@ export default class Starmap extends Vue {
 
   @ui.State hoveredStarID!: string | null;
   @ui.State selectedExplorerID!: string | null;
+  @ui.State imageSizes!: Record<string, Vector2>;
+
+  seenImages = new Set<string>();
 
   get state(): GalaxyState {
     return this.$store.state.galaxy as GalaxyState;
@@ -159,6 +159,28 @@ export default class Starmap extends Vue {
   get hoveredStar(): Star | null {
     if (!this.hoveredStarID) return null;
     return this.galaxy.stars[this.hoveredStarID];
+  }
+
+  getSpaceshipURL(explorer: Explorer): string {
+    return `/spaceships/${explorer.ship.image}`;
+  }
+
+  getImageSize(url: string): { x: string | number; y: string | number } {
+    if (this.imageSizes[url]) {
+      return scaleToHeight(this.imageSizes[url], 16);
+    } else if (this.seenImages.has(url)) {
+      return { x: 16, y: 16 };
+    } else {
+      this.seenImages.add(url);
+      const img = new Image();
+      img.onload = () => {
+        const size = { x: img.width, y: img.height };
+        console.log("Got image size:", { url, size });
+        this.$store.commit("ui/addImageSize", { url, size });
+      };
+      img.src = url;
+      return { x: 16, y: 16 };
+    }
   }
 
   getIsKnown(sid: string): boolean {

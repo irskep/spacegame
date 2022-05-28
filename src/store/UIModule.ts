@@ -1,3 +1,4 @@
+import { Vector2 } from "@/game/framework/Vector2";
 import { Module } from "vuex";
 import { UIState, RootState } from "./types";
 
@@ -8,6 +9,7 @@ export const UIModule: Module<UIState, RootState> = {
     selectedStarID: null,
     hoveredExplorerID: null,
     selectedExplorerID: null,
+    imageSizes: {},
   },
   getters: {},
   actions: {},
@@ -23,6 +25,9 @@ export const UIModule: Module<UIState, RootState> = {
     },
     selectExplorer(state, explorerID: string | null) {
       state.selectedExplorerID = explorerID;
+    },
+    addImageSize(state, args: { url: string; size: Vector2 }) {
+      state.imageSizes[args.url] = args.size;
     },
   },
 };

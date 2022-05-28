@@ -1,5 +1,6 @@
 import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
 import { StarMetadataMap } from "@/game/exploration/gen/StarMetadataSystem";
+import { Vector2 } from "@/game/framework/Vector2";
 
 export interface TravelerComponent {
   name: string;
@@ -52,6 +53,7 @@ export interface UIState {
   selectedStarID: string | null;
   hoveredExplorerID: string | null;
   selectedExplorerID: string | null;
+  imageSizes: Record<string, Vector2>;
 }
 
 export interface RootState {

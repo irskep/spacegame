@@ -21,4 +21,8 @@ export default class MessageLog extends Vue {
 }
 </script>
 
-<style lang="css" scoped></style>
+<style lang="css">
+.MessageLog {
+  text-align: right;
+}
+</style>
