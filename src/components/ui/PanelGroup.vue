@@ -29,4 +29,18 @@ export default class PanelGroup extends Vue {
   margin-bottom: 1rem;
   pointer-events: auto;
 }
+
+.PanelGroup.m-hud-left {
+  position: absolute;
+  top: 0;
+  left: 1rem;
+  bottom: 0;
+}
+
+.PanelGroup.m-hud-right {
+  position: absolute;
+  top: 0;
+  right: 1rem;
+  bottom: 0;
+}
 </style>

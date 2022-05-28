@@ -8,7 +8,7 @@ import { StarMetadataSystem } from "@/game/exploration/gen/StarMetadataSystem";
 import { GalaxyState, RootState } from "./types";
 import { generateExplorer } from "@/game/exploration/gen/explorers";
 import { RNG } from "@/game/framework/RNG";
-import { tickScan, tickTravel } from "./ticks";
+import { NEXTS, STARTS, TICKS } from "./ticks";
 
 const galaxyCache: Record<string, Galaxy> = {};
 
@@ -97,9 +97,11 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
   namespaced: true,
   state: {
     animationHandle: 0,
+    messages: [],
     seed: "0",
     starInfo: {},
     govtInfo: {},
+    planetInfo: {},
     explorers: {},
   },
   getters: {
@@ -113,15 +115,12 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
       ctx.dispatch("stopTick");
       console.log("RESUME");
       if (ctx.state.animationHandle !== 0) return;
-      let lastTick = Date.now();
-      const exec = () => {
-        const now = Date.now();
-        const dt = now - lastTick;
-
+      let lastTime = performance.now();
+      const exec = (t: number) => {
         ctx.state.animationHandle = requestAnimationFrame(exec);
-        this.commit("galaxy/tick", dt);
-
-        lastTick = now;
+        const dt = t - lastTime;
+        this.commit("galaxy/tick", dt / 1000);
+        lastTime = dt;
       };
       ctx.state.animationHandle = requestAnimationFrame(exec);
     },
@@ -142,30 +141,12 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
       const galaxy = getGalaxy(state.seed);
 
       for (const e of Object.values(state.explorers)) {
-        const oldState = e.state;
-        switch (e.state) {
-          case "traveling":
-            tickTravel(dt, state, galaxy, e);
-            break;
-          case "scanning":
-            tickScan(dt, state, galaxy, e);
-            break;
-        }
+        TICKS[e.state](dt, state, galaxy, e);
 
-        const newState = e.state;
-        if (newState != oldState) {
-          switch (newState) {
-            case "traveling":
-              e.destinationStarID = new RNG(`${Math.random()}`).choice(
-                galaxy.getNeighborIDs(e.starID)
-              );
-              e.travelProgress = 0;
-              break;
-            case "scanning":
-              e.destinationStarID = null;
-              e.scanProgress = 0;
-              break;
-          }
+        const nextState = NEXTS[e.state](dt, state, galaxy, e);
+        if (nextState) {
+          e.state = nextState;
+          STARTS[e.state](dt, state, galaxy, e);
         }
       }
     },

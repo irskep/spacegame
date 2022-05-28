@@ -30,17 +30,27 @@ export type Explorer = TravelerComponent & {
   scanProgress: number;
 };
 
+export interface PlanetInfo {
+  name: string;
+  explored: boolean;
+}
+
 export interface GalaxyState {
   animationHandle: number;
+  messages: string[];
+
   seed: string;
+
   starInfo: StarMetadataMap;
   govtInfo: GovtMap;
+  planetInfo: Record<string, PlanetInfo>;
   explorers: Record<string, Explorer>;
 }
 
 export interface UIState {
   hoveredStarID: string | null;
   selectedStarID: string | null;
+  hoveredExplorerID: string | null;
   selectedExplorerID: string | null;
 }
 

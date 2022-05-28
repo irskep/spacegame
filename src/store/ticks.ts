@@ -1,12 +1,31 @@
 import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { RNG } from "@/game/framework/RNG";
 import { distance } from "@/game/framework/util";
-import { Explorer, GalaxyState } from "./types";
+import { addMessage } from "./messages";
+import { Explorer, ExplorerState, GalaxyState } from "./types";
 
 const CONSTANTS = {
-  travelTime: 10000,
-  scanTime: 10000,
+  travelTime: 5000,
+  scanTime: 2000,
 };
+
+type StarExplorationState = "None" | "Some" | "All";
+
+function getStarExplorationState(
+  state: GalaxyState,
+  galaxy: Galaxy,
+  starID: string
+) {
+  const info = state.starInfo[starID];
+  if (!info.known || !info.explored) return "None";
+
+  for (const neighborID of galaxy.getNeighborIDs(starID)) {
+    const neighborInfo = state.starInfo[neighborID];
+    if (!neighborInfo.known) return "Some";
+  }
+
+  return "All";
+}
 
 function expandStar(state: GalaxyState, galaxy: Galaxy, starID: string) {
   state.starInfo[starID].known = true;
@@ -17,39 +36,69 @@ function expandStar(state: GalaxyState, galaxy: Galaxy, starID: string) {
   }
 }
 
-export function tickTravel(
+export type ExplorerTickFunction = (
   dt: number,
   state: GalaxyState,
   galaxy: Galaxy,
   e: Explorer
-) {
-  if (!e.destinationStarID) {
-    const unexploredNeighbors = galaxy
-      .getNeighbors(galaxy.stars[e.starID])
-      .filter((star) => !state.starInfo[star.id].explored);
-    if (unexploredNeighbors.length) {
-      e.destinationStarID = new RNG(`${Math.random()}`).choice(
-        unexploredNeighbors
-      ).id;
-    } else {
-      e.destinationStarID = new RNG(`${Math.random()}`).choice(
-        galaxy.getNeighborIDs(e.starID)
-      );
+) => void;
+export const TICKS: Record<ExplorerState, ExplorerTickFunction> = {
+  traveling: function (
+    dt: number,
+    state: GalaxyState,
+    galaxy: Galaxy,
+    e: Explorer
+  ) {
+    if (!e.destinationStarID) {
+      const unexploredNeighbors = galaxy
+        .getNeighbors(galaxy.stars[e.starID])
+        .filter((star) => !state.starInfo[star.id].explored);
+      if (unexploredNeighbors.length) {
+        e.destinationStarID = new RNG(`${Math.random()}`).choice(
+          unexploredNeighbors
+        ).id;
+      } else {
+        e.destinationStarID = new RNG(`${Math.random()}`).choice(
+          galaxy.getNeighborIDs(e.starID)
+        );
+      }
+      e.travelProgress = 0;
     }
-    e.travelProgress = 0;
-  }
-  if (!galaxy.stars[e.starID]) {
-    console.error("bad data:", e.starID);
-    return;
-  }
-  const srcStar = galaxy.stars[e.starID];
-  const destStar = galaxy.stars[e.destinationStarID];
-  const starDist = distance(srcStar.point, destStar.point);
 
-  const speedFactor = 50 / starDist;
+    const srcStar = galaxy.stars[e.starID];
+    const destStar = galaxy.stars[e.destinationStarID];
+    const starDist = distance(srcStar.point, destStar.point);
 
-  e.travelProgress += (dt * speedFactor) / CONSTANTS.travelTime;
-  if (e.travelProgress >= 1) {
+    const speedFactor = 50 / starDist;
+
+    e.travelProgress += (dt * speedFactor) / CONSTANTS.travelTime;
+  },
+  scanning: function (
+    dt: number,
+    state: GalaxyState,
+    galaxy: Galaxy,
+    e: Explorer
+  ) {
+    e.scanProgress += dt / CONSTANTS.scanTime;
+  },
+};
+
+export type ExplorerNextFunction = (
+  dt: number,
+  state: GalaxyState,
+  galaxy: Galaxy,
+  e: Explorer
+) => ExplorerState | null;
+export const NEXTS: Record<ExplorerState, ExplorerNextFunction> = {
+  traveling: function (
+    dt: number,
+    state: GalaxyState,
+    galaxy: Galaxy,
+    e: Explorer
+  ): ExplorerState | null {
+    if (e.travelProgress < 1) return null;
+    if (!e.destinationStarID) return "scanning"; // error state
+
     expandStar(state, galaxy, e.destinationStarID);
     e.travelProgress = 0;
     e.starID = e.destinationStarID;
@@ -58,23 +107,47 @@ export function tickTravel(
     for (const e2 of Object.values(state.explorers)) {
       if (e2.starID === e.starID && e.id !== e2.id) {
         // Immediately travel again, there's another ship here
-        return;
+        return "traveling";
       }
     }
-    e.state = "scanning";
-  }
-}
+    return "scanning";
+  },
+  scanning: function (
+    dt: number,
+    state: GalaxyState,
+    galaxy: Galaxy,
+    e: Explorer
+  ): ExplorerState | null {
+    if (e.scanProgress < 1) return null;
 
-export function tickScan(
-  dt: number,
-  state: GalaxyState,
-  galaxy: Galaxy,
-  e: Explorer
-) {
-  e.scanProgress += dt / CONSTANTS.scanTime;
+    const star = state.starInfo[e.starID];
 
-  if (e.scanProgress >= 1) {
     e.scanProgress = 0;
-    e.state = "traveling";
-  }
-}
+    addMessage(state, `${e.name} finished scanning ${star.name}`);
+
+    return "traveling";
+  },
+};
+
+export const STARTS: Record<ExplorerState, ExplorerTickFunction> = {
+  traveling: function (
+    dt: number,
+    state: GalaxyState,
+    galaxy: Galaxy,
+    e: Explorer
+  ) {
+    e.destinationStarID = new RNG(`${Math.random()}`).choice(
+      galaxy.getNeighborIDs(e.starID)
+    );
+    e.travelProgress = 0;
+  },
+  scanning: function (
+    dt: number,
+    state: GalaxyState,
+    galaxy: Galaxy,
+    e: Explorer
+  ) {
+    e.destinationStarID = null;
+    e.scanProgress = 0;
+  },
+};

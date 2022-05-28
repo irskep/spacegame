@@ -24,7 +24,7 @@ import { StarSystem } from "stellardream";
 
 const x = namespace("galaxy");
 
-interface PlanetInfo {
+interface PlanetRollup {
   name: string;
   planetType: string;
   cssClass: Record<string, boolean>;
@@ -55,7 +55,7 @@ export default class StarDetails extends Vue {
     return getStarSystem(this.starID);
   }
 
-  get planets(): PlanetInfo[] {
+  get planets(): PlanetRollup[] {
     if (!this.info?.explored) return [];
     const ordinals: string[] = [
       "First",

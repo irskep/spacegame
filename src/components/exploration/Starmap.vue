@@ -86,7 +86,7 @@
 
     <text
       class="Starmap_Star_Label"
-      v-if="hoveredStar"
+      v-if="hoveredStar && getIsExplored(hoveredStarID)"
       :x="Math.max(2, hoveredStar.point.x - 40)"
       :y="Math.max(2, hoveredStar.point.y - 20)"
     >

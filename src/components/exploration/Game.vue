@@ -5,7 +5,7 @@
       <PanContainer className="Map" :center="panContainerCenter">
         <Starmap />
       </PanContainer>
-      <PanelGroup className="m-hud-top">
+      <PanelGroup className="m-hud-left">
         <Panel><ExplorerList /></Panel>
         <Panel v-if="selectedStarID">
           <StarDetails :starID="selectedStarID" />
@@ -13,6 +13,9 @@
         <Panel v-if="selectedExplorerID">
           <ExplorerDetails :explorerID="selectedExplorerID" />
         </Panel>
+      </PanelGroup>
+      <PanelGroup className="m-hud-right">
+        <Panel><MessageLog /></Panel>
       </PanelGroup>
     </div>
   </div>
@@ -27,6 +30,7 @@ import StarDetails from "@/components/exploration/StarDetails.vue";
 import PanContainer from "@/components/exploration/PanContainer.vue";
 import Panel from "@/components/ui/Panel.vue";
 import PanelGroup from "@/components/ui/PanelGroup.vue";
+import MessageLog from "@/components/ui/MessageLog.vue";
 
 export default {
   name: "Game",
@@ -39,6 +43,7 @@ export default {
     PanContainer,
     Panel,
     PanelGroup,
+    MessageLog,
   },
   mounted: function () {
     this.$store.commit("galaxy/ensureSeeded");
