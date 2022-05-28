@@ -170,8 +170,13 @@ export default class Starmap extends Vue {
   }
 
   getStarColor(s: Star): string {
-    if (!this.starInfo[s.id].explored) return "transparent";
+    const info = this.starInfo[s.id];
+    if (!info.explored) return "transparent";
     const starSystem = getStarSystem(s.id);
+
+    if (info.buildings.length > 0) {
+      return "#CB4FA2";
+    }
 
     if (getStarSystemFacts(starSystem).hasHabitablePlanet) {
       return "lightgreen";
