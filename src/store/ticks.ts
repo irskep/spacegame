@@ -24,9 +24,18 @@ export function tickTravel(
   e: Explorer
 ) {
   if (!e.destinationStarID) {
-    e.destinationStarID = new RNG(`${Math.random()}`).choice(
-      galaxy.getNeighborIDs(e.starID)
-    );
+    const unexploredNeighbors = galaxy
+      .getNeighbors(galaxy.stars[e.starID])
+      .filter((star) => !state.starInfo[star.id].explored);
+    if (unexploredNeighbors.length) {
+      e.destinationStarID = new RNG(`${Math.random()}`).choice(
+        unexploredNeighbors
+      ).id;
+    } else {
+      e.destinationStarID = new RNG(`${Math.random()}`).choice(
+        galaxy.getNeighborIDs(e.starID)
+      );
+    }
     e.travelProgress = 0;
   }
   if (!galaxy.stars[e.starID]) {

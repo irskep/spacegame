@@ -116,6 +116,8 @@ import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
 import { StarMetadataMap } from "@/game/exploration/gen/StarMetadataSystem";
 import { Vector2 } from "@/game/framework/Vector2";
 import { lerp } from "@/game/framework/util";
+import { getStarSystem } from "@/store/GalaxyModule";
+import { getStarSystemFacts } from "@/game/exploration/types/spacefacts";
 
 const x = namespace("galaxy");
 const ui = namespace("ui");
@@ -168,8 +170,16 @@ export default class Starmap extends Vue {
   }
 
   getStarColor(s: Star): string {
-    if (!this.govtInfo[s.id] || !this.getIsExplored(s.id)) return "#616161";
-    return this.govtInfo[s.id].color;
+    if (!this.starInfo[s.id].explored) return "transparent";
+    const starSystem = getStarSystem(s.id);
+
+    if (getStarSystemFacts(starSystem).hasHabitablePlanet) {
+      return "lightgreen";
+    }
+
+    return "#616161";
+    // if (!this.govtInfo[s.id] || !this.getIsExplored(s.id)) return "#616161";
+    // return this.govtInfo[s.id].color;
   }
 
   getStarName(s: string): string {

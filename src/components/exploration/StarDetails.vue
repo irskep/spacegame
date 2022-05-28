@@ -1,7 +1,6 @@
 <template>
   <div class="StarDetails" v-if="starID">
     <h6>{{ info.name }}</h6>
-    <p>{{ govt.name }}</p>
     <p v-for="planet in planets" :key="planet.name" :class="planet.cssClass">
       {{ planet.name }}: {{ planet.planetType }}
     </p>
@@ -57,6 +56,7 @@ export default class StarDetails extends Vue {
   }
 
   get planets(): PlanetInfo[] {
+    if (!this.info?.explored) return [];
     const ordinals: string[] = [
       "First",
       "Second",
