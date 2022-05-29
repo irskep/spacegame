@@ -102,14 +102,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
-import { Explorer, GalaxyState, StarMetadataMap } from "@/store/types";
+import { Explorer, PlanetInfo, StarMetadataMap } from "@/store/types";
 
 import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { Star } from "@/game/exploration/types/Star";
-import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
 import { scaleToHeight, Vector2 } from "@/game/framework/Vector2";
 import { lerp } from "@/game/framework/util";
 
@@ -121,8 +120,8 @@ export default class Starmap extends Vue {
   @x.State animationHandle!: number;
   @x.State timerHandle!: number;
   @x.State seed!: string;
-  @x.State govtInfo!: GovtMap;
   @x.State starInfo!: StarMetadataMap;
+  @x.State planetInfo!: Record<string, PlanetInfo>;
   @x.State explorers!: Record<string, Explorer>;
   @x.Getter galaxy!: Galaxy;
 
@@ -131,10 +130,6 @@ export default class Starmap extends Vue {
   @ui.State imageSizes!: Record<string, Vector2>;
 
   seenImages = new Set<string>();
-
-  get state(): GalaxyState {
-    return this.$store.state.galaxy as GalaxyState;
-  }
 
   get allNeighbors(): [Star, Star][] {
     // hack: watch animationHandle
@@ -240,6 +235,12 @@ export default class Starmap extends Vue {
   }
 
   setSelectedStar(starID: string | null) {
+    if (starID) {
+      console.log(this.starInfo[starID]);
+      console.log(
+        this.starInfo[starID].planetIDs.map((p) => this.planetInfo[p])
+      );
+    }
     this.$store.commit("ui/selectStar", starID);
   }
 

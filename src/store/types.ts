@@ -12,6 +12,7 @@ export interface StarMetadata {
   explored: boolean;
   buildings: Building[];
   planetIDs: string[];
+  exploredPlanetsCount: number;
   hasTerranHabitable: boolean;
 }
 

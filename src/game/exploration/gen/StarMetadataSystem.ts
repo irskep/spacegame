@@ -24,6 +24,7 @@ export const StarMetadataSystem = {
       return {
         id: sid,
         name: starnames.flatten("#starname#"),
+        exploredPlanetsCount: 0,
         known: false,
         explored: false,
         hasTerranHabitable: false, // will fill in later

@@ -1,7 +1,7 @@
 import { Module } from "vuex";
 
 import { Galaxy } from "@/game/exploration/types/Galaxy";
-import { GalaxyState, RootState } from "./types";
+import { GalaxyState, PlanetInfo, RootState } from "./types";
 import { NEXTS, STARTS, TICKS } from "./mutationHelpers/ticks";
 import { getGalaxy } from "./getterHelpers/getGalaxy";
 import { newRandomSeed } from "./mutationHelpers/newRandomSeed";
@@ -23,6 +23,10 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
     galaxy: function (state): Galaxy {
       console.log("Galaxy for", state.seed);
       return getGalaxy(state.seed);
+    },
+    starSystemPlanets: function (state): (sid: string) => PlanetInfo[] {
+      return (sid) =>
+        state.starInfo[sid].planetIDs.map((pid) => state.planetInfo[pid]);
     },
   },
   actions: {

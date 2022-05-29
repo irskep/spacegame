@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
 import {
@@ -18,8 +18,6 @@ import {
   StarMetadataMap,
 } from "@/store/types";
 import { Galaxy } from "@/game/exploration/types/Galaxy";
-import { StarSystem } from "stellardream";
-import { getStarSystem } from "@/store/getterHelpers/starSystems";
 
 const x = namespace("galaxy");
 
@@ -35,9 +33,15 @@ export default class StarDetails extends Vue {
   @x.State starInfo!: StarMetadataMap;
   @x.State planetInfo!: Record<string, PlanetInfo>;
   @x.Getter galaxy!: Galaxy;
+  @x.Getter starSystemPlanets!: (sid: string) => PlanetInfo[];
+
+  @Watch("galaxy.planetInfo", { deep: true })
+  function() {
+    /* noop */
+  }
 
   get state(): GalaxyState {
-    return this.$store.state as GalaxyState;
+    return this.$store.state.galaxy;
   }
 
   get info(): StarMetadata | null {
@@ -45,11 +49,9 @@ export default class StarDetails extends Vue {
     return this.starInfo[this.starID];
   }
 
-  get starSystem(): StarSystem {
-    return getStarSystem(this.starID);
-  }
-
   get planets(): PlanetRollup[] {
+    this.planetInfo;
+    this.info?.planetIDs;
     if (!this.info || !this.info?.explored) return [];
     const ordinals: string[] = [
       "First",
@@ -74,8 +76,7 @@ export default class StarDetails extends Vue {
       "Twentieth",
     ];
 
-    return this.info.planetIDs
-      .map((pid) => this.planetInfo[pid])
+    return this.starSystemPlanets(this.starID)
       .filter((p) => p.known)
       .map((p) => {
         return {

@@ -12,6 +12,7 @@ export function getScannables(
     .map((id) => state.planetInfo[id])
     .filter((p) => !p.known)
     .map((p) => {
+      // debugger;
       return {
         scanTimeFactor: 1,
         text: `${info.name} ${p.index + 1}`,

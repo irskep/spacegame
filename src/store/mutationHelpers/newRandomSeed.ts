@@ -44,7 +44,7 @@ export function newRandomSeed(state: GalaxyState): GalaxyState {
         id: planetID,
         index: i,
         name: null,
-        known: false,
+        known: star.id === g.homeStarID,
         temp,
         type: planet.planetType,
         isTidallyLocked,

@@ -4,6 +4,7 @@ import { distance } from "@/game/framework/util";
 import { addMessage } from "./messages";
 import { Explorer, ExplorerState, GalaxyState } from "../types";
 import { getScannables } from "../getterHelpers/scannables";
+import { State } from "vuex-class";
 
 const CONSTANTS = {
   travelTime: 5,
@@ -14,9 +15,9 @@ function expandStar(state: GalaxyState, galaxy: Galaxy, starID: string) {
   state.starInfo[starID].known = true;
   state.starInfo[starID].explored = true;
 
-  for (const neighborID of galaxy.getNeighborIDs(starID)) {
-    state.starInfo[neighborID].known = true;
-  }
+  // for (const neighborID of galaxy.getNeighborIDs(starID)) {
+  // state.starInfo[neighborID].known = true;
+  // }
 }
 
 export type ExplorerTickFunction = (
@@ -33,17 +34,34 @@ export const TICKS: Record<ExplorerState, ExplorerTickFunction> = {
     e: Explorer
   ) {
     if (!e.destinationStarID) {
-      const unexploredNeighbors = galaxy
+      const freeNeighbors = galaxy
         .getNeighbors(galaxy.stars[e.starID])
-        .filter((star) => !state.starInfo[star.id].explored);
+        .filter((star) => {
+          // Don't go to stars where others are already going
+          for (const otherExplorer of Object.values(state.explorers)) {
+            if (otherExplorer.id === e.id) continue;
+            if (otherExplorer.destinationStarID === star.id) return false;
+            if (otherExplorer.starID === star.id) return false;
+          }
+          return true;
+        });
+
+      if (!freeNeighbors.length) {
+        e.travelProgress = 0;
+        return; // in travel limbo; nothing available
+      }
+
+      const unexploredNeighbors = freeNeighbors.filter(
+        (star) => !state.starInfo[star.id].explored
+      );
       if (unexploredNeighbors.length) {
         e.destinationStarID = new RNG(`${Math.random()}`).choice(
           unexploredNeighbors
         ).id;
       } else {
         e.destinationStarID = new RNG(`${Math.random()}`).choice(
-          galaxy.getNeighborIDs(e.starID)
-        );
+          freeNeighbors
+        ).id;
       }
       e.travelProgress = 0;
     }
@@ -68,7 +86,7 @@ export const TICKS: Record<ExplorerState, ExplorerTickFunction> = {
       e.scannable = scannables[0];
     }
 
-    e.scanProgress += dt / CONSTANTS.scanTime;
+    e.scanProgress += dt / (CONSTANTS.scanTime * e.scannable.scanTimeFactor);
   },
 };
 
@@ -121,6 +139,12 @@ export const NEXTS: Record<ExplorerState, ExplorerNextFunction> = {
         break;
     }
 
+    const newScannables = getScannables(galaxy, state, e.starID);
+    if (newScannables.length > 0) {
+      e.scannable = null;
+      return "scanning";
+    }
+
     return "traveling";
   },
 };
@@ -141,6 +165,7 @@ export const STARTS: Record<ExplorerState, ExplorerTickFunction> = {
     galaxy: Galaxy,
     e: Explorer
   ) {
+    e.scannable = null;
     e.scanProgress = 0;
   },
 };
