@@ -52,3 +52,7 @@ export function getStarSystem(s: string): StarSystem {
   }
   return starSystemCache[s];
 }
+
+export function getPlanetID(starID: string, planetIndex: number): string {
+  return `planet-${starID}-${planetIndex}`;
+}

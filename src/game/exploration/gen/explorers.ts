@@ -24,6 +24,7 @@ export function generateExplorer(
     destinationStarID: null,
     travelProgress: 0,
     scanProgress: 0,
+    scannable: null,
     state: "traveling",
     ship: {
       id: makeID("ship"),

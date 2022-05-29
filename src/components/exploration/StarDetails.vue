@@ -11,14 +11,13 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
-import { GalaxyState } from "@/store/types";
-import { Govt } from "@/game/exploration/gen/StarGovtSystem";
-import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
-import { Galaxy } from "@/game/exploration/types/Galaxy";
 import {
+  GalaxyState,
+  PlanetInfo,
   StarMetadata,
   StarMetadataMap,
-} from "@/game/exploration/gen/StarMetadataSystem";
+} from "@/store/types";
+import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { StarSystem } from "stellardream";
 import { getStarSystem } from "@/store/getterHelpers/starSystems";
 
@@ -33,8 +32,8 @@ interface PlanetRollup {
 @Component
 export default class StarDetails extends Vue {
   @Prop() starID!: string;
-  @x.State govtInfo!: GovtMap;
   @x.State starInfo!: StarMetadataMap;
+  @x.State planetInfo!: Record<string, PlanetInfo>;
   @x.Getter galaxy!: Galaxy;
 
   get state(): GalaxyState {
@@ -46,17 +45,12 @@ export default class StarDetails extends Vue {
     return this.starInfo[this.starID];
   }
 
-  get govt(): Govt | null {
-    if (!this.starID) return null;
-    return this.govtInfo[this.starID];
-  }
-
   get starSystem(): StarSystem {
     return getStarSystem(this.starID);
   }
 
   get planets(): PlanetRollup[] {
-    if (!this.info?.explored) return [];
+    if (!this.info || !this.info?.explored) return [];
     const ordinals: string[] = [
       "First",
       "Second",
@@ -80,25 +74,22 @@ export default class StarDetails extends Vue {
       "Twentieth",
     ];
 
-    const planets = getStarSystem(this.starID).planets;
-    return planets.map((planet, i) => {
-      const isCold = planet.distance > this.starSystem.habitableZoneMax;
-      const isHot = planet.distance < this.starSystem.habitableZoneMin;
-      const isTidallyLocked =
-        !isCold && this.starSystem.stars[0].starType == "M";
-      const hab = !isHot && !isCold && !isTidallyLocked;
-      return {
-        name: ordinals[i],
-        planetType: planet.planetType,
-        hab,
-        isTidallyLocked,
-        cssClass: {
-          Planet: true,
-          [`m-${planet.planetType}`]: true,
-          "m-habitable": hab,
-        },
-      };
-    });
+    return this.info.planetIDs
+      .map((pid) => this.planetInfo[pid])
+      .filter((p) => p.known)
+      .map((p) => {
+        return {
+          name: ordinals[p.index],
+          planetType: p.type,
+          hab: p.isTerranHabitable,
+          isTidallyLocked: p.isTidallyLocked,
+          cssClass: {
+            Planet: true,
+            [`m-${p.type}`]: true,
+            "m-habitable": p.isTerranHabitable,
+          },
+        };
+      });
   }
 }
 </script>

@@ -3,6 +3,7 @@ import { RNG } from "@/game/framework/RNG";
 import { distance } from "@/game/framework/util";
 import { addMessage } from "./messages";
 import { Explorer, ExplorerState, GalaxyState } from "../types";
+import { getScannables } from "../getterHelpers/scannables";
 
 const CONSTANTS = {
   travelTime: 5,
@@ -61,6 +62,12 @@ export const TICKS: Record<ExplorerState, ExplorerTickFunction> = {
     galaxy: Galaxy,
     e: Explorer
   ) {
+    if (!e.scannable) {
+      const scannables = getScannables(galaxy, state, e.starID);
+      if (!scannables.length) return;
+      e.scannable = scannables[0];
+    }
+
     e.scanProgress += dt / CONSTANTS.scanTime;
   },
 };
@@ -100,12 +107,19 @@ export const NEXTS: Record<ExplorerState, ExplorerNextFunction> = {
     galaxy: Galaxy,
     e: Explorer
   ): ExplorerState | null {
+    if (!e.scannable) return "traveling"; // nothing to scan
     if (e.scanProgress < 1) return null;
 
-    const star = state.starInfo[e.starID];
-
-    e.scanProgress = 0;
-    addMessage(state, `${e.name} finished scanning ${star.name}`);
+    switch (e.scannable.kind) {
+      case "planet":
+        state.planetInfo[e.scannable.targetID].known = true;
+        addMessage(state, `${e.name} discovered ${e.scannable.text}`);
+        break;
+      case "star":
+        state.starInfo[e.scannable.targetID].known = true;
+        addMessage(state, `${e.name} discovered ${e.scannable.text}`);
+        break;
+    }
 
     return "traveling";
   },
@@ -118,9 +132,7 @@ export const STARTS: Record<ExplorerState, ExplorerTickFunction> = {
     galaxy: Galaxy,
     e: Explorer
   ) {
-    e.destinationStarID = new RNG(`${Math.random()}`).choice(
-      galaxy.getNeighborIDs(e.starID)
-    );
+    e.destinationStarID = null; // tick will pick a destination
     e.travelProgress = 0;
   },
   scanning: function (
@@ -129,7 +141,6 @@ export const STARTS: Record<ExplorerState, ExplorerTickFunction> = {
     galaxy: Galaxy,
     e: Explorer
   ) {
-    e.destinationStarID = null;
     e.scanProgress = 0;
   },
 };

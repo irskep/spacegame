@@ -5,7 +5,24 @@
       class="Spaceship m-large"
       :src="`/spaceships/${explorer.ship.image}`"
     />
-    <p v-if="explorer.state === 'scanning'">Scanning {{ star.name }}</p>
+    <p
+      v-if="
+        explorer.state === 'scanning' &&
+        explorer.scannable &&
+        explorer.scannable.kind === 'planet'
+      "
+    >
+      Scanning planet {{ explorer.scannable.text }}
+    </p>
+    <p
+      v-if="
+        explorer.state === 'scanning' &&
+        explorer.scannable &&
+        explorer.scannable.kind === 'star'
+      "
+    >
+      Scanning neighboring star {{ explorer.scannable.text }}
+    </p>
     <ProgressBar
       v-if="explorer.state === 'scanning'"
       color="lightgreen"
@@ -30,14 +47,13 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
 import ProgressBar from "@/components/ui/ProgressBar.vue";
-import { Explorer, GalaxyState } from "@/store/types";
-import { Govt } from "@/game/exploration/gen/StarGovtSystem";
-import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
-import { Galaxy } from "@/game/exploration/types/Galaxy";
 import {
+  Explorer,
+  GalaxyState,
   StarMetadata,
   StarMetadataMap,
-} from "@/game/exploration/gen/StarMetadataSystem";
+} from "@/store/types";
+import { Galaxy } from "@/game/exploration/types/Galaxy";
 
 const x = namespace("galaxy");
 
@@ -45,7 +61,6 @@ const x = namespace("galaxy");
 export default class ExplorerDetails extends Vue {
   @Prop() explorerID!: string;
   @x.State explorers!: Record<string, Explorer>;
-  @x.State govtInfo!: GovtMap;
   @x.State starInfo!: StarMetadataMap;
   @x.Getter galaxy!: Galaxy;
 
@@ -70,10 +85,6 @@ export default class ExplorerDetails extends Vue {
   get destStar(): StarMetadata | null {
     if (!this.explorer.destinationStarID) return null;
     return this.starInfo[this.explorer.destinationStarID];
-  }
-
-  get govt(): Govt | null {
-    return this.govtInfo[this.explorer.starID];
   }
 }
 </script>

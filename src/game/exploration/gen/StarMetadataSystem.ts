@@ -1,17 +1,8 @@
 import starnames from "@/game/exploration/gen/starnames";
 import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { RNG } from "@/game/framework/RNG";
-
-export type StarMetadataMap = Record<string, StarMetadata>;
-
-export type Building = "Colony";
-
-export interface StarMetadata {
-  name: string;
-  known: boolean;
-  explored: boolean;
-  buildings: Building[];
-}
+import { getStarSystem } from "@/store/getterHelpers/starSystems";
+import { Building, StarMetadata, StarMetadataMap } from "@/store/types";
 
 export const StarMetadataSystem = {
   makeMetadata: function (seed: string, g: Galaxy): StarMetadataMap {
@@ -31,10 +22,15 @@ export const StarMetadataSystem = {
     const rng = new RNG(sid);
     return rng.replaceMathRandom(() => {
       return {
+        id: sid,
         name: starnames.flatten("#starname#"),
         known: false,
         explored: false,
+        hasTerranHabitable: false, // will fill in later
         buildings,
+        planetIDs: getStarSystem(sid).planets.map(
+          (p, i) => `planet-${sid}-${i}`
+        ),
       };
     });
   },

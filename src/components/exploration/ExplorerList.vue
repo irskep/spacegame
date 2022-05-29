@@ -20,10 +20,8 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
 import InlineProgressBar from "@/components/ui/InlineProgressBar.vue";
-import { Explorer, GalaxyState } from "@/store/types";
-import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
+import { Explorer, GalaxyState, StarMetadataMap } from "@/store/types";
 import { Galaxy } from "@/game/exploration/types/Galaxy";
-import { StarMetadataMap } from "@/game/exploration/gen/StarMetadataSystem";
 
 const x = namespace("galaxy");
 
@@ -31,17 +29,11 @@ const x = namespace("galaxy");
 export default class ExplorerDetails extends Vue {
   @Prop() explorerID!: string;
   @x.State explorers!: Record<string, Explorer>;
-  @x.State govtInfo!: GovtMap;
   @x.State starInfo!: StarMetadataMap;
   @x.Getter galaxy!: Galaxy;
 
   @x.State animationHandle!: number;
   @x.State timerHandle!: number;
-  mounted() {
-    // hack: watch animationHandle
-    this.animationHandle;
-    this.timerHandle;
-  }
 
   get state(): GalaxyState {
     return this.$store.state as GalaxyState;
@@ -52,9 +44,12 @@ export default class ExplorerDetails extends Vue {
     this.animationHandle;
     this.timerHandle;
 
-    if (e.scanProgress > 0) return e.scanProgress;
-    if (e.travelProgress > 0) return e.travelProgress;
-    return 0;
+    switch (e.state) {
+      case "traveling":
+        return e.travelProgress;
+      case "scanning":
+        return e.scanProgress;
+    }
   }
 
   getExplorerColor(e: Explorer): string {

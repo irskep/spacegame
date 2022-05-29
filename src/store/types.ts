@@ -1,6 +1,19 @@
 import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
-import { StarMetadataMap } from "@/game/exploration/gen/StarMetadataSystem";
 import { Vector2 } from "@/game/framework/Vector2";
+
+export type StarMetadataMap = Record<string, StarMetadata>;
+
+export type Building = "Colony";
+
+export interface StarMetadata {
+  id: string;
+  name: string;
+  known: boolean;
+  explored: boolean;
+  buildings: Building[];
+  planetIDs: string[];
+  hasTerranHabitable: boolean;
+}
 
 export interface TravelerComponent {
   name: string;
@@ -21,6 +34,13 @@ export interface Ship {
   image: string;
 }
 
+export interface Scannable {
+  scanTimeFactor: number;
+  text: string;
+  targetID: string;
+  kind: "star" | "planet";
+}
+
 export type ExplorerState = "traveling" | "scanning";
 
 export type Explorer = TravelerComponent & {
@@ -29,11 +49,20 @@ export type Explorer = TravelerComponent & {
   ship: Ship;
   state: ExplorerState;
   scanProgress: number;
+  scannable: Scannable | null;
 };
 
+export type PlanetTemp = "hot" | "cold" | "hab";
+
 export interface PlanetInfo {
-  name: string;
-  explored: boolean;
+  name: string | null;
+  known: boolean;
+  id: string;
+  index: number;
+  temp: PlanetTemp;
+  type: "Terran" | "Neptunian" | "Jovian";
+  isTidallyLocked: boolean;
+  isTerranHabitable: boolean;
 }
 
 export interface GalaxyState {

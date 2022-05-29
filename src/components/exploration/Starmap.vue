@@ -105,16 +105,13 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 
-import { Explorer, GalaxyState } from "@/store/types";
+import { Explorer, GalaxyState, StarMetadataMap } from "@/store/types";
 
 import { Galaxy } from "@/game/exploration/types/Galaxy";
 import { Star } from "@/game/exploration/types/Star";
 import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
-import { StarMetadataMap } from "@/game/exploration/gen/StarMetadataSystem";
 import { scaleToHeight, Vector2 } from "@/game/framework/Vector2";
 import { lerp } from "@/game/framework/util";
-import { getStarSystem } from "@/store/getterHelpers/starSystems";
-import { getStarSystemFacts } from "@/game/exploration/types/spacefacts";
 
 const x = namespace("galaxy");
 const ui = namespace("ui");
@@ -177,7 +174,6 @@ export default class Starmap extends Vue {
       const img = new Image();
       img.onload = () => {
         const size = { x: img.width, y: img.height };
-        console.log("Got image size:", { url, size });
         this.$store.commit("ui/addImageSize", { url, size });
       };
       img.src = url;
@@ -196,13 +192,12 @@ export default class Starmap extends Vue {
   getStarColor(s: Star): string {
     const info = this.starInfo[s.id];
     if (!info.explored) return "transparent";
-    const starSystem = getStarSystem(s.id);
 
     if (info.buildings.length > 0) {
       return "#CB4FA2";
     }
 
-    if (getStarSystemFacts(starSystem).hasHabitablePlanet) {
+    if (info.hasTerranHabitable) {
       return "lightgreen";
     }
 
