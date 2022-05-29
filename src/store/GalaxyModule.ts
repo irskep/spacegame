@@ -10,8 +10,9 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
   namespaced: true,
   state: {
     animationHandle: 0,
+    timerHandle: 0,
     messages: [],
-    lowPowerMode: false,
+    lowPowerMode: true,
     seed: "0",
     starInfo: {},
     govtInfo: {},
@@ -31,7 +32,14 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
       if (ctx.state.animationHandle !== 0) return;
       let lastTime: number | null = null;
       const exec = (t: number) => {
-        ctx.state.animationHandle = requestAnimationFrame(exec);
+        if (ctx.state.lowPowerMode) {
+          ctx.state.timerHandle = setTimeout(() => {
+            ctx.state.timerHandle = requestAnimationFrame(exec);
+          }, 1000 / 15);
+        } else {
+          ctx.state.animationHandle = requestAnimationFrame(exec);
+        }
+
         if (!lastTime) {
           lastTime = t;
           return;
@@ -43,10 +51,17 @@ export const GalaxyModule: Module<GalaxyState, RootState> = {
       ctx.state.animationHandle = requestAnimationFrame(exec);
     },
     stopTick(ctx) {
-      if (ctx.state.animationHandle === 0) return;
+      if (ctx.state.animationHandle === 0 && ctx.state.timerHandle === 0)
+        return;
       console.log("PAUSE");
-      cancelAnimationFrame(ctx.state.animationHandle);
+      if (ctx.state.animationHandle) {
+        cancelAnimationFrame(ctx.state.animationHandle);
+      }
+      if (ctx.state.timerHandle) {
+        clearTimeout(ctx.state.timerHandle);
+      }
       ctx.state.animationHandle = 0;
+      ctx.state.timerHandle = 0;
     },
   },
   mutations: {

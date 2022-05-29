@@ -44,11 +44,13 @@ const x = namespace("galaxy");
 @Component({ components: { ProgressBar } })
 export default class ExplorerDetails extends Vue {
   @Prop() explorerID!: string;
-  @x.State animationHandle!: number;
   @x.State explorers!: Record<string, Explorer>;
   @x.State govtInfo!: GovtMap;
   @x.State starInfo!: StarMetadataMap;
   @x.Getter galaxy!: Galaxy;
+
+  @x.State animationHandle!: number;
+  @x.State timerHandle!: number;
 
   get state(): GalaxyState {
     return this.$store.state as GalaxyState;
@@ -57,7 +59,7 @@ export default class ExplorerDetails extends Vue {
   get explorer(): Explorer {
     // hack: watch animationHandle
     this.animationHandle;
-
+    this.timerHandle;
     return this.explorers[this.explorerID];
   }
 
