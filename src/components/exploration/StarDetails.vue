@@ -8,18 +8,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import { namespace } from "vuex-class";
+import { GalaxyState, StarMetadata } from "@/store/types";
+import { createNamespacedHelpers } from "vuex";
 
-import {
-  GalaxyState,
-  PlanetInfo,
-  StarMetadata,
-  StarMetadataMap,
-} from "@/store/types";
-import { Galaxy } from "@/game/exploration/types/Galaxy";
-
-const x = namespace("galaxy");
+const { mapState, mapGetters } = createNamespacedHelpers("galaxy");
 
 interface PlanetRollup {
   name: string;
@@ -27,72 +19,65 @@ interface PlanetRollup {
   cssClass: Record<string, boolean>;
 }
 
-@Component
-export default class StarDetails extends Vue {
-  @Prop() starID!: string;
-  @x.State starInfo!: StarMetadataMap;
-  @x.State planetInfo!: Record<string, PlanetInfo>;
-  @x.Getter galaxy!: Galaxy;
-  @x.Getter starSystemPlanets!: (sid: string) => PlanetInfo[];
+export default {
+  name: "StarDetails",
+  components: {},
+  props: {
+    starID: String,
+  },
+  computed: {
+    ...mapState(["starInfo", "planetInfo"]),
+    ...mapGetters(["galaxy"]),
+    state: function (): GalaxyState {
+      return this.$store.state.galaxy as GalaxyState;
+    },
+    info: function (): StarMetadata {
+      return this.starInfo[this.starID];
+    },
+    planets: function (): PlanetRollup[] {
+      if (!this.info || !this.info?.explored) return [];
+      const ordinals: string[] = [
+        "First",
+        "Second",
+        "Third",
+        "Fourth",
+        "Fifth",
+        "Sixth",
+        "Seventh",
+        "Eighth",
+        "Ninth",
+        "Tenth",
+        "Eleventh",
+        "Twelfth",
+        "Thirteenth",
+        "Fourteenth",
+        "Fifteenth",
+        "Sixteenth",
+        "Seventeenth",
+        "Eighteenth",
+        "Nineteenth",
+        "Twentieth",
+      ];
 
-  @Watch("galaxy.planetInfo", { deep: true })
-  function() {
-    /* noop */
-  }
-
-  get state(): GalaxyState {
-    return this.$store.state.galaxy;
-  }
-
-  get info(): StarMetadata | null {
-    if (!this.starID) return null;
-    return this.starInfo[this.starID];
-  }
-
-  get planets(): PlanetRollup[] {
-    this.planetInfo;
-    this.info?.planetIDs;
-    if (!this.info || !this.info?.explored) return [];
-    const ordinals: string[] = [
-      "First",
-      "Second",
-      "Third",
-      "Fourth",
-      "Fifth",
-      "Sixth",
-      "Seventh",
-      "Eighth",
-      "Ninth",
-      "Tenth",
-      "Eleventh",
-      "Twelfth",
-      "Thirteenth",
-      "Fourteenth",
-      "Fifteenth",
-      "Sixteenth",
-      "Seventeenth",
-      "Eighteenth",
-      "Nineteenth",
-      "Twentieth",
-    ];
-
-    return this.starSystemPlanets(this.starID)
-      .filter((p) => p.known)
-      .map((p) => {
-        return {
-          name: ordinals[p.index],
-          planetType: p.type,
-          hab: p.isTerranHabitable,
-          isTidallyLocked: p.isTidallyLocked,
-          cssClass: {
-            Planet: true,
-            [`m-${p.type}`]: true,
-            "m-habitable": p.isTerranHabitable,
-          },
-        };
-      });
-  }
-}
+      return this.info.planetIDs
+        .map((pid) => this.state.planetInfo[pid])
+        .filter((p) => p.known)
+        .map((p) => {
+          return {
+            name: ordinals[p.index],
+            planetType: p.type,
+            hab: p.isTerranHabitable,
+            isTidallyLocked: p.isTidallyLocked,
+            cssClass: {
+              Planet: true,
+              [`m-${p.type}`]: true,
+              "m-habitable": p.isTerranHabitable,
+            },
+          };
+        });
+    },
+  },
+};
 </script>
 
 <style lang="css" scoped>
