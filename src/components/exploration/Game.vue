@@ -60,12 +60,7 @@ export default {
       return this.$store.state.ui.selectedExplorerID;
     },
     panContainerCenter: function () {
-      const star = this.$store.getters["galaxy/playerStar"];
-      if (star) {
-        return star.point;
-      } else {
-        return { x: 400, y: 300 };
-      }
+      return { x: 350, y: 300 };
     },
   },
 };
