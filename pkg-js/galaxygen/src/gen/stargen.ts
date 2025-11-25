@@ -1,11 +1,9 @@
-import { Galaxy } from "@/game/exploration/types/Galaxy";
-import type { Star } from "@/game/exploration/types/Star";
-import { RNG } from "@/game/framework/RNG";
-import { distance } from "@/game/framework/util";
-import type { Vector2 } from "@/game/framework/Vector2";
-
-export const MIN_STAR_SPACE = 40;
-const MAX_STAR_SPACE = 80;
+import { MAX_STAR_SPACE, MIN_STAR_SPACE } from "../constants";
+import { RNG } from "../framework/RNG";
+import { distance } from "../framework/util";
+import type { Vector2 } from "../framework/Vector2";
+import { Galaxy } from "../types/Galaxy";
+import type { Star } from "../types/Star";
 
 export function generateStars(
   seed: string,

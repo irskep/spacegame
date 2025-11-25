@@ -1,5 +1,5 @@
 {
-  "name": "idlegame",
+  "name": "@spacegame/idlegame",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,11 +10,11 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@spacegame/design-system": "workspace:*",
+    "@spacegame/galaxygen": "workspace:*",
+    "@spacegame/galaxyrender": "workspace:*",
     "pinia": "^3.0.4",
     "pinia-plugin-persistedstate": "^4.7.1",
-    "seedrandom": "^3.0.5",
-    "stellardream": "^0.1.5",
-    "tracery-grammar": "^2.7.4",
     "vue": "^3.5.25",
     "vue-router": "^4.6.3"
   },

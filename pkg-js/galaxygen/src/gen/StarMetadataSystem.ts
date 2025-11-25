@@ -1,8 +1,8 @@
-import starnames from "@/game/exploration/gen/starnames";
-import type { Galaxy } from "@/game/exploration/types/Galaxy";
-import { RNG } from "@/game/framework/RNG";
-import { getStarSystem } from "@/store/getterHelpers/starSystems";
-import type { Building, StarMetadata, StarMetadataMap } from "@/store/types";
+import { RNG } from "../framework/RNG";
+import { getStarSystem } from "../helpers/starSystems";
+import type { Building, StarMetadata, StarMetadataMap } from "../types";
+import type { Galaxy } from "../types/Galaxy";
+import starnames from "./starnames";
 
 export const StarMetadataSystem = {
   makeMetadata: (_seed: string, g: Galaxy): StarMetadataMap => {

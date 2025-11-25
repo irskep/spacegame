@@ -1,6 +1,6 @@
+import type { Vector2 } from "@spacegame/galaxygen";
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import type { Vector2 } from "@/game/framework/Vector2";
 
 export const useUIStore = defineStore("ui", () => {
   const hoveredStarID = ref<string | null>(null);

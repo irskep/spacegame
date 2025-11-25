@@ -1,5 +1,5 @@
-import type { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
-import type { Vector2 } from "@/game/framework/Vector2";
+import type { Vector2 } from "../framework/Vector2";
+import type { GovtMap } from "../gen/StarGovtSystem";
 
 export type StarMetadataMap = Record<string, StarMetadata>;
 
@@ -88,7 +88,8 @@ export interface UIState {
   imageSizes: Record<string, Vector2>;
 }
 
-export interface RootState {
-  galaxy: GalaxyState;
-  ui: UIState;
-}
+// Re-export types from other files
+export type { Vector2 } from "../framework/Vector2";
+export type { Govt, GovtMap } from "../gen/StarGovtSystem";
+export { Galaxy } from "./Galaxy";
+export type { Star } from "./Star";

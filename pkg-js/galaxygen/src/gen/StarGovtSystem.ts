@@ -1,6 +1,6 @@
-import govtnames from "@/game/exploration/gen/govtnames";
-import type { Galaxy } from "@/game/exploration/types/Galaxy";
-import { RNG } from "@/game/framework/RNG";
+import { RNG } from "../framework/RNG";
+import type { Galaxy } from "../types/Galaxy";
+import govtnames from "./govtnames";
 
 export interface Govt {
   name: string;

@@ -7,12 +7,16 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useGalaxyStore } from "@/stores/galaxy";
 
-const galaxyStore = useGalaxyStore();
+const props = defineProps<{
+  messages: string[];
+  maxMessages?: number;
+}>();
 
 const indexedMessages = computed(() =>
-  galaxyStore.messages.slice(0, 10).map((text, index) => ({ index, text })),
+  props.messages
+    .slice(0, props.maxMessages ?? 10)
+    .map((text, index) => ({ index, text })),
 );
 </script>
 

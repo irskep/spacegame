@@ -29,7 +29,7 @@
       :progress="explorer.scanProgress"
     />
     <p v-if="explorer.state === 'traveling' && destStar">
-      {{ star?.name }} &rarr; {{ destStar.name }}
+      {{ currentStar?.name }} &rarr; {{ destStar.name }}
     </p>
     <ProgressBar
       v-if="explorer.state === 'traveling'"
@@ -43,32 +43,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import ProgressBar from "@/components/ui/ProgressBar.vue";
-import { useGalaxyStore } from "@/stores/galaxy";
+import { ProgressBar } from "@spacegame/design-system";
+import type { Explorer, StarMetadata } from "@spacegame/galaxygen";
 
-const props = defineProps<{
-  explorerID: string;
+defineProps<{
+  explorer: Explorer;
+  currentStar: StarMetadata | null;
+  destStar: StarMetadata | null;
 }>();
-
-const galaxyStore = useGalaxyStore();
-
-const explorer = computed(() => {
-  // Force reactivity
-  galaxyStore.animationHandle;
-  galaxyStore.timerHandle;
-  return galaxyStore.explorers[props.explorerID];
-});
-
-const star = computed(() => {
-  if (!explorer.value) return null;
-  return galaxyStore.starInfo[explorer.value.starID];
-});
-
-const destStar = computed(() => {
-  if (!explorer.value?.destinationStarID) return null;
-  return galaxyStore.starInfo[explorer.value.destinationStarID];
-});
 </script>
 
 <style scoped>

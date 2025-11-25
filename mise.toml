@@ -17,6 +17,9 @@ run = "pnpm --filter idlegame dev"
 [tasks.lint]
 run = "pnpm biome check ."
 
+[tasks."lint:fix"]
+run = "pnpm biome check --write ."
+
 [tasks.typecheck]
 run = "pnpm -r typecheck"
 

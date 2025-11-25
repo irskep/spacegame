@@ -1,20 +1,20 @@
+import {
+  type Explorer,
+  type Galaxy,
+  type GalaxyState,
+  type GovtMap,
+  GovtSystem,
+  generateExplorer,
+  getStarSystem,
+  type PlanetInfo,
+  type PlanetTemp,
+  type StarMetadataMap,
+  StarMetadataSystem,
+} from "@spacegame/galaxygen";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { generateExplorer } from "@/game/exploration/gen/explorers";
-import type { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
-import { GovtSystem } from "@/game/exploration/gen/StarGovtSystem";
-import { StarMetadataSystem } from "@/game/exploration/gen/StarMetadataSystem";
-import type { Galaxy } from "@/game/exploration/types/Galaxy";
 import { getGalaxy } from "@/store/getterHelpers/getGalaxy";
-import { getStarSystem } from "@/store/getterHelpers/starSystems";
 import { NEXTS, STARTS, TICKS } from "@/store/mutationHelpers/ticks";
-import type {
-  Explorer,
-  GalaxyState,
-  PlanetInfo,
-  PlanetTemp,
-  StarMetadataMap,
-} from "@/store/types";
 
 export const useGalaxyStore = defineStore(
   "galaxy",

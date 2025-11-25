@@ -1,16 +1,15 @@
 <template>
-  <div class="StarDetails" v-if="starID">
-    <h6>{{ info?.name }}</h6>
-    <p v-for="planet in planets" :key="planet.name" :class="planet.cssClass">
+  <div class="StarDetails" v-if="star">
+    <h6>{{ star.name }}</h6>
+    <p v-for="planet in planetRollups" :key="planet.name" :class="planet.cssClass">
       {{ planet.name }}: {{ planet.planetType }}
     </p>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { PlanetInfo, StarMetadata } from "@spacegame/galaxygen";
 import { computed } from "vue";
-import type { PlanetInfo } from "@/store/types";
-import { useGalaxyStore } from "@/stores/galaxy";
 
 interface PlanetRollup {
   name: string;
@@ -19,19 +18,12 @@ interface PlanetRollup {
 }
 
 const props = defineProps<{
-  starID?: string;
+  star: StarMetadata;
+  planets: PlanetInfo[];
 }>();
 
-const galaxyStore = useGalaxyStore();
-
-const info = computed(() => {
-  if (!props.starID) return null;
-  return galaxyStore.starInfo[props.starID];
-});
-
-const planets = computed<PlanetRollup[]>(() => {
-  const starInfo = info.value;
-  if (!starInfo || !starInfo.explored) return [];
+const planetRollups = computed<PlanetRollup[]>(() => {
+  if (!props.star.explored) return [];
 
   const ordinals = [
     "First",
@@ -56,8 +48,7 @@ const planets = computed<PlanetRollup[]>(() => {
     "Twentieth",
   ];
 
-  return starInfo.planetIDs
-    .map((pid: string) => galaxyStore.planetInfo[pid])
+  return props.planets
     .filter((p: PlanetInfo) => p.known)
     .map((p: PlanetInfo) => ({
       name: ordinals[p.index],

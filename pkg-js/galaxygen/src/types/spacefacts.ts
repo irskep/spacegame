@@ -1,4 +1,4 @@
-import type { GalaxyState } from "@/store/types";
+import type { GalaxyState } from ".";
 import type { Galaxy } from "./Galaxy";
 
 type StarExplorationState = "None" | "Some" | "All";

@@ -1,5 +1,4 @@
-import { generateStars } from "@/game/exploration/gen/stargen";
-import type { Galaxy } from "@/game/exploration/types/Galaxy";
+import { type Galaxy, generateStars } from "@spacegame/galaxygen";
 
 const galaxyCache: Record<string, Galaxy> = {};
 export function getGalaxy(s: string): Galaxy {

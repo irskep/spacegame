@@ -1,6 +1,6 @@
 import { StarSystem } from "stellardream";
 
-import { RNG } from "@/game/framework/RNG";
+import { RNG } from "../framework/RNG";
 
 const starSystemCache: Record<string, StarSystem> = {};
 export function generateStarSystem(s: string): StarSystem {

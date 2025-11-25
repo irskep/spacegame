@@ -1,8 +1,8 @@
-import { SPACESHIP_IMAGES } from "@/game/defs/shipGfx";
-import peoplenames from "@/game/exploration/gen/peoplenames";
-import shipnames from "@/game/exploration/gen/shipnames";
-import { RNG } from "@/game/framework/RNG";
-import type { Explorer } from "@/store/types";
+import { SPACESHIP_IMAGES } from "../defs/shipGfx";
+import { RNG } from "../framework/RNG";
+import type { Explorer } from "../types";
+import peoplenames from "./peoplenames";
+import shipnames from "./shipnames";
 
 let nextId = 1;
 const makeID = (prefix: string) => {

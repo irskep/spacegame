@@ -1,4 +1,4 @@
-import type { GalaxyState } from "../types";
+import type { GalaxyState } from "@spacegame/galaxygen";
 
 export function addMessage(state: GalaxyState, msg: string): GalaxyState {
   state.messages.unshift(msg);

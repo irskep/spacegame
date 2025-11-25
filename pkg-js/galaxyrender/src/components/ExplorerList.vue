@@ -2,9 +2,9 @@
   <div class="ExplorerList">
     <p
       class="ExplorerList_Item"
-      v-for="explorer of Object.values(galaxyStore.explorers)"
+      v-for="explorer of Object.values(explorers)"
       :key="explorer.id"
-      @click="selectExplorer(explorer.id)"
+      @click="emit('selectExplorer', explorer.id)"
     >
       <strong>{{ explorer.name }}:</strong> {{ explorer.state }}
       <InlineProgressBar
@@ -16,18 +16,21 @@
 </template>
 
 <script setup lang="ts">
-import InlineProgressBar from "@/components/ui/InlineProgressBar.vue";
-import type { Explorer } from "@/store/types";
-import { useGalaxyStore } from "@/stores/galaxy";
-import { useUIStore } from "@/stores/ui";
+import { InlineProgressBar } from "@spacegame/design-system";
+import type { Explorer } from "@spacegame/galaxygen";
 
-const galaxyStore = useGalaxyStore();
-const uiStore = useUIStore();
+const props = defineProps<{
+  explorers: Record<string, Explorer>;
+  animationHandle: number;
+}>();
+
+const emit = defineEmits<{
+  selectExplorer: [explorerID: string];
+}>();
 
 function getExplorerProgress(e: Explorer): number {
-  // Force reactivity by accessing animation handles
-  galaxyStore.animationHandle;
-  galaxyStore.timerHandle;
+  // Force reactivity by accessing animation handle
+  props.animationHandle;
 
   switch (e.state) {
     case "traveling":
@@ -42,10 +45,6 @@ function getExplorerColor(e: Explorer): string {
     traveling: "lightblue",
     scanning: "lightgreen",
   }[e.state];
-}
-
-function selectExplorer(eid: string) {
-  uiStore.selectExplorer(eid);
 }
 </script>
 

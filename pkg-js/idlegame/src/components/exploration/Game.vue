@@ -3,35 +3,58 @@
     <DebugToolbar />
     <div class="Game_Inner">
       <PanContainer className="Map" :center="panContainerCenter">
-        <Starmap />
+        <Starmap
+          :galaxy="galaxyStore.galaxy"
+          :starInfo="galaxyStore.starInfo"
+          :explorers="galaxyStore.explorers"
+          :selectedStarID="uiStore.selectedStarID"
+          :selectedExplorerID="uiStore.selectedExplorerID"
+          :hoveredStarID="uiStore.hoveredStarID"
+          :imageSizes="uiStore.imageSizes"
+          :animationHandle="galaxyStore.animationHandle"
+          @selectStar="uiStore.selectStar"
+          @hoverStar="uiStore.hoverStar"
+          @selectExplorer="uiStore.selectExplorer"
+          @addImageSize="uiStore.addImageSize"
+        />
       </PanContainer>
       <PanelGroup className="m-hud-left">
-        <Panel><ExplorerList /></Panel>
-        <Panel v-if="uiStore.selectedStarID">
-          <StarDetails :starID="uiStore.selectedStarID" />
+        <Panel>
+          <ExplorerList
+            :explorers="galaxyStore.explorers"
+            :animationHandle="galaxyStore.animationHandle"
+            @selectExplorer="uiStore.selectExplorer"
+          />
         </Panel>
-        <Panel v-if="uiStore.selectedExplorerID">
-          <ExplorerDetails :explorerID="uiStore.selectedExplorerID" />
+        <Panel v-if="selectedStar">
+          <StarDetails :star="selectedStar" :planets="selectedStarPlanets" />
+        </Panel>
+        <Panel v-if="selectedExplorer">
+          <ExplorerDetails
+            :explorer="selectedExplorer"
+            :currentStar="explorerCurrentStar"
+            :destStar="explorerDestStar"
+          />
         </Panel>
       </PanelGroup>
       <PanelGroup className="m-hud-right">
-        <Panel><MessageLog /></Panel>
+        <Panel><MessageLog :messages="galaxyStore.messages" /></Panel>
       </PanelGroup>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { MessageLog, Panel, PanelGroup } from "@spacegame/design-system";
+import {
+  ExplorerDetails,
+  ExplorerList,
+  PanContainer,
+  StarDetails,
+  Starmap,
+} from "@spacegame/galaxyrender";
+import { computed, onMounted } from "vue";
 import DebugToolbar from "@/components/exploration/DebugToolbar.vue";
-import ExplorerDetails from "@/components/exploration/ExplorerDetails.vue";
-import ExplorerList from "@/components/exploration/ExplorerList.vue";
-import PanContainer from "@/components/exploration/PanContainer.vue";
-import StarDetails from "@/components/exploration/StarDetails.vue";
-import Starmap from "@/components/exploration/Starmap.vue";
-import MessageLog from "@/components/ui/MessageLog.vue";
-import Panel from "@/components/ui/Panel.vue";
-import PanelGroup from "@/components/ui/PanelGroup.vue";
 import { useGalaxyStore } from "@/stores/galaxy";
 import { useUIStore } from "@/stores/ui";
 
@@ -39,6 +62,32 @@ const galaxyStore = useGalaxyStore();
 const uiStore = useUIStore();
 
 const panContainerCenter = { x: 350, y: 300 };
+
+// Computed properties for selected items
+const selectedStar = computed(() => {
+  if (!uiStore.selectedStarID) return null;
+  return galaxyStore.starInfo[uiStore.selectedStarID];
+});
+
+const selectedStarPlanets = computed(() => {
+  if (!selectedStar.value) return [];
+  return selectedStar.value.planetIDs.map((pid) => galaxyStore.planetInfo[pid]);
+});
+
+const selectedExplorer = computed(() => {
+  if (!uiStore.selectedExplorerID) return null;
+  return galaxyStore.explorers[uiStore.selectedExplorerID];
+});
+
+const explorerCurrentStar = computed(() => {
+  if (!selectedExplorer.value) return null;
+  return galaxyStore.starInfo[selectedExplorer.value.starID];
+});
+
+const explorerDestStar = computed(() => {
+  if (!selectedExplorer.value?.destinationStarID) return null;
+  return galaxyStore.starInfo[selectedExplorer.value.destinationStarID];
+});
 
 onMounted(() => {
   galaxyStore.ensureSeeded();
