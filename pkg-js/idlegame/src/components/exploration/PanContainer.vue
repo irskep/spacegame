@@ -3,77 +3,73 @@
     class="PanContainer"
     :class="[className]"
     ref="container"
-    v-on:mousedown="mousedown"
-    v-on:mouseup="mouseup"
-    v-on:mouseleave="mouseup"
-    v-on:mousemove="mousemove"
-    v-on:wheel="scroll"
+    @mousedown="onMousedown"
+    @mouseup="onMouseup"
+    @mouseleave="onMouseup"
+    @mousemove="onMousemove"
+    @wheel="onScroll"
   >
-    <div
-      class="PanContainer_Inner"
-      :style="{
-        transform: transform,
-      }"
-    >
-      <slot ref="child"></slot>
+    <div class="PanContainer_Inner" :style="{ transform }">
+      <slot />
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: "PanContainer",
-  data: function () {
-    return {
-      offset: { x: 0, y: 0 },
-      offsetStart: { x: 0, y: 0 },
-      mouseStart: { x: 0, y: 0 },
-      isMouseDown: false,
-    };
-  },
-  props: ["center", "className"],
-  computed: {
-    transform: function () {
-      const x = -this.$props.center.x + this.offset.x;
-      const y = -this.$props.center.y + this.offset.y;
-      return `translate(${x}px, ${y}px)`;
-    },
-  },
-  methods: {
-    mousedown: function (e) {
-      this.isMouseDown = true;
-      this.mouseStart = { x: e.clientX, y: e.clientY };
-      this.offsetStart = this.offset;
-    },
-    mouseup: function () {
-      this.isMouseDown = false;
-    },
-    mousemove: function (e) {
-      if (!this.isMouseDown) return;
-      this.offset = {
-        x: this.offsetStart.x + e.clientX - this.mouseStart.x,
-        y: this.offsetStart.y + e.clientY - this.mouseStart.y,
-      };
-    },
-    scroll: function (e) {
-      e.preventDefault();
-      this.offset = {
-        x: this.offset.x - e.deltaX,
-        y: this.offset.y - e.deltaY,
-      };
-    },
-  },
-  watch: {
-    center: function () {
-      this.offset = { x: 0, y: 0 };
-      this.offsetStart = { x: 0, y: 0 };
-      this.mouseDelta = { x: 0, y: 0 };
-    },
-  },
-};
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+
+const props = defineProps<{
+  center: { x: number; y: number }
+  className?: string
+}>()
+
+const offset = ref({ x: 0, y: 0 })
+const offsetStart = ref({ x: 0, y: 0 })
+const mouseStart = ref({ x: 0, y: 0 })
+const isMouseDown = ref(false)
+
+const transform = computed(() => {
+  const x = -props.center.x + offset.value.x
+  const y = -props.center.y + offset.value.y
+  return `translate(${x}px, ${y}px)`
+})
+
+function onMousedown(e: MouseEvent) {
+  isMouseDown.value = true
+  mouseStart.value = { x: e.clientX, y: e.clientY }
+  offsetStart.value = offset.value
+}
+
+function onMouseup() {
+  isMouseDown.value = false
+}
+
+function onMousemove(e: MouseEvent) {
+  if (!isMouseDown.value) return
+  offset.value = {
+    x: offsetStart.value.x + e.clientX - mouseStart.value.x,
+    y: offsetStart.value.y + e.clientY - mouseStart.value.y,
+  }
+}
+
+function onScroll(e: WheelEvent) {
+  e.preventDefault()
+  offset.value = {
+    x: offset.value.x - e.deltaX,
+    y: offset.value.y - e.deltaY,
+  }
+}
+
+watch(
+  () => props.center,
+  () => {
+    offset.value = { x: 0, y: 0 }
+    offsetStart.value = { x: 0, y: 0 }
+  }
+)
 </script>
 
-<style lang="css">
+<style>
 .PanContainer {
   position: relative;
   overflow: hidden;

@@ -4,7 +4,11 @@
   </div>
 </template>
 
-<style lang="css">
+<script setup lang="ts">
+// App root component
+</script>
+
+<style>
 html {
   box-sizing: border-box;
 }
@@ -22,8 +26,8 @@ html {
 /* Body */
 html {
   font-size: 62.5%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
 }
 
 body {
@@ -191,9 +195,9 @@ textarea {
 
 .button,
 button,
-input[type="submit"],
-input[type="reset"],
-input[type="button"] {
+input[type='submit'],
+input[type='reset'],
+input[type='button'] {
   display: inline-block;
   padding: 5px 10px;
   text-align: center;
@@ -208,9 +212,9 @@ input[type="button"] {
 }
 .button[disabled],
 button[disabled],
-input[type="submit"][disabled],
-input[type="reset"][disabled],
-input[type="button"][disabled] {
+input[type='submit'][disabled],
+input[type='reset'][disabled],
+input[type='button'][disabled] {
   cursor: default;
   opacity: 0.5;
 }
@@ -218,12 +222,12 @@ input[type="button"][disabled] {
 .button:hover,
 button:focus,
 button:hover,
-input[type="submit"]:focus,
-input[type="submit"]:hover,
-input[type="reset"]:focus,
-input[type="reset"]:hover,
-input[type="button"]:focus,
-input[type="button"]:hover {
+input[type='submit']:focus,
+input[type='submit']:hover,
+input[type='reset']:focus,
+input[type='reset']:hover,
+input[type='button']:focus,
+input[type='button']:hover {
   background-color: #982c61;
   border-color: #982c61;
   color: #f9f9f9;
@@ -250,7 +254,7 @@ input[type]:focus {
   outline: 0;
 }
 
-input[type="checkbox"]:focus {
+input[type='checkbox']:focus {
   outline: 1px dotted #2c8898;
 }
 

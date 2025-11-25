@@ -4,7 +4,6 @@ import { distance } from "@/game/framework/util";
 import { addMessage } from "./messages";
 import { Explorer, ExplorerState, GalaxyState } from "../types";
 import { getScannables } from "../getterHelpers/scannables";
-import { State } from "vuex-class";
 
 const CONSTANTS = {
   travelTime: 5,

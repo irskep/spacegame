@@ -2,9 +2,9 @@
   <div class="ExplorerList">
     <p
       class="ExplorerList_Item"
-      v-for="explorer of Object.values(explorers)"
+      v-for="explorer of Object.values(galaxyStore.explorers)"
       :key="explorer.id"
-      v-on:click="selectExplorer(explorer.id)"
+      @click="selectExplorer(explorer.id)"
     >
       <strong>{{ explorer.name }}:</strong> {{ explorer.state }}
       <InlineProgressBar
@@ -15,57 +15,41 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import { namespace } from "vuex-class";
+<script setup lang="ts">
+import { useGalaxyStore } from '@/stores/galaxy'
+import { useUIStore } from '@/stores/ui'
+import InlineProgressBar from '@/components/ui/InlineProgressBar.vue'
+import type { Explorer } from '@/store/types'
 
-import InlineProgressBar from "@/components/ui/InlineProgressBar.vue";
-import { Explorer, GalaxyState, StarMetadataMap } from "@/store/types";
-import { Galaxy } from "@/game/exploration/types/Galaxy";
+const galaxyStore = useGalaxyStore()
+const uiStore = useUIStore()
 
-const x = namespace("galaxy");
+function getExplorerProgress(e: Explorer): number {
+  // Force reactivity by accessing animation handles
+  galaxyStore.animationHandle
+  galaxyStore.timerHandle
 
-@Component({ components: { InlineProgressBar } })
-export default class ExplorerDetails extends Vue {
-  @Prop() explorerID!: string;
-  @x.State explorers!: Record<string, Explorer>;
-  @x.State starInfo!: StarMetadataMap;
-  @x.Getter galaxy!: Galaxy;
-
-  @x.State animationHandle!: number;
-  @x.State timerHandle!: number;
-
-  get state(): GalaxyState {
-    return this.$store.state as GalaxyState;
+  switch (e.state) {
+    case 'traveling':
+      return e.travelProgress
+    case 'scanning':
+      return e.scanProgress
   }
+}
 
-  getExplorerProgress(e: Explorer): number {
-    // hack: watch animationHandle
-    this.animationHandle;
-    this.timerHandle;
+function getExplorerColor(e: Explorer): string {
+  return {
+    traveling: 'lightblue',
+    scanning: 'lightgreen',
+  }[e.state]
+}
 
-    switch (e.state) {
-      case "traveling":
-        return e.travelProgress;
-      case "scanning":
-        return e.scanProgress;
-    }
-  }
-
-  getExplorerColor(e: Explorer): string {
-    return {
-      traveling: "lightblue",
-      scanning: "lightgreen",
-    }[e.state];
-  }
-
-  selectExplorer(eid: string) {
-    this.$store.commit("ui/selectExplorer", eid);
-  }
+function selectExplorer(eid: string) {
+  uiStore.selectExplorer(eid)
 }
 </script>
 
-<style lang="css" scoped>
+<style scoped>
 .ExplorerList_Item {
   cursor: pointer;
 }

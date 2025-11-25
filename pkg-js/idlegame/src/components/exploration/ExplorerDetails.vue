@@ -29,7 +29,7 @@
       :progress="explorer.scanProgress"
     />
     <p v-if="explorer.state === 'traveling' && destStar">
-      {{ star.name }} &rarr; {{ destStar.name }}
+      {{ star?.name }} &rarr; {{ destStar.name }}
     </p>
     <ProgressBar
       v-if="explorer.state === 'traveling'"
@@ -42,54 +42,36 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import { namespace } from "vuex-class";
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useGalaxyStore } from '@/stores/galaxy'
+import ProgressBar from '@/components/ui/ProgressBar.vue'
 
-import ProgressBar from "@/components/ui/ProgressBar.vue";
-import {
-  Explorer,
-  GalaxyState,
-  StarMetadata,
-  StarMetadataMap,
-} from "@/store/types";
-import { Galaxy } from "@/game/exploration/types/Galaxy";
+const props = defineProps<{
+  explorerID: string
+}>()
 
-const x = namespace("galaxy");
+const galaxyStore = useGalaxyStore()
 
-@Component({ components: { ProgressBar } })
-export default class ExplorerDetails extends Vue {
-  @Prop() explorerID!: string;
-  @x.State explorers!: Record<string, Explorer>;
-  @x.State starInfo!: StarMetadataMap;
-  @x.Getter galaxy!: Galaxy;
+const explorer = computed(() => {
+  // Force reactivity
+  galaxyStore.animationHandle
+  galaxyStore.timerHandle
+  return galaxyStore.explorers[props.explorerID]
+})
 
-  @x.State animationHandle!: number;
-  @x.State timerHandle!: number;
+const star = computed(() => {
+  if (!explorer.value) return null
+  return galaxyStore.starInfo[explorer.value.starID]
+})
 
-  get state(): GalaxyState {
-    return this.$store.state as GalaxyState;
-  }
-
-  get explorer(): Explorer {
-    // hack: watch animationHandle
-    this.animationHandle;
-    this.timerHandle;
-    return this.explorers[this.explorerID];
-  }
-
-  get star(): StarMetadata | null {
-    return this.starInfo[this.explorer.starID];
-  }
-
-  get destStar(): StarMetadata | null {
-    if (!this.explorer.destinationStarID) return null;
-    return this.starInfo[this.explorer.destinationStarID];
-  }
-}
+const destStar = computed(() => {
+  if (!explorer.value?.destinationStarID) return null
+  return galaxyStore.starInfo[explorer.value.destinationStarID]
+})
 </script>
 
-<style lang="css" scoped>
+<style scoped>
 img.Spaceship.m-large {
   height: 64px;
   width: auto;

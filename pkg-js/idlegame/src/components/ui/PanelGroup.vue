@@ -1,21 +1,18 @@
 <template>
-  <div :class="_className"><slot></slot></div>
+  <div :class="computedClassName"><slot /></div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
+import { computed } from 'vue'
 
-@Component
-export default class PanelGroup extends Vue {
-  @Prop() className?: string;
+const props = defineProps<{
+  className?: string
+}>()
 
-  get _className(): string {
-    return `PanelGroup ${this.className || ""}`;
-  }
-}
+const computedClassName = computed(() => `PanelGroup ${props.className || ''}`)
 </script>
 
-<style lang="css">
+<style>
 .PanelGroup {
   display: flex;
   flex-direction: column;

@@ -3,25 +3,22 @@
     <div
       class="InlineProgressBar_Inner"
       :style="{ width: width, backgroundColor: color || 'lightgreen' }"
-    ></div>
+    />
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+<script setup lang="ts">
+import { computed } from 'vue'
 
-@Component
-export default class InlineProgressBar extends Vue {
-  @Prop() progress!: number;
-  @Prop() color!: string;
+const props = defineProps<{
+  progress?: number
+  color?: string
+}>()
 
-  get width(): string {
-    return `${(this.progress || 0) * 100}%`;
-  }
-}
+const width = computed(() => `${(props.progress || 0) * 100}%`)
 </script>
 
-<style lang="css">
+<style>
 .InlineProgressBar {
   position: relative;
   display: inline-block;

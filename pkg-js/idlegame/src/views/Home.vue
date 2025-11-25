@@ -4,13 +4,6 @@
   </div>
 </template>
 
-<script>
-import Game from "@/components/exploration/Game.vue";
-
-export default {
-  name: "Home",
-  components: {
-    Game,
-  },
-};
+<script setup lang="ts">
+import Game from '@/components/exploration/Game.vue'
 </script>

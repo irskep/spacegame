@@ -1,15 +1,12 @@
 <template>
-  <div class="Panel UI"><slot></slot></div>
+  <div class="Panel UI"><slot /></div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-
-@Component
-export default class Panel extends Vue {}
+<script setup lang="ts">
+// Simple slot wrapper component
 </script>
 
-<style lang="css">
+<style>
 .Panel {
   max-width: 350px;
   background-color: black;

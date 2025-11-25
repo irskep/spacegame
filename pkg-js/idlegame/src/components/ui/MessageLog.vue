@@ -5,23 +5,18 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { namespace } from "vuex-class";
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useGalaxyStore } from '@/stores/galaxy'
 
-const g = namespace("galaxy");
+const galaxyStore = useGalaxyStore()
 
-@Component
-export default class MessageLog extends Vue {
-  @g.State messages!: string[];
-
-  get indexedMessages(): { index: number; text: string }[] {
-    return this.messages.slice(0, 10).map((text, index) => ({ index, text }));
-  }
-}
+const indexedMessages = computed(() =>
+  galaxyStore.messages.slice(0, 10).map((text, index) => ({ index, text }))
+)
 </script>
 
-<style lang="css">
+<style>
 .MessageLog {
   text-align: right;
 }

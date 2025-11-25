@@ -1,5 +1,5 @@
 <template>
-  <svg class="Starmap" :width="galaxy.size.x" :height="galaxy.size.y">
+  <svg class="Starmap" :width="galaxyStore.galaxy.size.x" :height="galaxyStore.galaxy.size.y">
     <line
       v-for="pair in allNeighbors"
       :key="`${pair[0].id}-${pair[1].id}`"
@@ -9,7 +9,7 @@
       :y2="pair[1].point.y"
       class="Edge"
       stroke="gray"
-    ></line>
+    />
 
     <g
       class="Starmap_Star"
@@ -17,9 +17,9 @@
       :key="star.id + '2'"
       :id="star.id"
       data-id="star.id"
-      v-on:click="setSelectedStar(star.id)"
-      v-on:mouseenter="setHoveredStar(star.id)"
-      v-on:mouseleave="setHoveredStar(null)"
+      @click="setSelectedStar(star.id)"
+      @mouseenter="setHoveredStar(star.id)"
+      @mouseleave="setHoveredStar(null)"
     >
       <circle
         class="Starmap_Star_Govt"
@@ -29,7 +29,7 @@
         :r="10"
         :fill="getStarColor(star)"
         fill-opacity="0.7"
-      ></circle>
+      />
 
       <circle
         class="Starmap_Star_Inner"
@@ -38,17 +38,15 @@
         :r="5"
         fill="black"
         stroke="white"
-      ></circle>
+      />
     </g>
 
     <g
-      v-for="explorer of Object.values(explorers)"
-      v-bind:key="explorer.id"
-      v-on:click="setSelectedExplorer(explorer.id)"
+      v-for="explorer of Object.values(galaxyStore.explorers)"
+      :key="explorer.id"
+      @click="setSelectedExplorer(explorer.id)"
       class="Starmap_ExplorerIndicator"
-      :transform="`translate(${getExplorerPoint(explorer).x}, ${
-        getExplorerPoint(explorer).y
-      })`"
+      :transform="`translate(${getExplorerPoint(explorer).x}, ${getExplorerPoint(explorer).y})`"
       :id="explorer.id"
     >
       <line
@@ -58,7 +56,7 @@
         :y2="0"
         class="Edge"
         stroke="white"
-      ></line>
+      />
 
       <circle
         :class="{ pulse: getIsExplorerSelected(explorer) }"
@@ -67,9 +65,9 @@
         :r="12"
         stroke="white"
         fill="black"
-      ></circle>
+      />
 
-      <circle :cx="0" :cy="-23" :r="12" stroke="white" fill="black"></circle>
+      <circle :cx="0" :cy="-23" :r="12" stroke="white" fill="black" />
 
       <image
         :href="getSpaceshipURL(explorer)"
@@ -78,179 +76,149 @@
         transform-origin="center"
         :width="getImageSize(getSpaceshipURL(explorer)).x"
         :height="getImageSize(getSpaceshipURL(explorer)).y"
-      ></image>
+      />
     </g>
 
     <text
       class="Starmap_Star_Label"
-      v-if="hoveredStar && getIsExplored(hoveredStarID)"
+      v-if="hoveredStar && uiStore.hoveredStarID && getIsExplored(uiStore.hoveredStarID)"
       :x="Math.max(2, hoveredStar.point.x - 40)"
       :y="Math.max(2, hoveredStar.point.y - 20)"
     >
-      {{ getStarName(hoveredStarID) }}
+      {{ getStarName(uiStore.hoveredStarID) }}
     </text>
 
     <text
       class="Starmap_Explorer_Label"
-      v-if="selectedExplorerID"
-      :x="Math.max(2, getExplorerPoint(explorers[selectedExplorerID]).x - 40)"
-      :y="Math.max(2, getExplorerPoint(explorers[selectedExplorerID]).y - 30)"
+      v-if="uiStore.selectedExplorerID && galaxyStore.explorers[uiStore.selectedExplorerID]"
+      :x="Math.max(2, getExplorerPoint(galaxyStore.explorers[uiStore.selectedExplorerID]).x - 40)"
+      :y="Math.max(2, getExplorerPoint(galaxyStore.explorers[uiStore.selectedExplorerID]).y - 30)"
     >
-      {{ explorers[selectedExplorerID].name }}
+      {{ galaxyStore.explorers[uiStore.selectedExplorerID].name }}
     </text>
   </svg>
 </template>
 
-<script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
-import { namespace } from "vuex-class";
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { useGalaxyStore } from '@/stores/galaxy'
+import { useUIStore } from '@/stores/ui'
+import type { Explorer } from '@/store/types'
+import type { Star } from '@/game/exploration/types/Star'
+import type { Vector2 } from '@/game/framework/Vector2'
+import { scaleToHeight } from '@/game/framework/Vector2'
+import { lerp } from '@/game/framework/util'
 
-import { Explorer, PlanetInfo, StarMetadataMap } from "@/store/types";
+const galaxyStore = useGalaxyStore()
+const uiStore = useUIStore()
 
-import { Galaxy } from "@/game/exploration/types/Galaxy";
-import { Star } from "@/game/exploration/types/Star";
-import { scaleToHeight, Vector2 } from "@/game/framework/Vector2";
-import { lerp } from "@/game/framework/util";
+const seenImages = ref(new Set<string>())
 
-const x = namespace("galaxy");
-const ui = namespace("ui");
+const allNeighbors = computed<[Star, Star][]>(() => {
+  // Force reactivity
+  galaxyStore.animationHandle
+  galaxyStore.timerHandle
 
-@Component
-export default class Starmap extends Vue {
-  @x.State animationHandle!: number;
-  @x.State timerHandle!: number;
-  @x.State seed!: string;
-  @x.State starInfo!: StarMetadataMap;
-  @x.State planetInfo!: Record<string, PlanetInfo>;
-  @x.State explorers!: Record<string, Explorer>;
-  @x.Getter galaxy!: Galaxy;
+  return galaxyStore.galaxy
+    .getAllNeighbors()
+    .filter(([a, b]) => galaxyStore.starInfo[a.id] && galaxyStore.starInfo[b.id])
+    .filter(
+      ([a, b]) => galaxyStore.starInfo[a.id].known && galaxyStore.starInfo[b.id].known
+    )
+})
 
-  @ui.State hoveredStarID!: string | null;
-  @ui.State selectedExplorerID!: string | null;
-  @ui.State imageSizes!: Record<string, Vector2>;
+const allStars = computed<Star[]>(() => {
+  return Object.values(galaxyStore.galaxy.stars).filter(
+    (s) => galaxyStore.starInfo[s.id] && galaxyStore.starInfo[s.id].known
+  )
+})
 
-  seenImages = new Set<string>();
+const hoveredStar = computed<Star | null>(() => {
+  if (!uiStore.hoveredStarID) return null
+  return galaxyStore.galaxy.stars[uiStore.hoveredStarID]
+})
 
-  get allNeighbors(): [Star, Star][] {
-    // hack: watch animationHandle
-    this.animationHandle;
-    this.timerHandle;
+function getSpaceshipURL(explorer: Explorer): string {
+  return `/spaceships/${explorer.ship.image}`
+}
 
-    return this.galaxy
-      .getAllNeighbors()
-      .filter(([a, b]) => this.starInfo[a.id] && this.starInfo[b.id])
-      .filter(
-        ([a, b]) => this.starInfo[a.id].known && this.starInfo[b.id].known
-      );
-  }
-
-  get allStars(): Star[] {
-    return Object.values(this.galaxy.stars).filter(
-      (s) => this.starInfo[s.id] && this.starInfo[s.id].known
-    );
-  }
-
-  get hoveredStar(): Star | null {
-    if (!this.hoveredStarID) return null;
-    return this.galaxy.stars[this.hoveredStarID];
-  }
-
-  getSpaceshipURL(explorer: Explorer): string {
-    return `/spaceships/${explorer.ship.image}`;
-  }
-
-  getImageSize(url: string): { x: string | number; y: string | number } {
-    if (this.imageSizes[url]) {
-      return scaleToHeight(this.imageSizes[url], 16);
-    } else if (this.seenImages.has(url)) {
-      return { x: 16, y: 16 };
-    } else {
-      this.seenImages.add(url);
-      const img = new Image();
-      img.onload = () => {
-        const size = { x: img.width, y: img.height };
-        this.$store.commit("ui/addImageSize", { url, size });
-      };
-      img.src = url;
-      return { x: 16, y: 16 };
+function getImageSize(url: string): { x: number; y: number } {
+  if (uiStore.imageSizes[url]) {
+    return scaleToHeight(uiStore.imageSizes[url], 16)
+  } else if (seenImages.value.has(url)) {
+    return { x: 16, y: 16 }
+  } else {
+    seenImages.value.add(url)
+    const img = new Image()
+    img.onload = () => {
+      const size = { x: img.width, y: img.height }
+      uiStore.addImageSize(url, size)
     }
+    img.src = url
+    return { x: 16, y: 16 }
+  }
+}
+
+function getIsExplored(sid: string): boolean {
+  return galaxyStore.starInfo[sid] && galaxyStore.starInfo[sid].explored
+}
+
+function getStarColor(s: Star): string {
+  const info = galaxyStore.starInfo[s.id]
+  if (!info.explored) return 'transparent'
+
+  if (info.buildings.length > 0) {
+    return '#CB4FA2'
   }
 
-  getIsKnown(sid: string): boolean {
-    return this.starInfo[sid] && this.starInfo[sid].known;
+  if (info.hasTerranHabitable) {
+    return 'lightgreen'
   }
 
-  getIsExplored(sid: string): boolean {
-    return this.starInfo[sid] && this.starInfo[sid].explored;
+  return '#616161'
+}
+
+function getStarName(sid: string): string {
+  if (!galaxyStore.starInfo[sid]) return 'unknown'
+  return galaxyStore.starInfo[sid].name
+}
+
+function getExplorerPoint(e: Explorer): Vector2 {
+  const star = galaxyStore.galaxy.stars[e.starID]
+  if (!star) return { x: 0, y: 0 }
+  if (e.destinationStarID) {
+    const destStar = galaxyStore.galaxy.stars[e.destinationStarID]
+    return lerp(star.point, destStar.point, e.travelProgress)
+  } else {
+    return star.point
   }
+}
 
-  getStarColor(s: Star): string {
-    const info = this.starInfo[s.id];
-    if (!info.explored) return "transparent";
+function getIsExplorerSelected(e: Explorer): boolean {
+  return uiStore.selectedExplorerID === e.id
+}
 
-    if (info.buildings.length > 0) {
-      return "#CB4FA2";
-    }
+// UI events
+function setHoveredStar(starID: string | null) {
+  uiStore.hoverStar(starID)
+}
 
-    if (info.hasTerranHabitable) {
-      return "lightgreen";
-    }
-
-    return "#616161";
-    // if (!this.govtInfo[s.id] || !this.getIsExplored(s.id)) return "#616161";
-    // return this.govtInfo[s.id].color;
+function setSelectedStar(starID: string | null) {
+  if (starID) {
+    console.log(galaxyStore.starInfo[starID])
+    console.log(
+      galaxyStore.starInfo[starID].planetIDs.map((p) => galaxyStore.planetInfo[p])
+    )
   }
+  uiStore.selectStar(starID)
+}
 
-  getStarName(s: string): string {
-    if (!this.starInfo[s]) return "unknown";
-    return this.starInfo[s].name;
-  }
-
-  getHasExplorer(starID: string): boolean {
-    for (const e of Object.values(this.explorers)) {
-      if (e.starID == starID) return true;
-    }
-    return false;
-  }
-
-  getExplorerPoint(e: Explorer): Vector2 {
-    const star = this.galaxy.stars[e.starID];
-    if (!star) return { x: 0, y: 0 };
-    if (e.destinationStarID) {
-      const destStar = this.galaxy.stars[e.destinationStarID];
-      return lerp(star.point, destStar.point, e.travelProgress);
-    } else {
-      return star.point;
-    }
-  }
-
-  getIsExplorerSelected(e: Explorer): boolean {
-    return this.selectedExplorerID == e.id;
-  }
-
-  // UI events
-
-  setHoveredStar(starID: string | null) {
-    this.$store.commit("ui/hoverStar", starID);
-  }
-
-  setSelectedStar(starID: string | null) {
-    if (starID) {
-      console.log(this.starInfo[starID]);
-      console.log(
-        this.starInfo[starID].planetIDs.map((p) => this.planetInfo[p])
-      );
-    }
-    this.$store.commit("ui/selectStar", starID);
-  }
-
-  setSelectedExplorer(explorerID: string | null) {
-    this.$store.commit("ui/selectExplorer", explorerID);
-  }
+function setSelectedExplorer(explorerID: string | null) {
+  uiStore.selectExplorer(explorerID)
 }
 </script>
 
-<style lang="css" scoped>
+<style scoped>
 .Starmap {
   position: relative;
   background-color: black;
@@ -268,7 +236,6 @@ export default class Starmap extends Vue {
 
 .Starmap_Explorer_Label {
   fill: white;
-  /* font-weight: bold; */
 }
 
 .Starmap_Star:hover text {
