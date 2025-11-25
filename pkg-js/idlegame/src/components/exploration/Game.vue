@@ -125,7 +125,8 @@ const travelers = computed<Traveler[]>(() => {
 
   return Object.values(galaxyStore.explorers).map((e) => ({
     id: e.id,
-    image: e.ship.image,
+    label: e.id, // Use explorer ID as label for now
+    imageURL: `/spaceships/${e.ship.image}`,
     nodeID: e.starID,
     destNodeID: e.destinationStarID,
     progress: e.travelProgress,

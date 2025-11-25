@@ -25,6 +25,31 @@ importers:
         specifier: ^3.1.5
         version: 3.1.5(typescript@5.9.3)
 
+  pkg-js/explorationgame:
+    dependencies:
+      '@spacegame/galaxygen':
+        specifier: workspace:*
+        version: link:../galaxygen
+      '@spacegame/galaxyrender':
+        specifier: workspace:*
+        version: link:../galaxyrender
+      vue:
+        specifier: ^3.5.25
+        version: 3.5.25(typescript@5.9.3)
+    devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.2
+        version: 6.0.2(vite@7.2.4(@types/node@24.10.1))(vue@3.5.25(typescript@5.9.3))
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^7.2.4
+        version: 7.2.4(@types/node@24.10.1)
+      vue-tsc:
+        specifier: ^3.1.5
+        version: 3.1.5(typescript@5.9.3)
+
   pkg-js/galaxygen:
     dependencies:
       seedrandom:

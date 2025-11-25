@@ -8,8 +8,8 @@
 </template>
 
 <script setup lang="ts">
-import type { PlanetInfo, StarMetadata } from "@spacegame/galaxygen";
 import { computed } from "vue";
+import type { PlanetInfo, StarInfo } from "@/types";
 
 interface PlanetRollup {
   name: string;
@@ -18,7 +18,7 @@ interface PlanetRollup {
 }
 
 const props = defineProps<{
-  star: StarMetadata;
+  star: StarInfo;
   planets: PlanetInfo[];
 }>();
 
@@ -49,8 +49,8 @@ const planetRollups = computed<PlanetRollup[]>(() => {
   ];
 
   return props.planets
-    .filter((p: PlanetInfo) => p.known)
-    .map((p: PlanetInfo) => ({
+    .filter((p) => p.known)
+    .map((p) => ({
       name: ordinals[p.index],
       planetType: p.type,
       cssClass: {

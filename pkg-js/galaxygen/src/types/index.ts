@@ -1,25 +1,17 @@
-// Galaxy structure types (not game mechanics)
+// Pure generation types - no game state
 
-export type StarMetadataMap = Record<string, StarMetadata>;
+export type StarDataMap = Record<string, StarData>;
 
-export type Building = "Colony";
-
-export interface StarMetadata {
+export interface StarData {
   id: string;
   name: string;
-  known: boolean;
-  explored: boolean;
-  buildings: Building[];
   planetIDs: string[];
-  exploredPlanetsCount: number;
   hasTerranHabitable: boolean;
 }
 
 export type PlanetTemp = "hot" | "cold" | "hab";
 
-export interface PlanetInfo {
-  name: string | null;
-  known: boolean;
+export interface PlanetData {
   id: string;
   index: number;
   temp: PlanetTemp;
@@ -27,6 +19,8 @@ export interface PlanetInfo {
   isTidallyLocked: boolean;
   isTerranHabitable: boolean;
 }
+
+export type PlanetDataMap = Record<string, PlanetData>;
 
 // Re-export types from other files
 export type { Vector2 } from "../framework/Vector2";

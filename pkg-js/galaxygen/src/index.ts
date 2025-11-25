@@ -12,8 +12,8 @@ export {
 // Name generators
 export { default as govtnames } from "./gen/govtnames";
 export { default as peoplenames } from "./gen/peoplenames";
+export { StarDataSystem } from "./gen/StarDataSystem";
 export { GovtSystem } from "./gen/StarGovtSystem";
-export { StarMetadataSystem } from "./gen/StarMetadataSystem";
 export { default as shipnames } from "./gen/shipnames";
 // Generation
 export { generateStars } from "./gen/stargen";

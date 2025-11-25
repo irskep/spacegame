@@ -13,7 +13,8 @@ export interface Edge {
 
 export interface Traveler {
   id: string;
-  image: string;
+  label: string;
+  imageURL: string;
   nodeID: string;
   destNodeID: string | null;
   progress: number;

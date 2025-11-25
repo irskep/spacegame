@@ -3,17 +3,27 @@ import {
   type GovtMap,
   GovtSystem,
   getStarSystem,
-  type PlanetInfo,
+  type PlanetDataMap,
   type PlanetTemp,
-  type StarMetadataMap,
-  StarMetadataSystem,
+  type StarDataMap,
+  StarDataSystem,
 } from "@spacegame/galaxygen";
+
+const ENABLE_PERSISTENCE = false;
+
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { generateExplorer } from "@/game/explorers";
 import { getGalaxy } from "@/store/getterHelpers/getGalaxy";
 import { NEXTS, STARTS, TICKS } from "@/store/mutationHelpers/ticks";
-import type { Explorer, GalaxyState } from "@/types";
+import type {
+  Explorer,
+  GalaxyState,
+  PlanetInfoMap,
+  PlanetStateMap,
+  StarInfoMap,
+  StarStateMap,
+} from "@/types";
 
 export const useGalaxyStore = defineStore(
   "galaxy",
@@ -24,14 +34,44 @@ export const useGalaxyStore = defineStore(
     const messages = ref<string[]>([]);
     const lowPowerMode = ref(true);
     const seed = ref("0");
-    const starInfo = ref<StarMetadataMap>({});
+
+    // Pure generation data (from galaxygen)
+    const starData = ref<StarDataMap>({});
+    const planetData = ref<PlanetDataMap>({});
     const govtInfo = ref<GovtMap>({});
-    const planetInfo = ref<Record<string, PlanetInfo>>({});
+
+    // Game state overlay
+    const starState = ref<StarStateMap>({});
+    const planetState = ref<PlanetStateMap>({});
+
     const explorers = ref<Record<string, Explorer>>({});
 
     // Getters
     const galaxy = computed<Galaxy>(() => {
       return getGalaxy(seed.value);
+    });
+
+    // Combined views that merge data + state
+    const starInfo = computed<StarInfoMap>(() => {
+      const result: StarInfoMap = {};
+      for (const [id, data] of Object.entries(starData.value)) {
+        const state = starState.value[id];
+        if (state) {
+          result[id] = { ...data, ...state };
+        }
+      }
+      return result;
+    });
+
+    const planetInfo = computed<PlanetInfoMap>(() => {
+      const result: PlanetInfoMap = {};
+      for (const [id, data] of Object.entries(planetData.value)) {
+        const state = planetState.value[id];
+        if (state) {
+          result[id] = { ...data, ...state };
+        }
+      }
+      return result;
     });
 
     // Helper to get current state object (for compatibility with existing helpers)
@@ -42,8 +82,12 @@ export const useGalaxyStore = defineStore(
         messages: messages.value,
         lowPowerMode: lowPowerMode.value,
         seed: seed.value,
-        starInfo: starInfo.value,
+        starData: starData.value,
+        planetData: planetData.value,
         govtInfo: govtInfo.value,
+        starState: starState.value,
+        planetState: planetState.value,
+        starInfo: starInfo.value,
         planetInfo: planetInfo.value,
         explorers: explorers.value,
       };
@@ -53,10 +97,25 @@ export const useGalaxyStore = defineStore(
     function newRandomSeed() {
       seed.value = `${Math.random()}`;
       const g = getGalaxy(seed.value);
-      starInfo.value = StarMetadataSystem.makeMetadata(seed.value, g);
+
+      // Generate pure data from galaxygen
+      starData.value = StarDataSystem.makeData(seed.value, g);
       govtInfo.value = GovtSystem.makeGovts(seed.value, g);
       explorers.value = {};
 
+      // Initialize star state
+      const newStarState: StarStateMap = {};
+      for (const starID of Object.keys(starData.value)) {
+        newStarState[starID] = {
+          known: false,
+          explored: false,
+          buildings: [],
+          exploredPlanetsCount: 0,
+        };
+      }
+      starState.value = newStarState;
+
+      // Generate explorers
       for (let i = 0; i < 5; i++) {
         const e = generateExplorer(
           g.homeStarID,
@@ -65,15 +124,22 @@ export const useGalaxyStore = defineStore(
         explorers.value[e.id] = e;
       }
 
-      starInfo.value[g.homeStarID].known = true;
-      starInfo.value[g.homeStarID].explored = true;
+      // Set initial known/explored state for home star and neighbors
+      starState.value[g.homeStarID].known = true;
+      starState.value[g.homeStarID].explored = true;
       for (const neighborID of g.getNeighborIDs(g.homeStarID)) {
-        starInfo.value[neighborID].known = true;
+        starState.value[neighborID].known = true;
       }
+
+      // Generate planet data and state
+      const newPlanetData: PlanetDataMap = {};
+      const newPlanetState: PlanetStateMap = {};
 
       for (const star of Object.values(g.stars)) {
         const sys = getStarSystem(star.id);
-        starInfo.value[star.id].planetIDs.forEach((planetID, i) => {
+        const sd = starData.value[star.id];
+
+        sd.planetIDs.forEach((planetID, i) => {
           const planet = sys.planets[i];
           let temp: PlanetTemp = "cold";
           if (planet.distance > sys.habitableZoneMax) {
@@ -89,21 +155,32 @@ export const useGalaxyStore = defineStore(
             temp === "hab" &&
             !isTidallyLocked &&
             planet.planetType === "Terran";
-          planetInfo.value[planetID] = {
+
+          // Pure generation data
+          newPlanetData[planetID] = {
             id: planetID,
             index: i,
-            name: null,
-            known: star.id === g.homeStarID,
             temp,
             type: planet.planetType,
             isTidallyLocked,
             isTerranHabitable,
           };
+
+          // Game state
+          newPlanetState[planetID] = {
+            known: star.id === g.homeStarID,
+            name: null,
+          };
+
+          // Update star data with hasTerranHabitable
           if (isTerranHabitable) {
-            starInfo.value[star.id].hasTerranHabitable = true;
+            sd.hasTerranHabitable = true;
           }
         });
       }
+
+      planetData.value = newPlanetData;
+      planetState.value = newPlanetState;
     }
 
     function ensureSeeded() {
@@ -128,8 +205,8 @@ export const useGalaxyStore = defineStore(
 
       // Sync state back (mutations in tick handlers modify state object)
       messages.value = state.messages;
-      starInfo.value = state.starInfo;
-      planetInfo.value = state.planetInfo;
+      starState.value = state.starState;
+      planetState.value = state.planetState;
     }
 
     function beginTick() {
@@ -171,8 +248,8 @@ export const useGalaxyStore = defineStore(
       timerHandle.value = 0;
     }
 
-    function starSystemPlanets(sid: string): PlanetInfo[] {
-      return starInfo.value[sid].planetIDs.map((pid) => planetInfo.value[pid]);
+    function starSystemPlanets(sid: string) {
+      return starData.value[sid].planetIDs.map((pid) => planetInfo.value[pid]);
     }
 
     return {
@@ -182,10 +259,17 @@ export const useGalaxyStore = defineStore(
       messages,
       lowPowerMode,
       seed,
-      starInfo,
+      // Pure generation data
+      starData,
+      planetData,
       govtInfo,
-      planetInfo,
+      // Game state
+      starState,
+      planetState,
       explorers,
+      // Combined views (computed)
+      starInfo,
+      planetInfo,
       // Getters
       galaxy,
       // Actions
@@ -198,12 +282,15 @@ export const useGalaxyStore = defineStore(
     };
   },
   {
-    persist: {
+    persist: ENABLE_PERSISTENCE && {
+      key: "galaxy-v2",
       pick: [
         "seed",
-        "starInfo",
+        "starData",
+        "planetData",
         "govtInfo",
-        "planetInfo",
+        "starState",
+        "planetState",
         "explorers",
         "messages",
       ],

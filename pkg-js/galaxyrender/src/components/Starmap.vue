@@ -65,12 +65,12 @@
       <circle :cx="0" :cy="-23" :r="12" stroke="white" fill="black" />
 
       <image
-        :href="getTravelerImageURL(traveler)"
-        :x="-getImageSize(getTravelerImageURL(traveler)).x / 2"
-        :y="-23 - getImageSize(getTravelerImageURL(traveler)).y / 2"
+        :href="traveler.imageURL"
+        :x="-getImageSize(traveler.imageURL).x / 2"
+        :y="-23 - getImageSize(traveler.imageURL).y / 2"
         transform-origin="center"
-        :width="getImageSize(getTravelerImageURL(traveler)).x"
-        :height="getImageSize(getTravelerImageURL(traveler)).y"
+        :width="getImageSize(traveler.imageURL).x"
+        :height="getImageSize(traveler.imageURL).y"
       />
     </g>
 
@@ -91,7 +91,7 @@
       :x="Math.max(2, getTravelerPoint(travelerMap[selectedTravelerID]).x - 40)"
       :y="Math.max(2, getTravelerPoint(travelerMap[selectedTravelerID]).y - 30)"
     >
-      {{ travelerMap[selectedTravelerID].id }}
+      {{ travelerMap[selectedTravelerID].label }}
     </text>
   </svg>
 </template>
@@ -160,10 +160,6 @@ const hoveredNode = computed<Node | null>(() => {
 
 function getNodeVisualState(nodeID: string): NodeVisualState {
   return props.nodeVisualStates[nodeID] || {};
-}
-
-function getTravelerImageURL(traveler: Traveler): string {
-  return `/spaceships/${traveler.image}`;
 }
 
 function getImageSize(url: string): { x: number; y: number } {

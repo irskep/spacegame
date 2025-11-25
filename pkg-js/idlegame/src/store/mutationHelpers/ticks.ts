@@ -9,11 +9,11 @@ const CONSTANTS = {
 };
 
 function expandStar(state: GalaxyState, _galaxy: Galaxy, starID: string) {
-  state.starInfo[starID].known = true;
-  state.starInfo[starID].explored = true;
+  state.starState[starID].known = true;
+  state.starState[starID].explored = true;
 
   // for (const neighborID of galaxy.getNeighborIDs(starID)) {
-  // state.starInfo[neighborID].known = true;
+  // state.starState[neighborID].known = true;
   // }
 }
 
@@ -44,7 +44,7 @@ export const TICKS: Record<ExplorerState, ExplorerTickFunction> = {
       }
 
       const unexploredNeighbors = freeNeighbors.filter(
-        (star) => !state.starInfo[star.id].explored,
+        (star) => !state.starState[star.id].explored,
       );
       if (unexploredNeighbors.length) {
         e.destinationStarID = new RNG(`${Math.random()}`).choice(
@@ -117,11 +117,11 @@ export const NEXTS: Record<ExplorerState, ExplorerNextFunction> = {
 
     switch (e.scannable.kind) {
       case "planet":
-        state.planetInfo[e.scannable.targetID].known = true;
+        state.planetState[e.scannable.targetID].known = true;
         addMessage(state, `${e.name} discovered ${e.scannable.text}`);
         break;
       case "star":
-        state.starInfo[e.scannable.targetID].known = true;
+        state.starState[e.scannable.targetID].known = true;
         addMessage(state, `${e.name} discovered ${e.scannable.text}`);
         break;
     }
