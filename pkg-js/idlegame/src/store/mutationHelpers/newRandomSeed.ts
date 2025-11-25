@@ -1,9 +1,9 @@
+import { generateExplorer } from "@/game/exploration/gen/explorers";
 import { GovtSystem } from "@/game/exploration/gen/StarGovtSystem";
 import { StarMetadataSystem } from "@/game/exploration/gen/StarMetadataSystem";
-import { GalaxyState, PlanetTemp } from "../types";
-import { generateExplorer } from "@/game/exploration/gen/explorers";
 import { getGalaxy } from "../getterHelpers/getGalaxy";
 import { getStarSystem } from "../getterHelpers/starSystems";
+import type { GalaxyState, PlanetTemp } from "../types";
 
 export function newRandomSeed(state: GalaxyState): GalaxyState {
   state.seed = `${Math.random()}`;
@@ -14,7 +14,7 @@ export function newRandomSeed(state: GalaxyState): GalaxyState {
   for (let i = 0; i < 5; i++) {
     const e = generateExplorer(
       g.homeStarID,
-      Object.values(state.explorers).map((e) => e.name)
+      Object.values(state.explorers).map((e) => e.name),
     );
     state.explorers[e.id] = e;
   }
@@ -37,7 +37,7 @@ export function newRandomSeed(state: GalaxyState): GalaxyState {
       } else {
         temp = "hab";
       }
-      const isTidallyLocked = temp !== "cold" && sys.stars[0].starType == "M";
+      const isTidallyLocked = temp !== "cold" && sys.stars[0].starType === "M";
       const isTerranHabitable =
         temp === "hab" && !isTidallyLocked && planet.planetType === "Terran";
       state.planetInfo[planetID] = {

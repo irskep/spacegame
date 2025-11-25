@@ -16,57 +16,57 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { computed, ref, watch } from "vue";
 
 const props = defineProps<{
-  center: { x: number; y: number }
-  className?: string
-}>()
+  center: { x: number; y: number };
+  className?: string;
+}>();
 
-const offset = ref({ x: 0, y: 0 })
-const offsetStart = ref({ x: 0, y: 0 })
-const mouseStart = ref({ x: 0, y: 0 })
-const isMouseDown = ref(false)
+const offset = ref({ x: 0, y: 0 });
+const offsetStart = ref({ x: 0, y: 0 });
+const mouseStart = ref({ x: 0, y: 0 });
+const isMouseDown = ref(false);
 
 const transform = computed(() => {
-  const x = -props.center.x + offset.value.x
-  const y = -props.center.y + offset.value.y
-  return `translate(${x}px, ${y}px)`
-})
+  const x = -props.center.x + offset.value.x;
+  const y = -props.center.y + offset.value.y;
+  return `translate(${x}px, ${y}px)`;
+});
 
 function onMousedown(e: MouseEvent) {
-  isMouseDown.value = true
-  mouseStart.value = { x: e.clientX, y: e.clientY }
-  offsetStart.value = offset.value
+  isMouseDown.value = true;
+  mouseStart.value = { x: e.clientX, y: e.clientY };
+  offsetStart.value = offset.value;
 }
 
 function onMouseup() {
-  isMouseDown.value = false
+  isMouseDown.value = false;
 }
 
 function onMousemove(e: MouseEvent) {
-  if (!isMouseDown.value) return
+  if (!isMouseDown.value) return;
   offset.value = {
     x: offsetStart.value.x + e.clientX - mouseStart.value.x,
     y: offsetStart.value.y + e.clientY - mouseStart.value.y,
-  }
+  };
 }
 
 function onScroll(e: WheelEvent) {
-  e.preventDefault()
+  e.preventDefault();
   offset.value = {
     x: offset.value.x - e.deltaX,
     y: offset.value.y - e.deltaY,
-  }
+  };
 }
 
 watch(
   () => props.center,
   () => {
-    offset.value = { x: 0, y: 0 }
-    offsetStart.value = { x: 0, y: 0 }
-  }
-)
+    offset.value = { x: 0, y: 0 };
+    offsetStart.value = { x: 0, y: 0 };
+  },
+);
 </script>
 
 <style>

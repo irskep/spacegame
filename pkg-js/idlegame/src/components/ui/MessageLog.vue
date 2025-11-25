@@ -6,14 +6,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useGalaxyStore } from '@/stores/galaxy'
+import { computed } from "vue";
+import { useGalaxyStore } from "@/stores/galaxy";
 
-const galaxyStore = useGalaxyStore()
+const galaxyStore = useGalaxyStore();
 
 const indexedMessages = computed(() =>
-  galaxyStore.messages.slice(0, 10).map((text, index) => ({ index, text }))
-)
+  galaxyStore.messages.slice(0, 10).map((text, index) => ({ index, text })),
+);
 </script>
 
 <style>

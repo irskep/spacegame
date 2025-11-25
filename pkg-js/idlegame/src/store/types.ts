@@ -1,5 +1,5 @@
-import { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
-import { Vector2 } from "@/game/framework/Vector2";
+import type { GovtMap } from "@/game/exploration/gen/StarGovtSystem";
+import type { Vector2 } from "@/game/framework/Vector2";
 
 export type StarMetadataMap = Record<string, StarMetadata>;
 

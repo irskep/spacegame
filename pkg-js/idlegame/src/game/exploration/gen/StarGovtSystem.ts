@@ -1,7 +1,6 @@
-import { Galaxy } from "@/game/exploration/types/Galaxy";
-import { RNG } from "@/game/framework/RNG";
-
 import govtnames from "@/game/exploration/gen/govtnames";
+import type { Galaxy } from "@/game/exploration/types/Galaxy";
+import { RNG } from "@/game/framework/RNG";
 
 export interface Govt {
   name: string;
@@ -40,7 +39,7 @@ const COLORS = [
 ];
 
 export const GovtSystem = {
-  makeGovts: function (seed: string, g: Galaxy, numGovts = 5): GovtMap {
+  makeGovts: (seed: string, g: Galaxy, numGovts = 5): GovtMap => {
     const rng = new RNG(seed);
     const allStars = rng.shuffled(g.heyNow());
     const colors = rng.shuffled(COLORS).slice(0, numGovts);
@@ -72,7 +71,7 @@ export const GovtSystem = {
     const govtMap: GovtMap = {};
 
     const blockedSourceStars = new Set<string>();
-    const possibleSourceStars = new Array<string>();
+    const possibleSourceStars: string[] = [];
     for (const s of allStars) {
       if (blockedSourceStars.has(s.id)) continue;
       possibleSourceStars.push(s.id);
@@ -123,7 +122,7 @@ export const GovtSystem = {
     for (const govt of govts) {
       if (govt.count < 5 || govt.count < allStars.length / (numGovts * 3)) {
         console.log("Reroll govts");
-        return GovtSystem.makeGovts(seed + "-reroll", g, numGovts);
+        return GovtSystem.makeGovts(`${seed}-reroll`, g, numGovts);
       }
     }
 

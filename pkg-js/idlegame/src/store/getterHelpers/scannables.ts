@@ -1,10 +1,10 @@
-import { Galaxy } from "@/game/exploration/types/Galaxy";
-import { GalaxyState, Scannable } from "../types";
+import type { Galaxy } from "@/game/exploration/types/Galaxy";
+import type { GalaxyState, Scannable } from "../types";
 
 export function getScannables(
   g: Galaxy,
   state: GalaxyState,
-  starID: string
+  starID: string,
 ): Scannable[] {
   const info = state.starInfo[starID];
 

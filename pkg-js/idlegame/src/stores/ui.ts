@@ -1,32 +1,32 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
-import type { Vector2 } from '@/game/framework/Vector2'
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import type { Vector2 } from "@/game/framework/Vector2";
 
-export const useUIStore = defineStore('ui', () => {
-  const hoveredStarID = ref<string | null>(null)
-  const selectedStarID = ref<string | null>(null)
-  const hoveredExplorerID = ref<string | null>(null)
-  const selectedExplorerID = ref<string | null>(null)
-  const imageSizes = ref<Record<string, Vector2>>({})
+export const useUIStore = defineStore("ui", () => {
+  const hoveredStarID = ref<string | null>(null);
+  const selectedStarID = ref<string | null>(null);
+  const hoveredExplorerID = ref<string | null>(null);
+  const selectedExplorerID = ref<string | null>(null);
+  const imageSizes = ref<Record<string, Vector2>>({});
 
   function hoverStar(starID: string | null) {
-    hoveredStarID.value = starID
+    hoveredStarID.value = starID;
   }
 
   function selectStar(starID: string | null) {
-    selectedStarID.value = starID
+    selectedStarID.value = starID;
   }
 
   function hoverExplorer(explorerID: string | null) {
-    hoveredExplorerID.value = explorerID
+    hoveredExplorerID.value = explorerID;
   }
 
   function selectExplorer(explorerID: string | null) {
-    selectedExplorerID.value = explorerID
+    selectedExplorerID.value = explorerID;
   }
 
   function addImageSize(url: string, size: Vector2) {
-    imageSizes.value[url] = size
+    imageSizes.value[url] = size;
   }
 
   return {
@@ -40,5 +40,5 @@ export const useUIStore = defineStore('ui', () => {
     hoverExplorer,
     selectExplorer,
     addImageSize,
-  }
-})
+  };
+});

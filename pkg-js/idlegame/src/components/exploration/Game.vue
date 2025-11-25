@@ -22,28 +22,28 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useGalaxyStore } from '@/stores/galaxy'
-import { useUIStore } from '@/stores/ui'
-import DebugToolbar from '@/components/exploration/DebugToolbar.vue'
-import Starmap from '@/components/exploration/Starmap.vue'
-import ExplorerDetails from '@/components/exploration/ExplorerDetails.vue'
-import ExplorerList from '@/components/exploration/ExplorerList.vue'
-import StarDetails from '@/components/exploration/StarDetails.vue'
-import PanContainer from '@/components/exploration/PanContainer.vue'
-import Panel from '@/components/ui/Panel.vue'
-import PanelGroup from '@/components/ui/PanelGroup.vue'
-import MessageLog from '@/components/ui/MessageLog.vue'
+import { onMounted } from "vue";
+import DebugToolbar from "@/components/exploration/DebugToolbar.vue";
+import ExplorerDetails from "@/components/exploration/ExplorerDetails.vue";
+import ExplorerList from "@/components/exploration/ExplorerList.vue";
+import PanContainer from "@/components/exploration/PanContainer.vue";
+import StarDetails from "@/components/exploration/StarDetails.vue";
+import Starmap from "@/components/exploration/Starmap.vue";
+import MessageLog from "@/components/ui/MessageLog.vue";
+import Panel from "@/components/ui/Panel.vue";
+import PanelGroup from "@/components/ui/PanelGroup.vue";
+import { useGalaxyStore } from "@/stores/galaxy";
+import { useUIStore } from "@/stores/ui";
 
-const galaxyStore = useGalaxyStore()
-const uiStore = useUIStore()
+const galaxyStore = useGalaxyStore();
+const uiStore = useUIStore();
 
-const panContainerCenter = { x: 350, y: 300 }
+const panContainerCenter = { x: 350, y: 300 };
 
 onMounted(() => {
-  galaxyStore.ensureSeeded()
-  galaxyStore.beginTick()
-})
+  galaxyStore.ensureSeeded();
+  galaxyStore.beginTick();
+});
 </script>
 
 <style>

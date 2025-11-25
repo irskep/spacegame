@@ -8,14 +8,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from "vue";
 
 const props = defineProps<{
-  progress?: number
-  color?: string
-}>()
+  progress?: number;
+  color?: string;
+}>();
 
-const width = computed(() => `${(props.progress || 0) * 100}%`)
+const width = computed(() => `${(props.progress || 0) * 100}%`);
 </script>
 
 <style>

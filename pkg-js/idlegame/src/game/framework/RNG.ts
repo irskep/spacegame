@@ -32,15 +32,15 @@ export class RNG {
   }
 
   shuffled<T>(array: Array<T>): Array<T> {
-    const arr = new Array<T>().concat(array);
+    const arr = [...array];
     this.shuffle(arr);
     return arr;
   }
 
   shuffle<T>(array: Array<T>) {
-    let currentIndex = array.length,
-      temporaryValue,
-      randomIndex;
+    let currentIndex = array.length;
+    let temporaryValue: T;
+    let randomIndex: number;
 
     // While there remain elements to shuffle...
     while (0 !== currentIndex) {
@@ -60,7 +60,7 @@ export class RNG {
   // Gives back N values between 0 and Math.PI * 2, where values are evenly
   // distributed but start at a random place
   getSlots(n: number): number[] {
-    const slots = new Array<number>();
+    const slots: number[] = [];
     let last = this.getRandom();
     for (let i = 0; i < n; i++) {
       if (last > Math.PI * 2) last -= Math.PI * 2;

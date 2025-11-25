@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import Game from '@/components/exploration/Game.vue'
+import Game from "@/components/exploration/Game.vue";
 </script>

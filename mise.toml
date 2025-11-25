@@ -15,10 +15,17 @@ run = "pnpm --filter idlegame dev"
 run = "pnpm --filter idlegame dev"
 
 [tasks.lint]
-run = "pnpm -r lint"
+run = "pnpm biome check ."
 
 [tasks.typecheck]
 run = "pnpm -r typecheck"
 
 [tasks.format]
-run = "pnpm -r format"
+run = "pnpm biome format --write ."
+
+[tasks.validate]
+run = [
+  { task = "format" },
+  { task = "lint" },
+  { task = "typecheck" },
+]

@@ -1,16 +1,16 @@
-import { Galaxy } from "@/game/exploration/types/Galaxy";
+import type { Galaxy } from "@/game/exploration/types/Galaxy";
 import { RNG } from "@/game/framework/RNG";
 import { distance } from "@/game/framework/util";
-import { addMessage } from "./messages";
-import { Explorer, ExplorerState, GalaxyState } from "../types";
 import { getScannables } from "../getterHelpers/scannables";
+import type { Explorer, ExplorerState, GalaxyState } from "../types";
+import { addMessage } from "./messages";
 
 const CONSTANTS = {
   travelTime: 5,
   scanTime: 2,
 };
 
-function expandStar(state: GalaxyState, galaxy: Galaxy, starID: string) {
+function expandStar(state: GalaxyState, _galaxy: Galaxy, starID: string) {
   state.starInfo[starID].known = true;
   state.starInfo[starID].explored = true;
 
@@ -23,15 +23,10 @@ export type ExplorerTickFunction = (
   dt: number,
   state: GalaxyState,
   galaxy: Galaxy,
-  e: Explorer
+  e: Explorer,
 ) => void;
 export const TICKS: Record<ExplorerState, ExplorerTickFunction> = {
-  traveling: function (
-    dt: number,
-    state: GalaxyState,
-    galaxy: Galaxy,
-    e: Explorer
-  ) {
+  traveling: (dt: number, state: GalaxyState, galaxy: Galaxy, e: Explorer) => {
     if (!e.destinationStarID) {
       const freeNeighbors = galaxy
         .getNeighbors(galaxy.stars[e.starID])
@@ -51,15 +46,15 @@ export const TICKS: Record<ExplorerState, ExplorerTickFunction> = {
       }
 
       const unexploredNeighbors = freeNeighbors.filter(
-        (star) => !state.starInfo[star.id].explored
+        (star) => !state.starInfo[star.id].explored,
       );
       if (unexploredNeighbors.length) {
         e.destinationStarID = new RNG(`${Math.random()}`).choice(
-          unexploredNeighbors
+          unexploredNeighbors,
         ).id;
       } else {
         e.destinationStarID = new RNG(`${Math.random()}`).choice(
-          freeNeighbors
+          freeNeighbors,
         ).id;
       }
       e.travelProgress = 0;
@@ -73,12 +68,7 @@ export const TICKS: Record<ExplorerState, ExplorerTickFunction> = {
 
     e.travelProgress += (dt * speedFactor) / CONSTANTS.travelTime;
   },
-  scanning: function (
-    dt: number,
-    state: GalaxyState,
-    galaxy: Galaxy,
-    e: Explorer
-  ) {
+  scanning: (dt: number, state: GalaxyState, galaxy: Galaxy, e: Explorer) => {
     if (!e.scannable) {
       const scannables = getScannables(galaxy, state, e.starID);
       if (!scannables.length) return;
@@ -93,15 +83,15 @@ export type ExplorerNextFunction = (
   dt: number,
   state: GalaxyState,
   galaxy: Galaxy,
-  e: Explorer
+  e: Explorer,
 ) => ExplorerState | null;
 export const NEXTS: Record<ExplorerState, ExplorerNextFunction> = {
-  traveling: function (
-    dt: number,
+  traveling: (
+    _dt: number,
     state: GalaxyState,
     galaxy: Galaxy,
-    e: Explorer
-  ): ExplorerState | null {
+    e: Explorer,
+  ): ExplorerState | null => {
     if (e.travelProgress < 1) return null;
     if (!e.destinationStarID) return "scanning"; // error state
 
@@ -118,12 +108,12 @@ export const NEXTS: Record<ExplorerState, ExplorerNextFunction> = {
     }
     return "scanning";
   },
-  scanning: function (
-    dt: number,
+  scanning: (
+    _dt: number,
     state: GalaxyState,
     galaxy: Galaxy,
-    e: Explorer
-  ): ExplorerState | null {
+    e: Explorer,
+  ): ExplorerState | null => {
     if (!e.scannable) return "traveling"; // nothing to scan
     if (e.scanProgress < 1) return null;
 
@@ -149,21 +139,21 @@ export const NEXTS: Record<ExplorerState, ExplorerNextFunction> = {
 };
 
 export const STARTS: Record<ExplorerState, ExplorerTickFunction> = {
-  traveling: function (
-    dt: number,
-    state: GalaxyState,
-    galaxy: Galaxy,
-    e: Explorer
-  ) {
+  traveling: (
+    _dt: number,
+    _state: GalaxyState,
+    _galaxy: Galaxy,
+    e: Explorer,
+  ) => {
     e.destinationStarID = null; // tick will pick a destination
     e.travelProgress = 0;
   },
-  scanning: function (
-    dt: number,
-    state: GalaxyState,
-    galaxy: Galaxy,
-    e: Explorer
-  ) {
+  scanning: (
+    _dt: number,
+    _state: GalaxyState,
+    _galaxy: Galaxy,
+    e: Explorer,
+  ) => {
     e.scannable = null;
     e.scanProgress = 0;
   },

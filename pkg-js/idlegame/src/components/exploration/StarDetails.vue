@@ -8,37 +8,53 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useGalaxyStore } from '@/stores/galaxy'
-import type { PlanetInfo } from '@/store/types'
+import { computed } from "vue";
+import type { PlanetInfo } from "@/store/types";
+import { useGalaxyStore } from "@/stores/galaxy";
 
 interface PlanetRollup {
-  name: string
-  planetType: string
-  cssClass: Record<string, boolean>
+  name: string;
+  planetType: string;
+  cssClass: Record<string, boolean>;
 }
 
 const props = defineProps<{
-  starID?: string
-}>()
+  starID?: string;
+}>();
 
-const galaxyStore = useGalaxyStore()
+const galaxyStore = useGalaxyStore();
 
 const info = computed(() => {
-  if (!props.starID) return null
-  return galaxyStore.starInfo[props.starID]
-})
+  if (!props.starID) return null;
+  return galaxyStore.starInfo[props.starID];
+});
 
 const planets = computed<PlanetRollup[]>(() => {
-  const starInfo = info.value
-  if (!starInfo || !starInfo.explored) return []
+  const starInfo = info.value;
+  if (!starInfo || !starInfo.explored) return [];
 
   const ordinals = [
-    'First', 'Second', 'Third', 'Fourth', 'Fifth',
-    'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth',
-    'Eleventh', 'Twelfth', 'Thirteenth', 'Fourteenth', 'Fifteenth',
-    'Sixteenth', 'Seventeenth', 'Eighteenth', 'Nineteenth', 'Twentieth',
-  ]
+    "First",
+    "Second",
+    "Third",
+    "Fourth",
+    "Fifth",
+    "Sixth",
+    "Seventh",
+    "Eighth",
+    "Ninth",
+    "Tenth",
+    "Eleventh",
+    "Twelfth",
+    "Thirteenth",
+    "Fourteenth",
+    "Fifteenth",
+    "Sixteenth",
+    "Seventeenth",
+    "Eighteenth",
+    "Nineteenth",
+    "Twentieth",
+  ];
 
   return starInfo.planetIDs
     .map((pid: string) => galaxyStore.planetInfo[pid])
@@ -49,10 +65,10 @@ const planets = computed<PlanetRollup[]>(() => {
       cssClass: {
         Planet: true,
         [`m-${p.type}`]: true,
-        'm-habitable': p.isTerranHabitable,
+        "m-habitable": p.isTerranHabitable,
       },
-    }))
-})
+    }));
+});
 </script>
 
 <style scoped>

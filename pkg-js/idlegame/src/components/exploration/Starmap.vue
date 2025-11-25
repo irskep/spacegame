@@ -100,121 +100,126 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useGalaxyStore } from '@/stores/galaxy'
-import { useUIStore } from '@/stores/ui'
-import type { Explorer } from '@/store/types'
-import type { Star } from '@/game/exploration/types/Star'
-import type { Vector2 } from '@/game/framework/Vector2'
-import { scaleToHeight } from '@/game/framework/Vector2'
-import { lerp } from '@/game/framework/util'
+import { computed, ref } from "vue";
+import type { Star } from "@/game/exploration/types/Star";
+import { lerp } from "@/game/framework/util";
+import type { Vector2 } from "@/game/framework/Vector2";
+import { scaleToHeight } from "@/game/framework/Vector2";
+import type { Explorer } from "@/store/types";
+import { useGalaxyStore } from "@/stores/galaxy";
+import { useUIStore } from "@/stores/ui";
 
-const galaxyStore = useGalaxyStore()
-const uiStore = useUIStore()
+const galaxyStore = useGalaxyStore();
+const uiStore = useUIStore();
 
-const seenImages = ref(new Set<string>())
+const seenImages = ref(new Set<string>());
 
 const allNeighbors = computed<[Star, Star][]>(() => {
   // Force reactivity
-  galaxyStore.animationHandle
-  galaxyStore.timerHandle
+  galaxyStore.animationHandle;
+  galaxyStore.timerHandle;
 
   return galaxyStore.galaxy
     .getAllNeighbors()
-    .filter(([a, b]) => galaxyStore.starInfo[a.id] && galaxyStore.starInfo[b.id])
     .filter(
-      ([a, b]) => galaxyStore.starInfo[a.id].known && galaxyStore.starInfo[b.id].known
+      ([a, b]) => galaxyStore.starInfo[a.id] && galaxyStore.starInfo[b.id],
     )
-})
+    .filter(
+      ([a, b]) =>
+        galaxyStore.starInfo[a.id].known && galaxyStore.starInfo[b.id].known,
+    );
+});
 
 const allStars = computed<Star[]>(() => {
   return Object.values(galaxyStore.galaxy.stars).filter(
-    (s) => galaxyStore.starInfo[s.id] && galaxyStore.starInfo[s.id].known
-  )
-})
+    (s) => galaxyStore.starInfo[s.id] && galaxyStore.starInfo[s.id].known,
+  );
+});
 
 const hoveredStar = computed<Star | null>(() => {
-  if (!uiStore.hoveredStarID) return null
-  return galaxyStore.galaxy.stars[uiStore.hoveredStarID]
-})
+  if (!uiStore.hoveredStarID) return null;
+  return galaxyStore.galaxy.stars[uiStore.hoveredStarID];
+});
 
 function getSpaceshipURL(explorer: Explorer): string {
-  return `/spaceships/${explorer.ship.image}`
+  return `/spaceships/${explorer.ship.image}`;
 }
 
 function getImageSize(url: string): { x: number; y: number } {
   if (uiStore.imageSizes[url]) {
-    return scaleToHeight(uiStore.imageSizes[url], 16)
+    return scaleToHeight(uiStore.imageSizes[url], 16);
   } else if (seenImages.value.has(url)) {
-    return { x: 16, y: 16 }
+    return { x: 16, y: 16 };
   } else {
-    seenImages.value.add(url)
-    const img = new Image()
+    seenImages.value.add(url);
+    const img = new Image();
     img.onload = () => {
-      const size = { x: img.width, y: img.height }
-      uiStore.addImageSize(url, size)
-    }
-    img.src = url
-    return { x: 16, y: 16 }
+      const size = { x: img.width, y: img.height };
+      uiStore.addImageSize(url, size);
+    };
+    img.src = url;
+    return { x: 16, y: 16 };
   }
 }
 
 function getIsExplored(sid: string): boolean {
-  return galaxyStore.starInfo[sid] && galaxyStore.starInfo[sid].explored
+  return galaxyStore.starInfo[sid]?.explored;
 }
 
 function getStarColor(s: Star): string {
-  const info = galaxyStore.starInfo[s.id]
-  if (!info.explored) return 'transparent'
+  const info = galaxyStore.starInfo[s.id];
+  if (!info.explored) return "transparent";
 
   if (info.buildings.length > 0) {
-    return '#CB4FA2'
+    return "#CB4FA2";
   }
 
   if (info.hasTerranHabitable) {
-    return 'lightgreen'
+    return "lightgreen";
   }
 
-  return '#616161'
+  return "#616161";
 }
 
 function getStarName(sid: string): string {
-  if (!galaxyStore.starInfo[sid]) return 'unknown'
-  return galaxyStore.starInfo[sid].name
+  if (!galaxyStore.starInfo[sid]) return "unknown";
+  return galaxyStore.starInfo[sid].name;
 }
 
 function getExplorerPoint(e: Explorer): Vector2 {
-  const star = galaxyStore.galaxy.stars[e.starID]
-  if (!star) return { x: 0, y: 0 }
+  const star = galaxyStore.galaxy.stars[e.starID];
+  if (!star) return { x: 0, y: 0 };
   if (e.destinationStarID) {
-    const destStar = galaxyStore.galaxy.stars[e.destinationStarID]
-    return lerp(star.point, destStar.point, e.travelProgress)
+    const destStar = galaxyStore.galaxy.stars[e.destinationStarID];
+    return lerp(star.point, destStar.point, e.travelProgress);
   } else {
-    return star.point
+    return star.point;
   }
 }
 
 function getIsExplorerSelected(e: Explorer): boolean {
-  return uiStore.selectedExplorerID === e.id
+  return uiStore.selectedExplorerID === e.id;
 }
 
 // UI events
 function setHoveredStar(starID: string | null) {
-  uiStore.hoverStar(starID)
+  uiStore.hoverStar(starID);
 }
 
 function setSelectedStar(starID: string | null) {
   if (starID) {
-    console.log(galaxyStore.starInfo[starID])
+    console.log(galaxyStore.starInfo[starID]);
     console.log(
-      galaxyStore.starInfo[starID].planetIDs.map((p) => galaxyStore.planetInfo[p])
-    )
+      galaxyStore.starInfo[starID].planetIDs.map(
+        (p) => galaxyStore.planetInfo[p],
+      ),
+    );
   }
-  uiStore.selectStar(starID)
+  uiStore.selectStar(starID);
 }
 
 function setSelectedExplorer(explorerID: string | null) {
-  uiStore.selectExplorer(explorerID)
+  uiStore.selectExplorer(explorerID);
 }
 </script>
 

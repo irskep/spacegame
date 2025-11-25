@@ -1,4 +1,7 @@
 {
   "name": "spacegame",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.7"
+  }
 }

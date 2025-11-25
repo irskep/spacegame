@@ -1,14 +1,13 @@
-import { GalaxyState } from "@/store/types";
-import { Planet, StarSystem } from "stellardream";
-import { Galaxy } from "./Galaxy";
+import type { GalaxyState } from "@/store/types";
+import type { Galaxy } from "./Galaxy";
 
 type StarExplorationState = "None" | "Some" | "All";
 
 export function getStarExplorationState(
   state: GalaxyState,
   galaxy: Galaxy,
-  starID: string
-) {
+  starID: string,
+): StarExplorationState {
   const info = state.starInfo[starID];
   if (!info.known || !info.explored) return "None";
 

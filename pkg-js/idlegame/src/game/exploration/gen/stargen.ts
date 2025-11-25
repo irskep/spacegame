@@ -1,8 +1,8 @@
-import { RNG } from "@/game/framework/RNG";
-import { Vector2 } from "@/game/framework/Vector2";
-import { Star } from "@/game/exploration/types/Star";
 import { Galaxy } from "@/game/exploration/types/Galaxy";
+import type { Star } from "@/game/exploration/types/Star";
+import { RNG } from "@/game/framework/RNG";
 import { distance } from "@/game/framework/util";
+import type { Vector2 } from "@/game/framework/Vector2";
 
 export const MIN_STAR_SPACE = 40;
 const MAX_STAR_SPACE = 80;
@@ -10,7 +10,7 @@ const MAX_STAR_SPACE = 80;
 export function generateStars(
   seed: string,
   n = 100,
-  size = { x: 800, y: 600 }
+  size = { x: 800, y: 600 },
 ): Galaxy {
   const g = new Galaxy(size);
 
@@ -38,7 +38,7 @@ export function generateStars(
         numPlaced,
         "stars and",
         iters,
-        "iters"
+        "iters",
       );
       break;
     }

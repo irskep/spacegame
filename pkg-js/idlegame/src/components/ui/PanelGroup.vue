@@ -3,13 +3,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from "vue";
 
 const props = defineProps<{
-  className?: string
-}>()
+  className?: string;
+}>();
 
-const computedClassName = computed(() => `PanelGroup ${props.className || ''}`)
+const computedClassName = computed(() => `PanelGroup ${props.className || ""}`);
 </script>
 
 <style>

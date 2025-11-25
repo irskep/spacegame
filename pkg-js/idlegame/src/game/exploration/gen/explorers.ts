@@ -1,8 +1,8 @@
-import { Explorer } from "@/store/types";
-import shipnames from "@/game/exploration/gen/shipnames";
-import peoplenames from "@/game/exploration/gen/peoplenames";
-import { RNG } from "@/game/framework/RNG";
 import { SPACESHIP_IMAGES } from "@/game/defs/shipGfx";
+import peoplenames from "@/game/exploration/gen/peoplenames";
+import shipnames from "@/game/exploration/gen/shipnames";
+import { RNG } from "@/game/framework/RNG";
+import type { Explorer } from "@/store/types";
 
 let nextId = 1;
 const makeID = (prefix: string) => {
@@ -11,7 +11,7 @@ const makeID = (prefix: string) => {
 
 export function generateExplorer(
   starID: string,
-  usedNames: string[]
+  usedNames: string[],
 ): Explorer {
   let shipName = shipnames.flatten("#shipname#");
   while (usedNames.indexOf(shipName) >= 0) {

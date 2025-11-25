@@ -16,7 +16,7 @@ export function generateStarSystem(s: string): StarSystem {
     for (const planet of starSystem.planets) {
       const isCold = planet.distance > starSystem.habitableZoneMax;
       const isHot = planet.distance < starSystem.habitableZoneMin;
-      const isTidallyLocked = !isCold && starSystem.stars[0].starType == "M";
+      const isTidallyLocked = !isCold && starSystem.stars[0].starType === "M";
       if (!isCold && !isHot && !isTidallyLocked) {
         hasInterestingPlanet = true;
         break;
@@ -34,7 +34,7 @@ export function generateStarSystem(s: string): StarSystem {
   let resultScore = score(result);
   for (let i = 1; i < 100; i++) {
     const candidate = new StarSystem(
-      rng.getRandom() * (Number.MAX_SAFE_INTEGER / 4) + i
+      rng.getRandom() * (Number.MAX_SAFE_INTEGER / 4) + i,
     );
     const candidateScore = score(candidate);
     if (candidateScore > resultScore) {

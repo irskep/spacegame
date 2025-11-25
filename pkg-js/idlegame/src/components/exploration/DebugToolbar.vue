@@ -8,26 +8,26 @@
 </template>
 
 <script setup lang="ts">
-import { useGalaxyStore } from '@/stores/galaxy'
+import { useGalaxyStore } from "@/stores/galaxy";
 
-const galaxyStore = useGalaxyStore()
+const galaxyStore = useGalaxyStore();
 
 function newSeed() {
-  galaxyStore.newRandomSeed()
+  galaxyStore.newRandomSeed();
 }
 
 function resetState() {
-  galaxyStore.stopTick()
-  localStorage.removeItem('galaxy')
-  window.location.reload()
+  galaxyStore.stopTick();
+  localStorage.removeItem("galaxy");
+  window.location.reload();
 }
 
 function pause() {
-  galaxyStore.stopTick()
+  galaxyStore.stopTick();
 }
 
 function resume() {
-  galaxyStore.beginTick()
+  galaxyStore.beginTick();
 }
 </script>
 

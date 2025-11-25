@@ -1,7 +1,10 @@
-import { getDoLineSegmentsIntersect, Vector2 } from "@/game/framework/Vector2";
-import { distance } from "@/game/framework/util";
 import { MIN_STAR_SPACE } from "@/game/exploration/gen/stargen";
-import { Star } from "./Star";
+import { distance } from "@/game/framework/util";
+import {
+  getDoLineSegmentsIntersect,
+  type Vector2,
+} from "@/game/framework/Vector2";
+import type { Star } from "./Star";
 
 export class Galaxy {
   stars: Record<string, Star> = {};
@@ -96,8 +99,8 @@ export class Galaxy {
   }
 
   unconnect(a: string, b: string) {
-    this.arrayNeighbors[a] = this.arrayNeighbors[a].filter((x) => x != b);
-    this.arrayNeighbors[b] = this.arrayNeighbors[b].filter((x) => x != a);
+    this.arrayNeighbors[a] = this.arrayNeighbors[a].filter((x) => x !== b);
+    this.arrayNeighbors[b] = this.arrayNeighbors[b].filter((x) => x !== a);
     delete this.flatNeighbors[this._canonicalize(a, b)];
   }
 }

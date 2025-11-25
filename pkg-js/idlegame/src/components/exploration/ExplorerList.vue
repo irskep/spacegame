@@ -16,36 +16,36 @@
 </template>
 
 <script setup lang="ts">
-import { useGalaxyStore } from '@/stores/galaxy'
-import { useUIStore } from '@/stores/ui'
-import InlineProgressBar from '@/components/ui/InlineProgressBar.vue'
-import type { Explorer } from '@/store/types'
+import InlineProgressBar from "@/components/ui/InlineProgressBar.vue";
+import type { Explorer } from "@/store/types";
+import { useGalaxyStore } from "@/stores/galaxy";
+import { useUIStore } from "@/stores/ui";
 
-const galaxyStore = useGalaxyStore()
-const uiStore = useUIStore()
+const galaxyStore = useGalaxyStore();
+const uiStore = useUIStore();
 
 function getExplorerProgress(e: Explorer): number {
   // Force reactivity by accessing animation handles
-  galaxyStore.animationHandle
-  galaxyStore.timerHandle
+  galaxyStore.animationHandle;
+  galaxyStore.timerHandle;
 
   switch (e.state) {
-    case 'traveling':
-      return e.travelProgress
-    case 'scanning':
-      return e.scanProgress
+    case "traveling":
+      return e.travelProgress;
+    case "scanning":
+      return e.scanProgress;
   }
 }
 
 function getExplorerColor(e: Explorer): string {
   return {
-    traveling: 'lightblue',
-    scanning: 'lightgreen',
-  }[e.state]
+    traveling: "lightblue",
+    scanning: "lightgreen",
+  }[e.state];
 }
 
 function selectExplorer(eid: string) {
-  uiStore.selectExplorer(eid)
+  uiStore.selectExplorer(eid);
 }
 </script>
 
