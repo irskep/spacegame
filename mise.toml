@@ -1,0 +1,24 @@
+[tools]
+pnpm = "latest"
+node = "24"
+
+[hooks]
+postinstall = "pnpm install"
+
+[tasks.build]
+run = "pnpm -r build"
+
+[tasks.dev]
+run = "pnpm --filter idlegame dev"
+
+[tasks.serve]
+run = "pnpm --filter idlegame dev"
+
+[tasks.lint]
+run = "pnpm -r lint"
+
+[tasks.typecheck]
+run = "pnpm -r typecheck"
+
+[tasks.format]
+run = "pnpm -r format"
