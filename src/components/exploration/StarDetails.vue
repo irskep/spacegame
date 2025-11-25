@@ -8,7 +8,8 @@
 </template>
 
 <script lang="ts">
-import { GalaxyState, StarMetadata } from "@/store/types";
+import Vue from "vue";
+import { GalaxyState, PlanetInfo, StarMetadata } from "@/store/types";
 import { createNamespacedHelpers } from "vuex";
 
 const { mapState, mapGetters } = createNamespacedHelpers("galaxy");
@@ -19,7 +20,7 @@ interface PlanetRollup {
   cssClass: Record<string, boolean>;
 }
 
-export default {
+export default Vue.extend({
   name: "StarDetails",
   components: {},
   props: {
@@ -28,14 +29,15 @@ export default {
   computed: {
     ...mapState(["starInfo", "planetInfo"]),
     ...mapGetters(["galaxy"]),
-    state: function (): GalaxyState {
+    state(): GalaxyState {
       return this.$store.state.galaxy as GalaxyState;
     },
-    info: function (): StarMetadata {
-      return this.starInfo[this.starID];
+    info(): StarMetadata {
+      return (this as any).starInfo[this.starID];
     },
-    planets: function (): PlanetRollup[] {
-      if (!this.info || !this.info?.explored) return [];
+    planets(): PlanetRollup[] {
+      const info = this.info;
+      if (!info || !info.explored) return [];
       const ordinals: string[] = [
         "First",
         "Second",
@@ -59,10 +61,10 @@ export default {
         "Twentieth",
       ];
 
-      return this.info.planetIDs
-        .map((pid) => this.state.planetInfo[pid])
-        .filter((p) => p.known)
-        .map((p) => {
+      return info.planetIDs
+        .map((pid: string) => this.state.planetInfo[pid])
+        .filter((p: PlanetInfo) => p.known)
+        .map((p: PlanetInfo) => {
           return {
             name: ordinals[p.index],
             planetType: p.type,
@@ -77,7 +79,7 @@ export default {
         });
     },
   },
-};
+});
 </script>
 
 <style lang="css" scoped>
