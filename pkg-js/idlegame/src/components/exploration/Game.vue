@@ -4,17 +4,18 @@
     <div class="Game_Inner">
       <PanContainer className="Map" :center="panContainerCenter">
         <Starmap
-          :galaxy="galaxyStore.galaxy"
-          :starInfo="galaxyStore.starInfo"
-          :explorers="galaxyStore.explorers"
-          :selectedStarID="uiStore.selectedStarID"
-          :selectedExplorerID="uiStore.selectedExplorerID"
-          :hoveredStarID="uiStore.hoveredStarID"
+          :nodes="nodes"
+          :edges="edges"
+          :nodeVisualStates="nodeVisualStates"
+          :travelers="travelers"
+          :selectedNodeID="uiStore.selectedStarID"
+          :selectedTravelerID="uiStore.selectedExplorerID"
+          :hoveredNodeID="uiStore.hoveredStarID"
           :imageSizes="uiStore.imageSizes"
-          :animationHandle="galaxyStore.animationHandle"
-          @selectStar="uiStore.selectStar"
-          @hoverStar="uiStore.hoverStar"
-          @selectExplorer="uiStore.selectExplorer"
+          :size="galaxyStore.galaxy.size"
+          @selectNode="uiStore.selectStar"
+          @hoverNode="uiStore.hoverStar"
+          @selectTraveler="uiStore.selectExplorer"
           @addImageSize="uiStore.addImageSize"
         />
       </PanContainer>
@@ -47,14 +48,18 @@
 <script setup lang="ts">
 import { MessageLog, Panel, PanelGroup } from "@spacegame/design-system";
 import {
-  ExplorerDetails,
-  ExplorerList,
+  type Edge,
+  type Node,
+  type NodeVisualState,
   PanContainer,
-  StarDetails,
   Starmap,
+  type Traveler,
 } from "@spacegame/galaxyrender";
 import { computed, onMounted } from "vue";
 import DebugToolbar from "@/components/exploration/DebugToolbar.vue";
+import ExplorerDetails from "@/components/exploration/ExplorerDetails.vue";
+import ExplorerList from "@/components/exploration/ExplorerList.vue";
+import StarDetails from "@/components/exploration/StarDetails.vue";
 import { useGalaxyStore } from "@/stores/galaxy";
 import { useUIStore } from "@/stores/ui";
 
@@ -63,7 +68,72 @@ const uiStore = useUIStore();
 
 const panContainerCenter = { x: 350, y: 300 };
 
-// Computed properties for selected items
+// ===== Domain → Graph Mapping Layer =====
+
+// Map stars to nodes
+const nodes = computed<Node[]>(() => {
+  // Force reactivity on animation handle
+  galaxyStore.animationHandle;
+
+  return Object.values(galaxyStore.galaxy.stars).map((star) => ({
+    id: star.id,
+    position: star.point,
+    label: galaxyStore.starInfo[star.id]?.name,
+  }));
+});
+
+// Map star connections to edges
+const edges = computed<Edge[]>(() => {
+  return galaxyStore.galaxy.getAllNeighbors().map(([a, b]) => ({
+    fromNodeID: a.id,
+    toNodeID: b.id,
+  }));
+});
+
+// Map starInfo to node visual states
+const nodeVisualStates = computed<Record<string, NodeVisualState>>(() => {
+  // Force reactivity on animation handle
+  galaxyStore.animationHandle;
+
+  const states: Record<string, NodeVisualState> = {};
+  for (const [id, info] of Object.entries(galaxyStore.starInfo)) {
+    let borderColor = "#616161";
+    if (info.explored) {
+      if (info.buildings.length > 0) {
+        borderColor = "#CB4FA2";
+      } else if (info.hasTerranHabitable) {
+        borderColor = "lightgreen";
+      }
+    } else {
+      borderColor = "transparent";
+    }
+
+    states[id] = {
+      known: info.known,
+      selected: uiStore.selectedStarID === id,
+      hovered: uiStore.hoveredStarID === id,
+      borderColor,
+    };
+  }
+  return states;
+});
+
+// Map explorers to travelers
+const travelers = computed<Traveler[]>(() => {
+  // Force reactivity on animation handle
+  galaxyStore.animationHandle;
+
+  return Object.values(galaxyStore.explorers).map((e) => ({
+    id: e.id,
+    image: e.ship.image,
+    nodeID: e.starID,
+    destNodeID: e.destinationStarID,
+    progress: e.travelProgress,
+  }));
+});
+
+// ===== Computed properties for selected items =====
+
 const selectedStar = computed(() => {
   if (!uiStore.selectedStarID) return null;
   return galaxyStore.starInfo[uiStore.selectedStarID];

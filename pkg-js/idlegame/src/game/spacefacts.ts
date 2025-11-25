@@ -1,5 +1,5 @@
-import type { GalaxyState } from ".";
-import type { Galaxy } from "./Galaxy";
+import type { Galaxy } from "@spacegame/galaxygen";
+import type { GalaxyState } from "@/types";
 
 type StarExplorationState = "None" | "Some" | "All";
 

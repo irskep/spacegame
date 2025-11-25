@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { InlineProgressBar } from "@spacegame/design-system";
-import type { Explorer } from "@spacegame/galaxygen";
+import type { Explorer } from "@/types";
 
 const props = defineProps<{
   explorers: Record<string, Explorer>;

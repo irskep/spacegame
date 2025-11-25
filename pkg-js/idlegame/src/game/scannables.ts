@@ -1,5 +1,5 @@
-import type { GalaxyState, Scannable } from "../types";
-import type { Galaxy } from "../types/Galaxy";
+import type { Galaxy } from "@spacegame/galaxygen";
+import type { GalaxyState, Scannable } from "@/types";
 
 export function getScannables(
   g: Galaxy,

@@ -1,12 +1,6 @@
-import {
-  distance,
-  type Explorer,
-  type ExplorerState,
-  type Galaxy,
-  type GalaxyState,
-  getScannables,
-  RNG,
-} from "@spacegame/galaxygen";
+import { distance, type Galaxy, RNG } from "@spacegame/galaxygen";
+import { getScannables } from "@/game/scannables";
+import type { Explorer, ExplorerState, GalaxyState } from "@/types";
 import { addMessage } from "./messages";
 
 const CONSTANTS = {

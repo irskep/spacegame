@@ -44,7 +44,8 @@
 
 <script setup lang="ts">
 import { ProgressBar } from "@spacegame/design-system";
-import type { Explorer, StarMetadata } from "@spacegame/galaxygen";
+import type { StarMetadata } from "@spacegame/galaxygen";
+import type { Explorer } from "@/types";
 
 defineProps<{
   explorer: Explorer;
