@@ -4,6 +4,12 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    stellardream:
+      specifier: ^0.1.5
+      version: 0.1.5
+
 importers:
 
   .:
@@ -27,12 +33,18 @@ importers:
 
   pkg-js/explorationgame:
     dependencies:
+      '@spacegame/design-system':
+        specifier: workspace:*
+        version: link:../design-system
       '@spacegame/galaxygen':
         specifier: workspace:*
         version: link:../galaxygen
       '@spacegame/galaxyrender':
         specifier: workspace:*
         version: link:../galaxyrender
+      stellardream:
+        specifier: 'catalog:'
+        version: 0.1.5
       vue:
         specifier: ^3.5.25
         version: 3.5.25(typescript@5.9.3)
@@ -56,7 +68,7 @@ importers:
         specifier: ^3.0.5
         version: 3.0.5
       stellardream:
-        specifier: ^0.1.5
+        specifier: 'catalog:'
         version: 0.1.5
       tracery-grammar:
         specifier: ^2.7.4
@@ -80,6 +92,9 @@ importers:
       '@spacegame/galaxygen':
         specifier: workspace:*
         version: link:../galaxygen
+      stellardream:
+        specifier: 'catalog:'
+        version: 0.1.5
       vue:
         specifier: ^3.5.25
         version: 3.5.25(typescript@5.9.3)

@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "seedrandom": "^3.0.5",
-    "stellardream": "^0.1.5",
+    "stellardream": "catalog:",
     "tracery-grammar": "^2.7.4"
   },
   "devDependencies": {

@@ -1,6 +1,19 @@
 <template>
   <div class="App">
-    <PanContainer class="MapContainer" :center="playerCenter">
+    <div class="HUD">
+      <Button :selected="activeView === 'galaxy'" @click="activeView = 'galaxy'">
+        Galaxy
+      </Button>
+      <Button :selected="activeView === 'system'" @click="activeView = 'system'">
+        System
+      </Button>
+    </div>
+
+    <PanContainer
+      v-if="activeView === 'galaxy'"
+      class="MapContainer"
+      :center="playerCenter"
+    >
       <div class="MapScale">
         <Starmap
           :nodes="nodes"
@@ -19,13 +32,35 @@
         />
       </div>
     </PanContainer>
+
+    <template v-else>
+      <SystemView
+        :star="currentSystem.stars[0]"
+        :planets="currentSystem.planets"
+        :habitableZoneMin="currentSystem.habitableZoneMin"
+        :habitableZoneMax="currentSystem.habitableZoneMax"
+        :seed="playerStarID"
+      />
+      <PanelGroup class="m-hud-right">
+        <Panel>
+          <PlanetList
+            :starName="currentStarName"
+            :planets="currentSystem.planets"
+            :habitableZoneMin="currentSystem.habitableZoneMin"
+            :habitableZoneMax="currentSystem.habitableZoneMax"
+          />
+        </Panel>
+      </PanelGroup>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
+import { Button, Panel, PanelGroup } from "@spacegame/design-system";
 import {
   type Galaxy,
   generateStars,
+  getStarSystem,
   lerp,
   StarDataSystem,
   type Vector2,
@@ -36,9 +71,11 @@ import {
   type NodeVisualState,
   PanContainer,
   Starmap,
+  SystemView,
   type Traveler,
 } from "@spacegame/galaxyrender";
 import { computed, onMounted, onUnmounted, ref } from "vue";
+import PlanetList from "./components/PlanetList.vue";
 
 const SEED = "exploration-demo";
 const SCALE = 3;
@@ -48,6 +85,7 @@ const galaxy: Galaxy = generateStars(SEED);
 const starData = StarDataSystem.makeData(SEED, galaxy);
 
 // UI state
+const activeView = ref<"galaxy" | "system">("galaxy");
 const hoveredNodeID = ref<string | null>(null);
 const imageSizes = ref<Record<string, Vector2>>({});
 
@@ -55,6 +93,12 @@ const imageSizes = ref<Record<string, Vector2>>({});
 const playerStarID = ref(galaxy.homeStarID);
 const playerDestStarID = ref<string | null>(null);
 const playerProgress = ref(0);
+
+// Current star system (for System view)
+const currentSystem = computed(() => getStarSystem(playerStarID.value));
+const currentStarName = computed(
+  () => starData[playerStarID.value]?.name ?? "Unknown",
+);
 
 // Animation
 let animationHandle = 0;
@@ -212,5 +256,20 @@ body {
 .MapScale {
   transform: scale(3);
   transform-origin: top left;
+}
+
+.HUD {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  z-index: 10;
+}
+
+.SystemView {
+  width: 100%;
+  height: 100%;
 }
 </style>

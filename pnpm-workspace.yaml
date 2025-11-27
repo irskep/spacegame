@@ -1,2 +1,5 @@
 packages:
   - "pkg-js/*"
+
+catalog:
+  stellardream: ^0.1.5

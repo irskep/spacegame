@@ -1,0 +1,8 @@
+:root {
+  --color-bg-dark: black;
+  --color-bg-button: #444;
+  --color-bg-button-selected: #666;
+  --color-border: #666;
+  --color-border-light: #888;
+  --color-text: white;
+}
