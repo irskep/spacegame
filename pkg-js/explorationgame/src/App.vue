@@ -13,24 +13,23 @@
       v-if="activeView === 'galaxy'"
       class="MapContainer"
       :center="playerCenter"
+      :contentSize="galaxy.size"
     >
-      <div class="MapScale">
-        <Starmap
-          :nodes="nodes"
-          :edges="edges"
-          :nodeVisualStates="nodeVisualStates"
-          :travelers="travelers"
-          :selectedNodeID="null"
-          :selectedTravelerID="null"
-          :hoveredNodeID="hoveredNodeID"
-          :imageSizes="imageSizes"
-          :size="galaxy.size"
-          @selectNode="onSelectNode"
-          @hoverNode="(id) => (hoveredNodeID = id)"
-          @selectTraveler="() => {}"
-          @addImageSize="onAddImageSize"
-        />
-      </div>
+      <Starmap
+        :nodes="nodes"
+        :edges="edges"
+        :nodeVisualStates="nodeVisualStates"
+        :travelers="travelers"
+        :selectedNodeID="null"
+        :selectedTravelerID="null"
+        :hoveredNodeID="hoveredNodeID"
+        :imageSizes="imageSizes"
+        :size="galaxy.size"
+        @selectNode="onSelectNode"
+        @hoverNode="(id) => (hoveredNodeID = id)"
+        @selectTraveler="() => {}"
+        @addImageSize="onAddImageSize"
+      />
     </PanContainer>
 
     <template v-else>
@@ -78,7 +77,6 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import PlanetList from "./components/PlanetList.vue";
 
 const SEED = "exploration-demo";
-const SCALE = 3;
 const TRAVEL_SPEED = 0.5; // progress per second
 
 const galaxy: Galaxy = generateStars(SEED);
@@ -153,11 +151,8 @@ const playerPosition = computed<Vector2>(() => {
   return currentStar.point;
 });
 
-// Computed: center for PanContainer (scaled)
-const playerCenter = computed<Vector2>(() => ({
-  x: playerPosition.value.x * SCALE,
-  y: playerPosition.value.y * SCALE,
-}));
+// Computed: center for PanContainer
+const playerCenter = computed<Vector2>(() => playerPosition.value);
 
 // Handle node selection - navigate if adjacent
 function onSelectNode(nodeID: string) {
@@ -251,11 +246,6 @@ body {
 .MapContainer {
   width: 100%;
   height: 100%;
-}
-
-.MapScale {
-  transform: scale(3);
-  transform-origin: top left;
 }
 
 .HUD {

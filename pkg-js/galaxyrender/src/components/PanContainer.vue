@@ -16,21 +16,50 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
 const props = defineProps<{
   center: { x: number; y: number };
+  contentSize: { x: number; y: number };
   className?: string;
 }>();
 
+const container = ref<HTMLElement | null>(null);
+const containerSize = ref({ width: 1, height: 1 });
 const offset = ref({ x: 0, y: 0 });
 const offsetStart = ref({ x: 0, y: 0 });
 const mouseStart = ref({ x: 0, y: 0 });
 const isMouseDown = ref(false);
 
+let resizeObserver: ResizeObserver | null = null;
+
+onMounted(() => {
+  if (container.value) {
+    const rect = container.value.getBoundingClientRect();
+    containerSize.value = { width: rect.width, height: rect.height };
+    resizeObserver = new ResizeObserver((entries) => {
+      const { width, height } = entries[0].contentRect;
+      containerSize.value = { width, height };
+    });
+    resizeObserver.observe(container.value);
+  }
+});
+
+onUnmounted(() => {
+  resizeObserver?.disconnect();
+});
+
+// Scale factor: how much the content is scaled to fit the container
+const scale = computed(() => {
+  const scaleX = containerSize.value.width / props.contentSize.x;
+  const scaleY = containerSize.value.height / props.contentSize.y;
+  return Math.min(scaleX, scaleY); // "meet" behavior
+});
+
 const transform = computed(() => {
-  const x = -props.center.x + offset.value.x;
-  const y = -props.center.y + offset.value.y;
+  const s = scale.value;
+  const x = -props.center.x * s + offset.value.x;
+  const y = -props.center.y * s + offset.value.y;
   return `translate(${x}px, ${y}px)`;
 });
 
@@ -79,5 +108,7 @@ watch(
   position: absolute;
   left: 50%;
   top: 50%;
+  width: 100%;
+  height: 100%;
 }
 </style>

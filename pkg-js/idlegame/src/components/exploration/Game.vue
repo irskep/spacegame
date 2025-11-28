@@ -2,7 +2,7 @@
   <div class="Game">
     <DebugToolbar />
     <div class="Game_Inner">
-      <PanContainer className="Map" :center="panContainerCenter">
+      <PanContainer className="Map" :center="panContainerCenter" :contentSize="galaxyStore.galaxy.size">
         <Starmap
           :nodes="nodes"
           :edges="edges"

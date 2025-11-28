@@ -1,5 +1,5 @@
 <template>
-  <svg class="Starmap" :width="size.x" :height="size.y">
+  <svg class="Starmap" :viewBox="`0 0 ${size.x} ${size.y}`" preserveAspectRatio="xMinYMin meet">
     <!-- Edges -->
     <line
       v-for="edge in visibleEdges"
@@ -194,7 +194,8 @@ function getTravelerPoint(traveler: Traveler): Vector2 {
 
 <style scoped>
 .Starmap {
-  position: relative;
+  width: 100%;
+  height: 100%;
   background-color: black;
 }
 
