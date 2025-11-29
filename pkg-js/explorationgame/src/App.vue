@@ -285,7 +285,7 @@ body {
 .ResetButton {
   position: fixed;
   top: 1rem;
-  right: 1rem;
+  left: 1rem;
   z-index: 10;
 }
 
