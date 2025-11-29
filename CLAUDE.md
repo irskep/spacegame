@@ -9,3 +9,5 @@ Run 'mise validate' to check your work. 'mise dev' is always running and you are
 Never run typecheck via pnpm. Always use 'mise validate'.
 
 Ask permission before taking visual snapshots of chrome devtools MCP. Prefer using code-based evaluation over visual evaluation.
+
+Sometimes hot reloading doesn't work. Try reloading as a debugging step.

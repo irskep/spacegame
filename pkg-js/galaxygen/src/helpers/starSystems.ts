@@ -56,3 +56,31 @@ export function getStarSystem(s: string): StarSystem {
 export function getPlanetID(starID: string, planetIndex: number): string {
   return `planet-${starID}-${planetIndex}`;
 }
+
+function isValidHomeSystem(sys: StarSystem): boolean {
+  if (sys.planets.length < 4) return false;
+
+  for (const planet of sys.planets) {
+    if (
+      planet.distance >= sys.habitableZoneMin &&
+      planet.distance <= sys.habitableZoneMax
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function generateHomeStarSystem(s: string): StarSystem {
+  let attempts = 0;
+  while (attempts < 1000) {
+    const sys = generateStarSystem(`${s}-home-${attempts}`);
+    if (isValidHomeSystem(sys)) {
+      starSystemCache[s] = sys;
+      return sys;
+    }
+    attempts++;
+  }
+  // Fallback (shouldn't happen in practice)
+  return generateStarSystem(s);
+}

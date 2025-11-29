@@ -9,6 +9,8 @@
       </Button>
     </div>
 
+    <Button class="ResetButton" @click="reset">Reset</Button>
+
     <PanContainer
       v-if="activeView === 'galaxy'"
       class="MapContainer"
@@ -33,7 +35,8 @@
     </PanContainer>
 
     <template v-else>
-      <SystemView
+      <component
+        :is="ActiveSystemView"
         :star="currentSystem.stars[0]"
         :planets="currentSystem.planets"
         :habitableZoneMin="currentSystem.habitableZoneMin"
@@ -58,6 +61,7 @@
 import { Button, Panel, PanelGroup } from "@spacegame/design-system";
 import {
   type Galaxy,
+  generateHomeStarSystem,
   generateStars,
   getStarSystem,
   lerp,
@@ -71,15 +75,35 @@ import {
   PanContainer,
   Starmap,
   SystemView,
+  SystemViewSVG,
   type Traveler,
+  USE_SVG_SYSTEM_VIEW,
 } from "@spacegame/galaxyrender";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import PlanetList from "./components/PlanetList.vue";
 
-const SEED = "exploration-demo";
+const ActiveSystemView = USE_SVG_SYSTEM_VIEW ? SystemViewSVG : SystemView;
+
 const TRAVEL_SPEED = 0.5; // progress per second
 
+function getSeed(): string {
+  let seed = localStorage.getItem("galaxySeed");
+  if (!seed) {
+    seed = `galaxy-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem("galaxySeed", seed);
+  }
+  return seed;
+}
+
+const SEED = getSeed();
+
+function reset() {
+  localStorage.clear();
+  window.location.reload();
+}
+
 const galaxy: Galaxy = generateStars(SEED);
+generateHomeStarSystem(galaxy.homeStarID); // Ensure home star has 4+ planets with habitable zone
 const starData = StarDataSystem.makeData(SEED, galaxy);
 
 // UI state
@@ -255,6 +279,13 @@ body {
   transform: translateX(-50%);
   display: flex;
   gap: 1rem;
+  z-index: 10;
+}
+
+.ResetButton {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
   z-index: 10;
 }
 

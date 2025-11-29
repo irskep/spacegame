@@ -21,6 +21,7 @@ export { default as starnames } from "./gen/starnames";
 
 // Helpers
 export {
+  generateHomeStarSystem,
   generateStarSystem,
   getPlanetID,
   getStarSystem,
