@@ -13,66 +13,25 @@
     />
 
     <!-- Nodes -->
-    <g
-      class="Starmap_Node"
+    <StarmapNode
       v-for="node in visibleNodes"
       :key="node.id"
-      :id="node.id"
-      @click="emit('selectNode', node.id)"
-      @mouseenter="emit('hoverNode', node.id)"
-      @mouseleave="emit('hoverNode', null)"
-    >
-      <circle
-        class="Starmap_Node_Outer"
-        :class="{ 'm-unexplored': !getNodeVisualState(node.id).known }"
-        :cx="node.position.x"
-        :cy="node.position.y"
-        :r="10"
-        :fill="getNodeVisualState(node.id).borderColor || '#616161'"
-        fill-opacity="0.7"
-      />
-
-      <circle
-        class="Starmap_Node_Inner"
-        :cx="node.position.x"
-        :cy="node.position.y"
-        :r="5"
-        fill="black"
-        stroke="white"
-      />
-    </g>
+      :node="node"
+      :visualState="getNodeVisualState(node.id)"
+      @select="emit('selectNode', node.id)"
+      @hover="(id) => emit('hoverNode', id)"
+    />
 
     <!-- Travelers -->
-    <g
+    <StarmapTraveler
       v-for="traveler of travelers"
       :key="traveler.id"
-      @click="emit('selectTraveler', traveler.id)"
-      class="Starmap_Traveler"
-      :transform="`translate(${getTravelerPoint(traveler).x}, ${getTravelerPoint(traveler).y})`"
-      :id="traveler.id"
-    >
-      <line :x1="0" :y1="-10" :x2="0" :y2="0" class="Edge" stroke="white" />
-
-      <circle
-        :class="{ pulse: selectedTravelerID === traveler.id }"
-        :cx="0"
-        :cy="-23"
-        :r="12"
-        stroke="white"
-        fill="black"
-      />
-
-      <circle :cx="0" :cy="-23" :r="12" stroke="white" fill="black" />
-
-      <image
-        :href="traveler.imageURL"
-        :x="-getImageSize(traveler.imageURL).x / 2"
-        :y="-23 - getImageSize(traveler.imageURL).y / 2"
-        transform-origin="center"
-        :width="getImageSize(traveler.imageURL).x"
-        :height="getImageSize(traveler.imageURL).y"
-      />
-    </g>
+      :traveler="traveler"
+      :position="getTravelerPoint(traveler)"
+      :imageSize="getImageSize(traveler.imageURL)"
+      :selected="selectedTravelerID === traveler.id"
+      @select="emit('selectTraveler', traveler.id)"
+    />
 
     <!-- Hovered node label -->
     <text
@@ -100,6 +59,8 @@
 import { lerp, scaleToHeight, type Vector2 } from "@spacegame/galaxygen";
 import { computed, ref } from "vue";
 import type { Edge, Node, NodeVisualState, Traveler } from "../types";
+import StarmapNode from "./StarmapNode.vue";
+import StarmapTraveler from "./StarmapTraveler.vue";
 
 const props = defineProps<{
   nodes: Node[];
@@ -211,37 +172,5 @@ function getTravelerPoint(traveler: Traveler): Vector2 {
 
 .Starmap_Traveler_Label {
   fill: white;
-}
-
-.Starmap_Node:hover text {
-  visibility: visible;
-}
-
-.Starmap_Node:hover circle.Starmap_Node_Inner {
-  stroke: yellow;
-  fill: #333;
-}
-
-.Starmap_Traveler {
-  cursor: pointer;
-}
-
-.pulse {
-  animation-duration: 2s;
-  animation-name: pulse;
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
-}
-
-@keyframes pulse {
-  0% {
-    r: 9px;
-  }
-  50% {
-    r: 15px;
-  }
-  100% {
-    r: 9px;
-  }
 }
 </style>
