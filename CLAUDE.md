@@ -17,3 +17,5 @@ Ask permission before taking visual snapshots of chrome devtools MCP. Prefer usi
 Sometimes hot reloading doesn't work. Try reloading as a debugging step.
 
 Read @pkg-js/design-system/src/styles/variables.css
+
+All data returned from Pinia stores should be JSON-serializable, except galaxyStore, which uses a random seed to create a lot of data.

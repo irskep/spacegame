@@ -93,14 +93,15 @@ const annotations = computed(() => props.visualState.annotations ?? []);
 
 const backgroundAnnotation = computed(() =>
   annotations.value.find(
-    (a): a is NodeAnnotation & { type: "background" } => a.type === "background"
-  )
+    (a): a is NodeAnnotation & { type: "background" } =>
+      a.type === "background",
+  ),
 );
 
 const pulseAnnotation = computed(() =>
   annotations.value.find(
-    (a): a is NodeAnnotation & { type: "pulse" } => a.type === "pulse"
-  )
+    (a): a is NodeAnnotation & { type: "pulse" } => a.type === "pulse",
+  ),
 );
 
 const showStar = computed(() => {

@@ -11,15 +11,6 @@ run = "pnpm -r build"
 [tasks.dev]
 run = "pnpm --filter explorationgame dev"
 
-[tasks."dev:idlegame"]
-run = "pnpm --filter idlegame dev"
-
-[tasks."dev:explorationgame"]
-run = "pnpm --filter explorationgame dev"
-
-[tasks.serve]
-run = "pnpm --filter idlegame dev"
-
 [tasks.lint]
 run = "pnpm biome check ."
 

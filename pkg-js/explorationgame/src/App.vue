@@ -11,7 +11,7 @@
       </Button>
     </div>
 
-    <Button class="ResetButton" @click="reset">Reset</Button>
+    <Button class="ResetButton" @click="galaxyStore.reset">Reset</Button>
 
     <PanContainer
       v-if="activeView === 'galaxy'"
@@ -26,11 +26,11 @@
         :travelers="travelers"
         :selectedNodeID="null"
         :selectedTravelerID="null"
-        :hoveredNodeID="hoveredNodeID"
+        :hoveredNodeID="transientStore.hoveredNodeID"
         :imageSizes="imageSizes"
         :size="galaxy.size"
         @selectNode="onSelectNode"
-        @hoverNode="(id) => (hoveredNodeID = id)"
+        @hoverNode="(id) => (transientStore.hoveredNodeID = id)"
         @selectTraveler="() => {}"
         @addImageSize="onAddImageSize"
       />
@@ -43,7 +43,7 @@
         :planets="currentSystem.planets"
         :habitableZoneMin="currentSystem.habitableZoneMin"
         :habitableZoneMax="currentSystem.habitableZoneMax"
-        :seed="playerStarID"
+        :seed="playerStore.starID"
       />
       <PanelGroup class="m-hud-right">
         <Panel>
@@ -61,15 +61,7 @@
 
 <script setup lang="ts">
 import { Button, Panel, PanelGroup } from "@spacegame/design-system";
-import {
-  type Galaxy,
-  generateHomeStarSystem,
-  generateStars,
-  getStarSystem,
-  lerp,
-  StarDataSystem,
-  type Vector2,
-} from "@spacegame/galaxygen";
+import { getStarSystem, lerp, type Vector2 } from "@spacegame/galaxygen";
 import {
   type Edge,
   type Node,
@@ -86,33 +78,21 @@ import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import ModalContainer from "./components/ModalContainer.vue";
 import PlanetList from "./components/PlanetList.vue";
 import { useExplorationStore } from "./stores/explorationStore";
+import { useGalaxyStore } from "./stores/galaxyStore";
 import { useModalStore } from "./stores/modalStore";
+import { usePlayerStore } from "./stores/playerStore";
+import { useTransientStore } from "./stores/transientStore";
 
 const ActiveSystemView = USE_SVG_SYSTEM_VIEW ? SystemViewSVG : SystemView;
+const galaxyStore = useGalaxyStore();
+const playerStore = usePlayerStore();
+const transientStore = useTransientStore();
 const modalStore = useModalStore();
 const explorationStore = useExplorationStore();
 
 const TRAVEL_SPEED = 0.5; // progress per second
 
-function getSeed(): string {
-  let seed = localStorage.getItem("galaxySeed");
-  if (!seed) {
-    seed = `galaxy-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    localStorage.setItem("galaxySeed", seed);
-  }
-  return seed;
-}
-
-const SEED = getSeed();
-
-function reset() {
-  localStorage.clear();
-  window.location.reload();
-}
-
-const galaxy: Galaxy = generateStars(SEED);
-generateHomeStarSystem(galaxy.homeStarID); // Ensure home star has 4+ planets with habitable zone
-const starData = StarDataSystem.makeData(SEED, galaxy);
+const { galaxy, starData } = galaxyStore;
 
 // Initialize exploration: all stars discovered, home star system explored
 for (const id of Object.keys(galaxy.stars)) {
@@ -125,18 +105,12 @@ for (const neighborID of galaxy.getNeighborIDs(galaxy.homeStarID)) {
 
 // UI state
 const activeView = ref<"galaxy" | "system">("galaxy");
-const hoveredNodeID = ref<string | null>(null);
 const imageSizes = ref<Record<string, Vector2>>({});
 
-// Player state
-const playerStarID = ref(galaxy.homeStarID);
-const playerDestStarID = ref<string | null>(null);
-const playerProgress = ref(0);
-
 // Current star system (for System view)
-const currentSystem = computed(() => getStarSystem(playerStarID.value));
+const currentSystem = computed(() => getStarSystem(playerStore.starID));
 const currentStarName = computed(
-  () => starData[playerStarID.value]?.name ?? "Unknown",
+  () => starData[playerStore.starID]?.name ?? "Unknown",
 );
 
 // Animation
@@ -146,16 +120,7 @@ let lastTime: number | null = null;
 function tick(time: number) {
   if (lastTime !== null) {
     const dt = (time - lastTime) / 1000;
-
-    if (playerDestStarID.value) {
-      playerProgress.value += dt * TRAVEL_SPEED;
-
-      if (playerProgress.value >= 1) {
-        playerStarID.value = playerDestStarID.value;
-        playerDestStarID.value = null;
-        playerProgress.value = 0;
-      }
-    }
+    playerStore.tick(dt, TRAVEL_SPEED);
   }
 
   lastTime = time;
@@ -173,30 +138,33 @@ onUnmounted(() => {
 });
 
 // Update exploration when player arrives at a new star
-watch(playerStarID, (newStarID) => {
-  explorationStore.setExploration(newStarID, "systemExplored");
-  for (const neighborID of galaxy.getNeighborIDs(newStarID)) {
-    // Only upgrade to starExplored if not already systemExplored
-    if (explorationStore.getExploration(neighborID) !== "systemExplored") {
-      explorationStore.setExploration(neighborID, "starExplored");
+watch(
+  () => playerStore.starID,
+  (newStarID) => {
+    explorationStore.setExploration(newStarID, "systemExplored");
+    for (const neighborID of galaxy.getNeighborIDs(newStarID)) {
+      // Only upgrade to starExplored if not already systemExplored
+      if (explorationStore.getExploration(neighborID) !== "systemExplored") {
+        explorationStore.setExploration(neighborID, "starExplored");
+      }
     }
-  }
-});
+  },
+);
 
 // Computed: adjacent star IDs
 const adjacentStarIDs = computed<Set<string>>(() => {
-  return new Set(galaxy.getNeighborIDs(playerStarID.value));
+  return new Set(galaxy.getNeighborIDs(playerStore.starID));
 });
 
 // Computed: player's current visual position
 const playerPosition = computed<Vector2>(() => {
-  const currentStar = galaxy.stars[playerStarID.value];
+  const currentStar = galaxy.stars[playerStore.starID];
   if (!currentStar) return { x: 0, y: 0 };
 
-  if (playerDestStarID.value) {
-    const destStar = galaxy.stars[playerDestStarID.value];
+  if (playerStore.destStarID) {
+    const destStar = galaxy.stars[playerStore.destStarID];
     if (destStar) {
-      return lerp(currentStar.point, destStar.point, playerProgress.value);
+      return lerp(currentStar.point, destStar.point, playerStore.progress);
     }
   }
 
@@ -214,9 +182,8 @@ function onSelectNode(nodeID: string, shiftKey: boolean) {
     modalStore.push({ type: "systemView", starID: nodeID, starName });
   } else {
     // Click: navigate if adjacent and not already traveling
-    if (adjacentStarIDs.value.has(nodeID) && !playerDestStarID.value) {
-      playerDestStarID.value = nodeID;
-      playerProgress.value = 0;
+    if (adjacentStarIDs.value.has(nodeID) && !playerStore.isTraveling) {
+      playerStore.startTravel(nodeID);
     }
   }
 }
@@ -248,8 +215,8 @@ const nodeVisualStates = computed<Record<string, NodeVisualState>>(() => {
   const states: Record<string, NodeVisualState> = {};
 
   for (const id of Object.keys(galaxy.stars)) {
-    const isCurrent = id === playerStarID.value;
-    const isPlayerHere = isCurrent && playerDestStarID.value === null;
+    const isCurrent = id === playerStore.starID;
+    const isPlayerHere = isCurrent && !playerStore.isTraveling;
 
     const annotations: NodeAnnotation[] = [];
     if (isPlayerHere) {
@@ -259,7 +226,7 @@ const nodeVisualStates = computed<Record<string, NodeVisualState>>(() => {
     states[id] = {
       exploration: explorationStore.getExploration(id),
       selected: isCurrent,
-      hovered: hoveredNodeID.value === id,
+      hovered: transientStore.hoveredNodeID === id,
       annotations,
     };
   }
@@ -272,9 +239,9 @@ const travelers = computed<Traveler[]>(() => [
     id: "player",
     label: "Player",
     imageURL: "/spaceships/P-blue-a.png",
-    nodeID: playerStarID.value,
-    destNodeID: playerDestStarID.value,
-    progress: playerProgress.value,
+    nodeID: playerStore.starID,
+    destNodeID: playerStore.destStarID,
+    progress: playerStore.progress,
   },
 ]);
 </script>
