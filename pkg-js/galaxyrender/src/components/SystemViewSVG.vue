@@ -42,11 +42,17 @@ const props = defineProps<{
   seed: string;
 }>();
 
-const STAR_MARGIN = 200; // gap between star edge and first orbit
-const ORBIT_SPACING = 360; // constant gap between orbits (4x previous to avoid star occlusion)
+// Planet sizes: Terran=5, Neptunian=20, Jovian=40
+const MAX_PLANET_RADIUS = 40;
+const MIN_STAR_PLANET_GAP = 160;
+// First orbit is at starRadius + STAR_MARGIN from center
+// Planet edge closest to star is at (starRadius + STAR_MARGIN - MAX_PLANET_RADIUS)
+// Gap between star edge and planet edge = STAR_MARGIN - MAX_PLANET_RADIUS = MIN_STAR_PLANET_GAP
+const STAR_MARGIN = MAX_PLANET_RADIUS + MIN_STAR_PLANET_GAP;
+const ORBIT_SPACING = 360;
 const VIEW_MARGIN = 30;
 const MIN_STAR_RADIUS = 8;
-const PERSPECTIVE = 0.35; // vertical squash for 3D perspective
+const PERSPECTIVE = 0.35;
 
 const starRadius = computed(() => {
   return Math.max(MIN_STAR_RADIUS, props.star.radius * 25);
