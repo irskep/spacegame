@@ -50,6 +50,7 @@ import { MessageLog, Panel, PanelGroup } from "@spacegame/design-system";
 import {
   type Edge,
   type Node,
+  type NodeAnnotation,
   type NodeVisualState,
   PanContainer,
   Starmap,
@@ -97,16 +98,7 @@ const nodeVisualStates = computed<Record<string, NodeVisualState>>(() => {
 
   const states: Record<string, NodeVisualState> = {};
   for (const [id, info] of Object.entries(galaxyStore.starInfo)) {
-    let borderColor = "#616161";
-    if (info.explored) {
-      if (info.buildings.length > 0) {
-        borderColor = "#CB4FA2";
-      } else if (info.hasTerranHabitable) {
-        borderColor = "lightgreen";
-      }
-    } else {
-      borderColor = "transparent";
-    }
+    const annotations: NodeAnnotation[] = [];
 
     // Map to exploration level
     let exploration: "undiscovered" | "discovered" | "systemExplored" =
@@ -121,7 +113,7 @@ const nodeVisualStates = computed<Record<string, NodeVisualState>>(() => {
       exploration,
       selected: uiStore.selectedStarID === id,
       hovered: uiStore.hoveredStarID === id,
-      borderColor,
+      annotations,
     };
   }
   return states;

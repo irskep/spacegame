@@ -18,20 +18,28 @@
       :key="node.id"
       :node="node"
       :visualState="getNodeVisualState(node.id)"
-      @select="emit('selectNode', node.id)"
+      @select="(shiftKey) => emit('selectNode', node.id, shiftKey)"
       @hover="(id) => emit('hoverNode', id)"
     />
 
-    <!-- Travelers -->
+    <!-- Travelers (only shown when traveling) -->
     <StarmapTraveler
-      v-for="traveler of travelers"
+      v-for="traveler of travelingTravelers"
       :key="traveler.id"
       :traveler="traveler"
       :position="getTravelerPoint(traveler)"
-      :imageSize="getImageSize(traveler.imageURL)"
-      :selected="selectedTravelerID === traveler.id"
+      :sourcePosition="nodeMap[traveler.nodeID]?.position"
+      :destPosition="nodeMap[traveler.destNodeID!]?.position"
       @select="emit('selectTraveler', traveler.id)"
-    />
+    >
+      <template #default="{ rotation }">
+        <StarmapShip
+          :imageURL="traveler.imageURL"
+          :imageSize="getImageSize(traveler.imageURL)"
+          :rotation="rotation"
+        />
+      </template>
+    </StarmapTraveler>
 
     <!-- Hovered node label -->
     <text
@@ -60,6 +68,7 @@ import { lerp, scaleToHeight, type Vector2 } from "@spacegame/galaxygen";
 import { computed, ref } from "vue";
 import type { Edge, Node, NodeVisualState, Traveler } from "../types";
 import StarmapNode from "./StarmapNode.vue";
+import StarmapShip from "./StarmapShip.vue";
 import StarmapTraveler from "./StarmapTraveler.vue";
 
 const props = defineProps<{
@@ -75,7 +84,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  selectNode: [nodeID: string];
+  selectNode: [nodeID: string, shiftKey: boolean];
   hoverNode: [nodeID: string | null];
   selectTraveler: [travelerID: string];
   addImageSize: [url: string, size: Vector2];
@@ -120,6 +129,11 @@ const visibleEdges = computed<Edge[]>(() => {
 const hoveredNode = computed<Node | null>(() => {
   if (!props.hoveredNodeID) return null;
   return nodeMap.value[props.hoveredNodeID] || null;
+});
+
+// Filter to only travelers that are currently traveling (have a destination)
+const travelingTravelers = computed<Traveler[]>(() => {
+  return props.travelers.filter((t) => t.destNodeID !== null);
 });
 
 function getNodeVisualState(nodeID: string): NodeVisualState {

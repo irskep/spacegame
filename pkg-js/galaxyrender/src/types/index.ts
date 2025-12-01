@@ -28,9 +28,13 @@ export type ExplorationLevel =
   | "starExplored"
   | "systemExplored";
 
+export type NodeAnnotation =
+  | { type: "background"; color: string }
+  | { type: "pulse"; color?: string };
+
 export interface NodeVisualState {
   selected?: boolean;
   hovered?: boolean;
-  borderColor?: string;
   exploration?: ExplorationLevel;
+  annotations?: NodeAnnotation[];
 }

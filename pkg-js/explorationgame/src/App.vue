@@ -73,6 +73,7 @@ import {
 import {
   type Edge,
   type Node,
+  type NodeAnnotation,
   type NodeVisualState,
   PanContainer,
   Starmap,
@@ -205,10 +206,19 @@ const playerPosition = computed<Vector2>(() => {
 // Computed: center for PanContainer
 const playerCenter = computed<Vector2>(() => playerPosition.value);
 
-// Handle node selection - open system view modal
-function onSelectNode(nodeID: string) {
-  const starName = starData[nodeID]?.name ?? "Unknown";
-  modalStore.push({ type: "systemView", starID: nodeID, starName });
+// Handle node selection - navigate on click, open modal on shift+click
+function onSelectNode(nodeID: string, shiftKey: boolean) {
+  if (shiftKey) {
+    // Shift+click: open system view modal
+    const starName = starData[nodeID]?.name ?? "Unknown";
+    modalStore.push({ type: "systemView", starID: nodeID, starName });
+  } else {
+    // Click: navigate if adjacent and not already traveling
+    if (adjacentStarIDs.value.has(nodeID) && !playerDestStarID.value) {
+      playerDestStarID.value = nodeID;
+      playerProgress.value = 0;
+    }
+  }
 }
 
 function onAddImageSize(url: string, size: Vector2) {
@@ -233,27 +243,24 @@ const edges = computed<Edge[]>(() => {
   }));
 });
 
-// Map to node visual states with adjacent highlighting
+// Map to node visual states with annotations
 const nodeVisualStates = computed<Record<string, NodeVisualState>>(() => {
   const states: Record<string, NodeVisualState> = {};
-  const adjacent = adjacentStarIDs.value;
 
   for (const id of Object.keys(galaxy.stars)) {
-    const isAdjacent = adjacent.has(id);
     const isCurrent = id === playerStarID.value;
+    const isPlayerHere = isCurrent && playerDestStarID.value === null;
 
-    let borderColor = "#616161";
-    if (isCurrent) {
-      borderColor = "#4488ff";
-    } else if (isAdjacent) {
-      borderColor = "#88ff88";
+    const annotations: NodeAnnotation[] = [];
+    if (isPlayerHere) {
+      annotations.push({ type: "pulse" });
     }
 
     states[id] = {
       exploration: explorationStore.getExploration(id),
       selected: isCurrent,
       hovered: hoveredNodeID.value === id,
-      borderColor,
+      annotations,
     };
   }
   return states;

@@ -2,18 +2,38 @@
   <g
     class="Starmap_Node"
     :id="node.id"
-    @click="emit('select')"
+    @click="(e) => emit('select', e.shiftKey)"
     @mouseenter="emit('hover', node.id)"
     @mouseleave="emit('hover', null)"
   >
-    <!-- Only show outer ring for special states (adjacent/current) -->
+    <!-- Pulse annotation -->
+    <template v-if="pulseAnnotation">
+      <circle
+        class="Starmap_Node_Pulse"
+        :cx="node.position.x"
+        :cy="node.position.y"
+        r="5"
+        fill="none"
+        :stroke="pulseAnnotation.color ?? '#4488ff'"
+      />
+      <circle
+        class="Starmap_Node_Pulse Starmap_Node_Pulse--delayed"
+        :cx="node.position.x"
+        :cy="node.position.y"
+        r="5"
+        fill="none"
+        :stroke="pulseAnnotation.color ?? '#4488ff'"
+      />
+    </template>
+
+    <!-- Background annotation (outer ring) -->
     <circle
-      v-if="visualState.borderColor && visualState.borderColor !== '#616161'"
+      v-if="backgroundAnnotation"
       class="Starmap_Node_Outer"
       :cx="node.position.x"
       :cy="node.position.y"
       :r="10"
-      :fill="visualState.borderColor"
+      :fill="backgroundAnnotation.color"
       fill-opacity="0.7"
     />
 
@@ -24,7 +44,11 @@
       :cy="node.position.y"
       :r="5"
       fill="black"
-      :stroke="visualState.exploration === 'discovered' ? 'white' : 'none'"
+      :stroke="
+        visualState.exploration === 'discovered'
+          ? 'var(--color-bg-button)'
+          : 'none'
+      "
     />
 
     <!-- Colored star inside (for starExplored or systemExplored) -->
@@ -53,7 +77,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import type { Node, NodeVisualState } from "../types";
+import type { Node, NodeAnnotation, NodeVisualState } from "../types";
 
 const props = defineProps<{
   node: Node;
@@ -61,9 +85,23 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  select: [];
+  select: [shiftKey: boolean];
   hover: [nodeID: string | null];
 }>();
+
+const annotations = computed(() => props.visualState.annotations ?? []);
+
+const backgroundAnnotation = computed(() =>
+  annotations.value.find(
+    (a): a is NodeAnnotation & { type: "background" } => a.type === "background"
+  )
+);
+
+const pulseAnnotation = computed(() =>
+  annotations.value.find(
+    (a): a is NodeAnnotation & { type: "pulse" } => a.type === "pulse"
+  )
+);
 
 const showStar = computed(() => {
   const level = props.visualState.exploration;
@@ -81,5 +119,24 @@ const showStar = computed(() => {
 .Starmap_Node:hover circle.Starmap_Node_Inner {
   stroke: yellow;
   fill: #333;
+}
+
+@keyframes pulse-expand {
+  0% {
+    r: 5;
+    opacity: 0.8;
+  }
+  100% {
+    r: 25;
+    opacity: 0;
+  }
+}
+
+.Starmap_Node_Pulse {
+  animation: pulse-expand 2s ease-out infinite;
+}
+
+.Starmap_Node_Pulse--delayed {
+  animation-delay: 1s;
 }
 </style>
