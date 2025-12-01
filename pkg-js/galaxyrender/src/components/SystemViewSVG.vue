@@ -49,7 +49,7 @@ const MIN_STAR_RADIUS = 8;
 const PERSPECTIVE = 0.35; // vertical squash for 3D perspective
 
 const starRadius = computed(() => {
-  return Math.max(MIN_STAR_RADIUS, props.star.radius * 5);
+  return Math.max(MIN_STAR_RADIUS, props.star.radius * 25);
 });
 
 function orbitRadius(planetIndex: number): number {
