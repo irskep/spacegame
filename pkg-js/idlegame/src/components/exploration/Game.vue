@@ -108,8 +108,17 @@ const nodeVisualStates = computed<Record<string, NodeVisualState>>(() => {
       borderColor = "transparent";
     }
 
+    // Map to exploration level
+    let exploration: "undiscovered" | "discovered" | "systemExplored" =
+      "undiscovered";
+    if (info.explored) {
+      exploration = "systemExplored";
+    } else if (info.known) {
+      exploration = "discovered";
+    }
+
     states[id] = {
-      known: info.known,
+      exploration,
       selected: uiStore.selectedStarID === id,
       hovered: uiStore.hoveredStarID === id,
       borderColor,

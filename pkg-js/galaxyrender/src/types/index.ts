@@ -1,9 +1,11 @@
 import type { Vector2 } from "@spacegame/galaxygen";
+import type { Star } from "stellardream";
 
 export interface Node {
   id: string;
   position: Vector2;
   label?: string;
+  star?: Star;
 }
 
 export interface Edge {
@@ -20,9 +22,15 @@ export interface Traveler {
   progress: number;
 }
 
+export type ExplorationLevel =
+  | "undiscovered"
+  | "discovered"
+  | "starExplored"
+  | "systemExplored";
+
 export interface NodeVisualState {
   selected?: boolean;
   hovered?: boolean;
   borderColor?: string;
-  known?: boolean;
+  exploration?: ExplorationLevel;
 }

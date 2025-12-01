@@ -200,6 +200,7 @@ const nodes = computed<Node[]>(() => {
     id: star.id,
     position: star.point,
     label: starData[star.id]?.name,
+    star: getStarSystem(star.id).stars[0],
   }));
 });
 
@@ -227,8 +228,17 @@ const nodeVisualStates = computed<Record<string, NodeVisualState>>(() => {
       borderColor = "#88ff88";
     }
 
+    // Exploration level: current = systemExplored, adjacent = starExplored, others = discovered
+    let exploration: "discovered" | "starExplored" | "systemExplored" =
+      "discovered";
+    if (isCurrent) {
+      exploration = "systemExplored";
+    } else if (isAdjacent) {
+      exploration = "starExplored";
+    }
+
     states[id] = {
-      known: true,
+      exploration,
       selected: isCurrent,
       hovered: hoveredNodeID.value === id,
       borderColor,

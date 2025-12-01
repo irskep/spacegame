@@ -36,7 +36,7 @@
     <!-- Hovered node label -->
     <text
       class="Starmap_Node_Label"
-      v-if="hoveredNode && hoveredNodeID && getNodeVisualState(hoveredNodeID).known"
+      v-if="hoveredNode && hoveredNodeID && isVisible(hoveredNodeID)"
       :x="Math.max(2, hoveredNode.position.x - 40)"
       :y="Math.max(2, hoveredNode.position.y - 20)"
     >
@@ -100,17 +100,20 @@ const travelerMap = computed<Record<string, Traveler>>(() => {
   return map;
 });
 
-// Filter to only show nodes that are known
+function isVisible(nodeID: string): boolean {
+  const state = props.nodeVisualStates[nodeID];
+  return !!state?.exploration && state.exploration !== "undiscovered";
+}
+
+// Filter to only show nodes that are discovered or better
 const visibleNodes = computed<Node[]>(() => {
-  return props.nodes.filter((n) => props.nodeVisualStates[n.id]?.known);
+  return props.nodes.filter((n) => isVisible(n.id));
 });
 
-// Filter to only show edges where both nodes are known
+// Filter to only show edges where both nodes are visible
 const visibleEdges = computed<Edge[]>(() => {
   return props.edges.filter(
-    (e) =>
-      props.nodeVisualStates[e.fromNodeID]?.known &&
-      props.nodeVisualStates[e.toNodeID]?.known,
+    (e) => isVisible(e.fromNodeID) && isVisible(e.toNodeID),
   );
 });
 
