@@ -15,3 +15,5 @@ Typically, test changes after validate using chrome devtools MCP.
 Ask permission before taking visual snapshots of chrome devtools MCP. Prefer using code-based evaluation over visual evaluation.
 
 Sometimes hot reloading doesn't work. Try reloading as a debugging step.
+
+Read @pkg-js/design-system/src/styles/variables.css

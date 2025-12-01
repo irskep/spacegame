@@ -42,6 +42,9 @@ importers:
       '@spacegame/galaxyrender':
         specifier: workspace:*
         version: link:../galaxyrender
+      pinia:
+        specifier: ^3.0.4
+        version: 3.0.4(typescript@5.9.3)(vue@3.5.25(typescript@5.9.3))
       stellardream:
         specifier: 'catalog:'
         version: 0.1.5

@@ -1,5 +1,7 @@
 <template>
   <div class="App">
+    <ModalContainer />
+
     <div class="HUD">
       <Button :selected="activeView === 'galaxy'" @click="activeView = 'galaxy'">
         Galaxy
@@ -79,10 +81,15 @@ import {
   type Traveler,
   USE_SVG_SYSTEM_VIEW,
 } from "@spacegame/galaxyrender";
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import ModalContainer from "./components/ModalContainer.vue";
 import PlanetList from "./components/PlanetList.vue";
+import { useExplorationStore } from "./stores/explorationStore";
+import { useModalStore } from "./stores/modalStore";
 
 const ActiveSystemView = USE_SVG_SYSTEM_VIEW ? SystemViewSVG : SystemView;
+const modalStore = useModalStore();
+const explorationStore = useExplorationStore();
 
 const TRAVEL_SPEED = 0.5; // progress per second
 
@@ -105,6 +112,15 @@ function reset() {
 const galaxy: Galaxy = generateStars(SEED);
 generateHomeStarSystem(galaxy.homeStarID); // Ensure home star has 4+ planets with habitable zone
 const starData = StarDataSystem.makeData(SEED, galaxy);
+
+// Initialize exploration: all stars discovered, home star system explored
+for (const id of Object.keys(galaxy.stars)) {
+  explorationStore.setExploration(id, "discovered");
+}
+explorationStore.setExploration(galaxy.homeStarID, "systemExplored");
+for (const neighborID of galaxy.getNeighborIDs(galaxy.homeStarID)) {
+  explorationStore.setExploration(neighborID, "starExplored");
+}
 
 // UI state
 const activeView = ref<"galaxy" | "system">("galaxy");
@@ -155,6 +171,17 @@ onUnmounted(() => {
   }
 });
 
+// Update exploration when player arrives at a new star
+watch(playerStarID, (newStarID) => {
+  explorationStore.setExploration(newStarID, "systemExplored");
+  for (const neighborID of galaxy.getNeighborIDs(newStarID)) {
+    // Only upgrade to starExplored if not already systemExplored
+    if (explorationStore.getExploration(neighborID) !== "systemExplored") {
+      explorationStore.setExploration(neighborID, "starExplored");
+    }
+  }
+});
+
 // Computed: adjacent star IDs
 const adjacentStarIDs = computed<Set<string>>(() => {
   return new Set(galaxy.getNeighborIDs(playerStarID.value));
@@ -178,16 +205,10 @@ const playerPosition = computed<Vector2>(() => {
 // Computed: center for PanContainer
 const playerCenter = computed<Vector2>(() => playerPosition.value);
 
-// Handle node selection - navigate if adjacent
+// Handle node selection - open system view modal
 function onSelectNode(nodeID: string) {
-  // Can't navigate while traveling
-  if (playerDestStarID.value) return;
-
-  // Can only navigate to adjacent stars
-  if (!adjacentStarIDs.value.has(nodeID)) return;
-
-  playerDestStarID.value = nodeID;
-  playerProgress.value = 0;
+  const starName = starData[nodeID]?.name ?? "Unknown";
+  modalStore.push({ type: "systemView", starID: nodeID, starName });
 }
 
 function onAddImageSize(url: string, size: Vector2) {
@@ -228,17 +249,8 @@ const nodeVisualStates = computed<Record<string, NodeVisualState>>(() => {
       borderColor = "#88ff88";
     }
 
-    // Exploration level: current = systemExplored, adjacent = starExplored, others = discovered
-    let exploration: "discovered" | "starExplored" | "systemExplored" =
-      "discovered";
-    if (isCurrent) {
-      exploration = "systemExplored";
-    } else if (isAdjacent) {
-      exploration = "starExplored";
-    }
-
     states[id] = {
-      exploration,
+      exploration: explorationStore.getExploration(id),
       selected: isCurrent,
       hovered: hoveredNodeID.value === id,
       borderColor,
