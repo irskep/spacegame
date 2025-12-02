@@ -2,19 +2,10 @@
   <div class="App">
     <ModalContainer />
 
-    <div class="HUD">
-      <Button :selected="activeView === 'galaxy'" @click="activeView = 'galaxy'">
-        Galaxy
-      </Button>
-      <Button :selected="activeView === 'system'" @click="activeView = 'system'">
-        System
-      </Button>
-    </div>
-
-    <Button class="ResetButton" @click="galaxyStore.reset">Reset</Button>
+    <HUD />
 
     <PanContainer
-      v-if="activeView === 'galaxy'"
+      v-if="uiStateStore.activeView === 'galaxy'"
       class="MapContainer"
       :center="playerCenter"
       :contentSize="galaxy.size"
@@ -60,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Panel, PanelGroup } from "@spacegame/design-system";
+import { Panel, PanelGroup } from "@spacegame/design-system";
 import { getStarSystem, lerp, type Vector2 } from "@spacegame/galaxygen";
 import {
   type Edge,
@@ -69,28 +60,28 @@ import {
   type NodeVisualState,
   PanContainer,
   Starmap,
-  SystemView,
   SystemViewSVG,
   type Traveler,
-  USE_SVG_SYSTEM_VIEW,
 } from "@spacegame/galaxyrender";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
-import ModalContainer from "./components/ModalContainer.vue";
-import PlanetList from "./components/PlanetList.vue";
-import { useExplorationStore } from "./stores/explorationStore";
-import { useGalaxyStore } from "./stores/galaxyStore";
-import { useModalStore } from "./stores/modalStore";
-import { usePlayerStore } from "./stores/playerStore";
-import { useTransientStore } from "./stores/transientStore";
+import { computed, ref, watch } from "vue";
+import HUD from "@/components/hud/HUD.vue";
+import ModalContainer from "@/components/ModalContainer.vue";
+import PlanetList from "@/components/PlanetList.vue";
+import { useExplorationStore } from "@/stores/explorationStore";
+import { useGalaxyStore } from "@/stores/galaxyStore";
+import { useModalStore } from "@/stores/modalStore";
+import { usePlayerStore } from "@/stores/playerStore";
+import { useTransientStore } from "@/stores/transientStore";
+import { useUIStateStore } from "@/stores/uiStateStore";
+import useTick from "./useTick";
 
-const ActiveSystemView = USE_SVG_SYSTEM_VIEW ? SystemViewSVG : SystemView;
+const ActiveSystemView = SystemViewSVG;
 const galaxyStore = useGalaxyStore();
 const playerStore = usePlayerStore();
 const transientStore = useTransientStore();
 const modalStore = useModalStore();
 const explorationStore = useExplorationStore();
-
-const TRAVEL_SPEED = 0.5; // progress per second
+const uiStateStore = useUIStateStore();
 
 const { galaxy, starData } = galaxyStore;
 
@@ -104,38 +95,15 @@ for (const neighborID of galaxy.getNeighborIDs(galaxy.homeStarID)) {
 }
 
 // UI state
-const activeView = ref<"galaxy" | "system">("galaxy");
 const imageSizes = ref<Record<string, Vector2>>({});
 
 // Current star system (for System view)
 const currentSystem = computed(() => getStarSystem(playerStore.starID));
 const currentStarName = computed(
-  () => starData[playerStore.starID]?.name ?? "Unknown",
+  () => starData[playerStore.starID]?.name ?? "Unknown"
 );
 
-// Animation
-let animationHandle = 0;
-let lastTime: number | null = null;
-
-function tick(time: number) {
-  if (lastTime !== null) {
-    const dt = (time - lastTime) / 1000;
-    playerStore.tick(dt, TRAVEL_SPEED);
-  }
-
-  lastTime = time;
-  animationHandle = requestAnimationFrame(tick);
-}
-
-onMounted(() => {
-  animationHandle = requestAnimationFrame(tick);
-});
-
-onUnmounted(() => {
-  if (animationHandle) {
-    cancelAnimationFrame(animationHandle);
-  }
-});
+useTick();
 
 // Update exploration when player arrives at a new star
 watch(
@@ -148,7 +116,7 @@ watch(
         explorationStore.setExploration(neighborID, "starExplored");
       }
     }
-  },
+  }
 );
 
 // Computed: adjacent star IDs
@@ -264,28 +232,6 @@ body {
 }
 
 .MapContainer {
-  width: 100%;
-  height: 100%;
-}
-
-.HUD {
-  position: fixed;
-  top: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 1rem;
-  z-index: 10;
-}
-
-.ResetButton {
-  position: fixed;
-  top: 1rem;
-  left: 1rem;
-  z-index: 10;
-}
-
-.SystemView {
   width: 100%;
   height: 100%;
 }
