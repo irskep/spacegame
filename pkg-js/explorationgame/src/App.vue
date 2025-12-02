@@ -14,26 +14,21 @@ import HUD from "@/components/hud/HUD.vue";
 import GalaxyView from "@/components/primaryviews/GalaxyView.vue";
 import SystemPrimaryView from "@/components/primaryviews/SystemPrimaryView.vue";
 import ModalContainer from "@/components/ModalContainer.vue";
-import { useExplorationStore } from "@/stores/explorationStore";
-import { useGalaxyStore } from "@/stores/galaxyStore";
 import { useUIStateStore } from "@/stores/uiStateStore";
 import useTick from "./useTick";
 import useBasicExplorationPolicy from "./useBasicExplorationPolicy";
+import { useExplorationStore } from "./stores/explorationStore";
+import { useGalaxyStore } from "./stores/galaxyStore";
+import { watch } from "vue";
 
 const galaxyStore = useGalaxyStore();
 const explorationStore = useExplorationStore();
 const uiStateStore = useUIStateStore();
 
-const { galaxy } = galaxyStore;
-
-// Initialize exploration: all stars discovered, home star system explored
-for (const id of Object.keys(galaxy.stars)) {
-  explorationStore.setExploration(id, "discovered");
-}
-explorationStore.setExploration(galaxy.homeStarID, "systemExplored");
-for (const neighborID of galaxy.getNeighborIDs(galaxy.homeStarID)) {
-  explorationStore.setExploration(neighborID, "starExplored");
-}
+watch(
+  () => galaxyStore.seed,
+  () => explorationStore.reset()
+);
 
 useTick();
 useBasicExplorationPolicy();
@@ -44,20 +39,19 @@ useBasicExplorationPolicy();
   box-sizing: border-box;
 }
 
+:root {
+  background: black;
+}
+
 body {
   margin: 0;
   padding: 0;
-  background: black;
   overflow: hidden;
 }
 
 .App {
+  position: fixed;
   width: 100vw;
   height: 100vh;
-}
-
-.MapContainer {
-  width: 100%;
-  height: 100%;
 }
 </style>

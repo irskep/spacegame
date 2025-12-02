@@ -51,23 +51,8 @@ const uiStateStore = useUIStateStore();
 
 const { galaxy, starData } = galaxyStore;
 
-// Initialize exploration: all stars discovered, home star system explored
-for (const id of Object.keys(galaxy.stars)) {
-  explorationStore.setExploration(id, "discovered");
-}
-explorationStore.setExploration(galaxy.homeStarID, "systemExplored");
-for (const neighborID of galaxy.getNeighborIDs(galaxy.homeStarID)) {
-  explorationStore.setExploration(neighborID, "starExplored");
-}
-
 // UI state
 const imageSizes = ref<Record<string, Vector2>>({});
-
-// Current star system (for System view)
-const currentSystem = computed(() => getStarSystem(playerStore.starID));
-const currentStarName = computed(
-  () => starData[playerStore.starID]?.name ?? "Unknown"
-);
 
 // Computed: adjacent star IDs
 const adjacentStarIDs = computed<Set<string>>(() => {
@@ -164,4 +149,9 @@ const travelers = computed<Traveler[]>(() => [
 ]);
 </script>
 
-<style></style>
+<style>
+.MapContainer {
+  width: 100%;
+  height: 100%;
+}
+</style>

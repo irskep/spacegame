@@ -19,30 +19,20 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
+
 import { Panel, PanelGroup } from "@spacegame/design-system";
 import PlanetList from "@/components/PlanetList.vue";
 import { SystemViewSVG } from "@spacegame/galaxyrender";
 
 import { getStarSystem } from "@spacegame/galaxygen";
-import { computed } from "vue";
-import { useExplorationStore } from "@/stores/explorationStore";
 import { useGalaxyStore } from "@/stores/galaxyStore";
 import { usePlayerStore } from "@/stores/playerStore";
 
 const galaxyStore = useGalaxyStore();
 const playerStore = usePlayerStore();
-const explorationStore = useExplorationStore();
 
-const { galaxy, starData } = galaxyStore;
-
-// Initialize exploration: all stars discovered, home star system explored
-for (const id of Object.keys(galaxy.stars)) {
-  explorationStore.setExploration(id, "discovered");
-}
-explorationStore.setExploration(galaxy.homeStarID, "systemExplored");
-for (const neighborID of galaxy.getNeighborIDs(galaxy.homeStarID)) {
-  explorationStore.setExploration(neighborID, "starExplored");
-}
+const { starData } = galaxyStore;
 
 // Current star system (for System view)
 const currentSystem = computed(() => getStarSystem(playerStore.starID));
