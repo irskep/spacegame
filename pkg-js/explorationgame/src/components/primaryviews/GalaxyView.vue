@@ -24,23 +24,23 @@
 </template>
 
 <script setup lang="ts">
+import { getStarSystem, lerp, type Vector2 } from "@spacegame/galaxygen";
 import {
-  Node,
-  Edge,
-  NodeAnnotation,
-  NodeVisualState,
+  type Edge,
+  type Node,
+  type NodeAnnotation,
+  type NodeVisualState,
   PanContainer,
   Starmap,
-  Traveler,
+  type Traveler,
 } from "@spacegame/galaxyrender";
+import { computed, ref } from "vue";
 import { useExplorationStore } from "@/stores/explorationStore";
 import { useGalaxyStore } from "@/stores/galaxyStore";
 import { useModalStore } from "@/stores/modalStore";
 import { usePlayerStore } from "@/stores/playerStore";
 import { useTransientStore } from "@/stores/transientStore";
 import { useUIStateStore } from "@/stores/uiStateStore";
-import { computed, ref } from "vue";
-import { getStarSystem, lerp, Vector2 } from "@spacegame/galaxygen";
 
 const galaxyStore = useGalaxyStore();
 const playerStore = usePlayerStore();
@@ -84,8 +84,14 @@ function onSelectNode(nodeID: string, shiftKey: boolean) {
     const starName = starData[nodeID]?.name ?? "Unknown";
     modalStore.push({ type: "systemView", starID: nodeID, starName });
   } else {
-    // Click: navigate if adjacent and not already traveling
-    if (adjacentStarIDs.value.has(nodeID) && !playerStore.isTraveling) {
+    // Click: navigate if adjacent, not traveling, and destination is explored
+    const exploration = explorationStore.getExploration(nodeID);
+    const isExplored = exploration !== "discovered";
+    if (
+      adjacentStarIDs.value.has(nodeID) &&
+      !playerStore.isTraveling &&
+      isExplored
+    ) {
       playerStore.startTravel(nodeID);
     }
   }

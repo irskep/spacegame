@@ -19,13 +19,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
 import { Panel, PanelGroup } from "@spacegame/design-system";
-import PlanetList from "@/components/PlanetList.vue";
-import { SystemViewSVG } from "@spacegame/galaxyrender";
-
 import { getStarSystem } from "@spacegame/galaxygen";
+import { SystemViewSVG } from "@spacegame/galaxyrender";
+import { computed } from "vue";
+import PlanetList from "@/components/PlanetList.vue";
 import { useGalaxyStore } from "@/stores/galaxyStore";
 import { usePlayerStore } from "@/stores/playerStore";
 
@@ -37,7 +35,7 @@ const { starData } = galaxyStore;
 // Current star system (for System view)
 const currentSystem = computed(() => getStarSystem(playerStore.starID));
 const currentStarName = computed(
-  () => starData[playerStore.starID]?.name ?? "Unknown"
+  () => starData[playerStore.starID]?.name ?? "Unknown",
 );
 </script>
 

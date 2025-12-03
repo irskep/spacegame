@@ -8,8 +8,9 @@
 
 <script setup lang="ts">
 import { Button } from "@spacegame/design-system";
-import TopNav from "./TopNav.vue";
 import { useGalaxyStore } from "@/stores/galaxyStore";
+import TopNav from "./TopNav.vue";
+
 const galaxyStore = useGalaxyStore();
 </script>
 

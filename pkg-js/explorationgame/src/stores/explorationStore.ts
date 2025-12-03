@@ -26,7 +26,7 @@ export const useExplorationStore = defineStore("exploration", () => {
     }
     setExploration(galaxyStore.galaxy.homeStarID, "systemExplored");
     for (const neighborID of galaxyStore.galaxy.getNeighborIDs(
-      galaxyStore.galaxy.homeStarID
+      galaxyStore.galaxy.homeStarID,
     )) {
       setExploration(neighborID, "starExplored");
     }

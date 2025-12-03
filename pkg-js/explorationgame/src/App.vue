@@ -6,32 +6,58 @@
 
     <GalaxyView v-if="uiStateStore.activeView === 'galaxy'" />
     <SystemPrimaryView v-if="uiStateStore.activeView === 'system'" />
+    <TechnologiesView v-if="uiStateStore.activeView === 'technologies'" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { watch } from "vue";
 import HUD from "@/components/hud/HUD.vue";
+import ModalContainer from "@/components/ModalContainer.vue";
 import GalaxyView from "@/components/primaryviews/GalaxyView.vue";
 import SystemPrimaryView from "@/components/primaryviews/SystemPrimaryView.vue";
-import ModalContainer from "@/components/ModalContainer.vue";
+import TechnologiesView from "@/components/primaryviews/TechnologiesView.vue";
+import { useEventStore } from "@/stores/eventStore";
+import { useTechStore } from "@/stores/techStore";
 import { useUIStateStore } from "@/stores/uiStateStore";
-import useTick from "./useTick";
-import useBasicExplorationPolicy from "./useBasicExplorationPolicy";
 import { useExplorationStore } from "./stores/explorationStore";
 import { useGalaxyStore } from "./stores/galaxyStore";
-import { watch } from "vue";
+import { usePlayerStore } from "./stores/playerStore";
+import { allTechnologies, registerAllTechEffects } from "./technologies";
+import useTick from "./useTick";
 
 const galaxyStore = useGalaxyStore();
 const explorationStore = useExplorationStore();
 const uiStateStore = useUIStateStore();
+const playerStore = usePlayerStore();
+const eventStore = useEventStore();
+const techStore = useTechStore();
 
+// Register all technology effects
+registerAllTechEffects(eventStore, techStore);
+
+// Auto-unlock all technologies
+for (const tech of allTechnologies) {
+  techStore.unlock(tech.id);
+}
+
+// Reset exploration and tech when galaxy seed changes
 watch(
   () => galaxyStore.seed,
-  () => explorationStore.reset()
+  () => explorationStore.reset(),
+);
+
+// Emit playerArrivedAtStar event when player changes star
+// Also mark the current star as systemExplored (core behavior)
+watch(
+  () => playerStore.starID,
+  (newStarID) => {
+    explorationStore.setExploration(newStarID, "systemExplored");
+    eventStore.emit("playerArrivedAtStar", newStarID);
+  },
 );
 
 useTick();
-useBasicExplorationPolicy();
 </script>
 
 <style>

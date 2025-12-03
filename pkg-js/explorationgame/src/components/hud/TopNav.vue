@@ -12,12 +12,19 @@
     >
       System
     </Button>
+    <Button
+      :selected="uiStateStore.activeView === 'technologies'"
+      @click="uiStateStore.activeView = 'technologies'"
+    >
+      Technologies
+    </Button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Button } from "@spacegame/design-system";
 import { useUIStateStore } from "@/stores/uiStateStore";
+
 const uiStateStore = useUIStateStore();
 </script>
 
